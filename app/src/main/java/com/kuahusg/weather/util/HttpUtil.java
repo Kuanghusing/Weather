@@ -10,12 +10,15 @@ import java.net.URL;
 /**
  * Created by kuahusg on 16-4-27.
  */
-public class HttpUtil  {
+public class HttpUtil {
+
     public static void sendHttpRequest(final String address, final String method, final HttpCallBackListener listener) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 HttpURLConnection connection = null;
+
+
                 try {
                     URL url = new URL(address);
                     connection = (HttpURLConnection) url.openConnection();
@@ -26,7 +29,7 @@ public class HttpUtil  {
                     while ((tmp = bufferedReader.readLine()) != null) {
                         respon.append(tmp);
                     }
-                    LogUtil.v("HttpUtil:respon:",respon.toString());
+                    LogUtil.v("HttpUtil:respon:", respon.toString());
                     if (!TextUtils.isEmpty(respon)) {
                         if (listener != null) {
                             listener.onFinish(respon.toString());
@@ -37,12 +40,17 @@ public class HttpUtil  {
                     if (listener != null) {
                         listener.onError(e);
                     }
-                }finally {
+                } finally {
                     if (connection != null) {
                         connection.disconnect();
                     }
                 }
             }
         }).start();
+
+
     }
+
+
 }
+

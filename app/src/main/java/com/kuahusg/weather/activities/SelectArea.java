@@ -22,6 +22,7 @@ import com.kuahusg.weather.R;
 import com.kuahusg.weather.db.WeatherDB;
 import com.kuahusg.weather.model.City;
 import com.kuahusg.weather.util.LogUtil;
+import com.kuahusg.weather.util.Myapplication;
 import com.kuahusg.weather.util.Utility;
 
 import java.io.UnsupportedEncodingException;
@@ -34,11 +35,11 @@ import java.util.List;
 public class SelectArea extends AppCompatActivity {
     private Button queryButton;
     private EditText editText;
-    private ListView cityListView;
-    private List<String> cityList;
-    private List<City> cityL;
-    private ArrayAdapter<String> adapter;
-    private ProgressDialog progressDialog;
+    private static ListView cityListView;
+    private static List<String> cityList;
+    private static List<City> cityL;
+    private static ArrayAdapter<String> adapter;
+    private static ProgressDialog progressDialog;
     private boolean isFromWeatherActivity;
 
     @Override
@@ -75,27 +76,8 @@ public class SelectArea extends AppCompatActivity {
 
 //                cityList.clear();
                 String city = editText.getText().toString();
-                    Utility.quaryCity(city);
+                Utility.quaryCity(city);
 
-                cityL = Utility.cityList;
-
-//                LogUtil.v(this.toString() + "\tcityL.size()", cityL.size() + "\t");
-                cityList.clear();
-                for (City c :
-                        cityL) {
-                    cityList.add(c.getFullNmae());
-                }
-/*                LogUtil.v(this.getClass().getName() + "\tcityList.size()", +cityList.size() + "\t");
-                LogUtil.v(this.getClass().getName() + "\tcityList(0)", cityList.get(0));*/
-
-                if (cityList.size() > 0) {
-                    adapter.notifyDataSetChanged();
-                    cityListView.setSelection(0);
-
-                } else {
-                    Toast.makeText(SelectArea.this,"it seem no result...try again",Toast.LENGTH_LONG).show();
-                }
-                dismissProgress();
 
             }
         });
@@ -119,13 +101,55 @@ public class SelectArea extends AppCompatActivity {
 
     }
 
+
     public void showProgress() {
-            progressDialog = ProgressDialog.show(SelectArea.this, "loading", null);
+        if (progressDialog == null)
+            progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("loading");
+        progressDialog.setCancelable(true);
+        progressDialog.show();
     }
 
-    public void dismissProgress() {
+    public static void dismissProgress() {
         if (progressDialog.isShowing())
             progressDialog.dismiss();
     }
+
+
+    public static final int PROSSDIALOG_DISSMISS = 1;
+    public static final int RESULT_OK = 2;
+    public static Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case PROSSDIALOG_DISSMISS:
+                    dismissProgress();
+                    break;
+                case RESULT_OK:
+
+                    cityL = Utility.cityList;
+
+//                LogUtil.v(this.toString() + "\tcityL.size()", cityL.size() + "\t");
+                    cityList.clear();
+                    for (City c :
+                            cityL) {
+                        cityList.add(c.getFullNmae());
+                    }
+/*                LogUtil.v(this.getClass().getName() + "\tcityList.size()", +cityList.size() + "\t");
+                LogUtil.v(this.getClass().getName() + "\tcityList(0)", cityList.get(0));*/
+
+                    if (cityList.size() > 0) {
+                        adapter.notifyDataSetChanged();
+                        cityListView.setSelection(0);
+
+                    } else {
+                        Toast.makeText(Myapplication.getContext(), "it seem no result...try again", Toast.LENGTH_LONG).show();
+                    }
+                    break;
+
+            }
+        }
+    };
 
 }

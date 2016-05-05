@@ -1,5 +1,6 @@
 package com.kuahusg.weather.util;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
@@ -8,6 +9,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.kuahusg.weather.activities.SelectArea;
+import com.kuahusg.weather.activities.WeatherActivity;
 import com.kuahusg.weather.db.WeatherDB;
 import com.kuahusg.weather.model.City;
 import com.kuahusg.weather.model.Forecast;
@@ -61,7 +64,8 @@ public class Utility {
         final String new_address = "https://query.yahooapis.com/v1/public/yql?q=" + yql.replaceAll(" ", "%20").replaceAll("\"", "%22");
 //        final String new_address = "https://query.yahooapis.com/v1/public/yql?q=" + URLEncoder.encode(yql, "UTF-8").replaceAll("\\+","%20");
 
-        HttpUtil.sendHttpRequest(new_address, "GET", new HttpCallBackListener() {
+        HttpUtil httpUtil = new HttpUtil();
+        httpUtil.sendHttpRequest(new_address, "GET", new HttpCallBackListener() {
             @Override
             public void onFinish(String respon) {
                 try {
@@ -99,10 +103,7 @@ public class Utility {
                                 city.getWoeid());
                         cityList.add(city);
                         LogUtil.v(this.getClass().getName() + "\tcityList.size()", cityList.size() + "\t");
-                        /*Message m = new Message();
-                        m.what = 1;
-                        m.obj = cityList;
-                        handler.sendMessage(m);*/
+
                         Utility.cityList = cityList;
 //                        Utility.cityList = cityList;
 
@@ -110,9 +111,18 @@ public class Utility {
                     } else {
                         city = null;
                     }
+
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                Message message = new Message();
+                message.what = SelectArea.PROSSDIALOG_DISSMISS;
+                SelectArea.handler.sendMessage(message);
+                Message result = new Message();
+                result.what = SelectArea.RESULT_OK;
+                SelectArea.handler.sendMessage(result);
+
             }
 
             @Override
@@ -124,12 +134,18 @@ public class Utility {
 
             }
         });
+        /*try {
+            new Thread(httpUtil).join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
+
         LogUtil.v("Utility#cityList.size()2", cityList.size() + "\t");
-        try {
+/*        try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
 
         return Utility.cityList;
     }
@@ -141,7 +157,14 @@ public class Utility {
         String address = "https://query.yahooapis.com/v1/public/yql?q="
                 + "select item.forecast.date,item.forecast.low,item.forecast.high,item.forecast.text"
                 + " from weather.forecast where woeid = " + woeid + " and u=\"c\"&format=json";
-        HttpUtil.sendHttpRequest(tempAndPushdate.replaceAll(" ", "%20").replaceAll("\"", "%22"), "GET", new HttpCallBackListener() {
+        final Message message = new Message();
+        message.what = WeatherActivity.PROSSDIALOG_DISSMISS;
+        final Message show_weather = new Message();
+        show_weather.what = WeatherActivity.SHOW_WEATHER;
+        final Message tempAndD = new Message();
+        tempAndD.what = WeatherActivity.SHOW_TEMP_DATE;
+        HttpUtil.sendHttpRequest(tempAndPushdate.replaceAll(" ", "%20").replaceAll("\"", "%22"),
+                "GET", new HttpCallBackListener() {
             @Override
             public void onFinish(String respon) {
                 try {
@@ -155,8 +178,14 @@ public class Utility {
                     WeatherDB.saveTempAndDate(Integer.valueOf(temp), pushDate);
 
 
+                    WeatherActivity.handler.sendMessage(tempAndD);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
+
+
+                    //WeatherActivity.handler.sendMessage(message);
+
 
                 }
 
@@ -166,12 +195,20 @@ public class Utility {
             @Override
             public void onError(Exception e) {
                 e.printStackTrace();
-                LogUtil.d("Utility", "onError2");
+                LogUtil.d("Utility", "onError2" + e);
 /*                Toast.makeText(Myapplication.getContext(), "can not query the temp data from server",
                         Toast.LENGTH_LONG).show();*/
 
+                //WeatherActivity.handler.sendMessage(message);
+
+
             }
         });
+/*        try {
+            new Thread(httpUtil).join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
 
         HttpUtil.sendHttpRequest(address.replaceAll(" ", "%20").replaceAll("\"", "%22"), "GET", new HttpCallBackListener() {
 
@@ -189,14 +226,17 @@ public class Utility {
                         f = new Forecast(forecast.getString("date"), forecast.getString("high"),
                                 forecast.getString("low"), forecast.getString("text"));
                         boolean result = WeatherDB.saveForecast(f);
-                        if (result) {
 
-                        }
 
                     }
+                    LogUtil.v(this.getClass().toString(), "slove weather info finish");
+                    WeatherActivity.handler.sendMessage(show_weather);
+                    WeatherActivity.handler.sendMessage(message);
 
 
                 } catch (JSONException e) {
+
+                    //                   WeatherActivity.handler.sendMessage(message);
 
                     e.printStackTrace();
                 }
@@ -205,17 +245,21 @@ public class Utility {
             @Override
             public void onError(Exception e) {
                 e.printStackTrace();
-                LogUtil.d("Utility", "onError3");
+                LogUtil.d("Utility", "onError3" + e);
 /*                Toast.makeText(Myapplication.getContext(), "can not query weather info from server",
                         Toast.LENGTH_LONG).show();*/
 
+//                WeatherActivity.handler.sendMessage(message);
+
             }
         });
-        try {
+/*        try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
+
+
         return true;
 
     }

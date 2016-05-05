@@ -1,16 +1,21 @@
 package com.kuahusg.weather.activities;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.view.View;
 import android.view.Window;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.kuahusg.weather.R;
 import com.kuahusg.weather.db.WeatherDB;
@@ -20,24 +25,23 @@ import com.kuahusg.weather.util.LogUtil;
 import com.kuahusg.weather.util.Myapplication;
 import com.kuahusg.weather.util.Utility;
 
-import org.w3c.dom.Text;
-
 import java.util.List;
 
 /**
  * Created by kuahusg on 16-4-28.
  */
-public class WeatherActivity extends AppCompatActivity {
-    private TextView title;
-    private TextView data;
-    private TextView temp_now;
-    private TextView temp1;
-    private TextView temp2;
-    private TextView weather_text;
-    private City selectCity;
-    private String tempAndPushDate;
+public class WeatherActivity extends AppCompatActivity implements View.OnClickListener {
+    private static TextView title;
+    private static TextView data;
+    private static TextView temp_now;
+    private static TextView temp1;
+    private static TextView temp2;
+    private static TextView weather_text;
+    private static City selectCity;
+    private static String tempAndPushDate;
     private static List<Forecast> forecastList;
-    private ProgressDialog progressDialog;
+    private RelativeLayout weather_info;
+    public static ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,6 +54,10 @@ public class WeatherActivity extends AppCompatActivity {
         temp1 = (TextView) findViewById(R.id.temp1);
         temp2 = (TextView) findViewById(R.id.temp2);
         weather_text = (TextView) findViewById(R.id.weather_text);
+        weather_info = (RelativeLayout) findViewById(R.id.weather_info);
+
+        title.setOnClickListener(this);
+        weather_info.setOnClickListener(this);
 //        progressDialog = new ProgressDialog(this);
 
         selectCity = (City) getIntent().getSerializableExtra("selectCity");
@@ -76,6 +84,7 @@ public class WeatherActivity extends AppCompatActivity {
             queryWeatherFromServer(selectCity);
         } else {
             showWeather();
+            showTempAndDate();
         }
 
 
@@ -83,64 +92,135 @@ public class WeatherActivity extends AppCompatActivity {
 
     private void queryWeatherFromServer(final City selectCity) {
         showProgress();
-        boolean querySuccessfully = Utility.queryWeather(selectCity.getWoeid());
-        dismissProgress();
-
-        if (querySuccessfully) {
-            forecastList = WeatherDB.loadForecast();
-            tempAndPushDate = WeatherDB.loadTempAndDate();
-            showWeather();
+        Utility.queryWeather(selectCity.getWoeid());
 
 
-        }
+//        ProgressDialog progressDialog = showProgress();
+//        dismissProgress(progressDialog);
 
     }
 
 /*    @Override
     protected void onDestroy() {
         super.onDestroy();
-        finish();
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        onDestroy();
     }*/
 
-    private void showWeather() {
-//        progressDialog = ProgressDialog.show(this, "loading", null,true,true);
+/*    @Override
+    public void onBackPressed() {
+        super.onDestroy();
+//        super.onBackPressed();
+    }*/
+
+    private static void showWeather() {
+//        progressDialog = ProgressDialog.show(this, "loading","title");
 //        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 //        showProgress();
         if (!forecastList.isEmpty()) {
             Forecast forecastToday = forecastList.get(0);
-            String[] t = tempAndPushDate.split("\\|");
-            temp_now.setText(t[0] + "℃");
-            String date = t[1].replace(" CST", "").replaceAll(" \\d{4}", "");
-            data.setText(date);
             temp1.setText(forecastToday.getLow() + "℃");
             temp2.setText(forecastToday.getHigh() + "℃");
             weather_text.setText(forecastToday.getWeatherText());
             title.setText(selectCity.getCity_name());
 
         } else {
-            LogUtil.v(this.getClass().getName(), "no size in forecastList");
+            LogUtil.v(Myapplication.getContext().getClass().getName(), "no size in forecastList");
         }
-        dismissProgress();
+//        dismissProgress();
     }
 
-    private void showProgress() {
+    private static void showTempAndDate() {
+        if (!TextUtils.isEmpty(tempAndPushDate)) {
+
+            String[] t = tempAndPushDate.split("\\|");
+            temp_now.setText(t[0] + "℃");
+            String date = t[1].replace(" CST", "").replaceAll(" \\d{4}", "");
+            data.setText(date);
+        }
+    }
+
+    private ProgressDialog showProgress() {
         if (progressDialog == null) {
-            progressDialog = ProgressDialog.show(this, "loading", null, true, true);
-        }
 
+            progressDialog = new ProgressDialog(WeatherActivity.this);
+        }
+        progressDialog.setMessage("loading");
+        progressDialog.setTitle("title");
         progressDialog.show();
+
+
+//        progressDialog.show();
+        return progressDialog;
     }
 
-    private void dismissProgress() {
+    private static void dismissProgress() {
         if (progressDialog != null && progressDialog.isShowing()) {
 
             progressDialog.dismiss();
         }
     }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.title:
+                alertDialog("?", "switch the city?", "NO!!", "Yes~", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(WeatherActivity.this, SelectArea.class);
+                        intent.putExtra("isFromWeatherActivity", true);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+                break;
+            case R.id.weather_info:
+                alertDialog("Sure?", "refesh the weather info?", "NO!NO!NO!", "Sure!", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        showProgress();
+                        queryWeatherFromServer(selectCity);
+                    }
+                });
+                break;
+        }
+    }
+
+    private void alertDialog(String title, String message, String negativeString, String positiveString, DialogInterface.OnClickListener listener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(title)
+                .setMessage(message)
+                .setNegativeButton(negativeString, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .setPositiveButton(positiveString, listener)
+                .show();
+
+
+    }
+
+    public static final int SHOW_WEATHER = 2;
+    public static final int PROSSDIALOG_DISSMISS = 1;
+    public static final int SHOW_TEMP_DATE = 3;
+    public static Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case PROSSDIALOG_DISSMISS:
+                    dismissProgress();
+                    break;
+                case SHOW_WEATHER:
+                    forecastList = WeatherDB.loadForecast();
+                    showWeather();
+                    break;
+                case SHOW_TEMP_DATE:
+                    showTempAndDate();
+                    break;
+
+            }
+        }
+    };
 }
