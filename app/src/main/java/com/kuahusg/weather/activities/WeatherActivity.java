@@ -1,6 +1,7 @@
 package com.kuahusg.weather.activities;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -32,7 +33,7 @@ import java.util.List;
  */
 public class WeatherActivity extends AppCompatActivity implements View.OnClickListener {
     private static TextView title;
-    private static TextView data;
+    private static TextView date;
     private static TextView temp_now;
     private static TextView temp1;
     private static TextView temp2;
@@ -40,27 +41,34 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     private static City selectCity;
     private static String tempAndPushDate;
     private static List<Forecast> forecastList;
-    private RelativeLayout weather_info;
+    private static RelativeLayout weather_info;
     public static ProgressDialog progressDialog;
+    public static Context mcontext;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.weather_layout);
+        mcontext = getApplicationContext();
         title = (TextView) findViewById(R.id.title);
-        data = (TextView) findViewById(R.id.public_data);
+        date = (TextView) findViewById(R.id.public_data);
         temp_now = (TextView) findViewById(R.id.temp_now);
         temp1 = (TextView) findViewById(R.id.temp1);
         temp2 = (TextView) findViewById(R.id.temp2);
         weather_text = (TextView) findViewById(R.id.weather_text);
         weather_info = (RelativeLayout) findViewById(R.id.weather_info);
 
+        title.setText("loading");
+        date.setVisibility(View.INVISIBLE);
+        weather_info.setVisibility(View.INVISIBLE);
+
         title.setOnClickListener(this);
         weather_info.setOnClickListener(this);
 //        progressDialog = new ProgressDialog(this);
 
         selectCity = (City) getIntent().getSerializableExtra("selectCity");
+        boolean anotherCity = getIntent().getBooleanExtra("anotherCity", false);
         if (selectCity != null) {
             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
             editor.putString("selectCity", selectCity.getFullNmae());
@@ -78,6 +86,9 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
             City city = new City(city_name, woeid, fullName);
             selectCity = city;
         }
+        if (anotherCity) {
+            queryWeatherFromServer(selectCity);
+        }
         tempAndPushDate = WeatherDB.loadTempAndDate();
         forecastList = WeatherDB.loadForecast();
         if (forecastList.size() <= 0 || TextUtils.isEmpty(tempAndPushDate)) {
@@ -91,7 +102,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void queryWeatherFromServer(final City selectCity) {
-        showProgress();
+//        showProgress();
         Utility.queryWeather(selectCity.getWoeid());
 
 
@@ -122,6 +133,9 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
             weather_text.setText(forecastToday.getWeatherText());
             title.setText(selectCity.getCity_name());
 
+            date.setVisibility(View.VISIBLE);
+            weather_info.setVisibility(View.VISIBLE);
+
         } else {
             LogUtil.v(Myapplication.getContext().getClass().getName(), "no size in forecastList");
         }
@@ -134,14 +148,14 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
             String[] t = tempAndPushDate.split("\\|");
             temp_now.setText(t[0] + "℃");
             String date = t[1].replace(" CST", "").replaceAll(" \\d{4}", "");
-            data.setText(date);
+            WeatherActivity.date.setText(date);
         }
     }
 
     private ProgressDialog showProgress() {
         if (progressDialog == null) {
 
-            progressDialog = new ProgressDialog(WeatherActivity.this);
+            progressDialog = new ProgressDialog(this);
         }
         progressDialog.setMessage("loading");
         progressDialog.setTitle("title");
@@ -179,6 +193,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
                     public void onClick(DialogInterface dialog, int which) {
                         showProgress();
                         queryWeatherFromServer(selectCity);
+                        title.setText("loading");
                     }
                 });
                 break;
@@ -217,6 +232,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
                     showWeather();
                     break;
                 case SHOW_TEMP_DATE:
+                    tempAndPushDate = WeatherDB.loadTempAndDate();
                     showTempAndDate();
                     break;
 

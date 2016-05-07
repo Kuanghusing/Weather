@@ -1,20 +1,20 @@
 package com.kuahusg.weather.activities;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -25,7 +25,6 @@ import com.kuahusg.weather.util.LogUtil;
 import com.kuahusg.weather.util.Myapplication;
 import com.kuahusg.weather.util.Utility;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,26 +33,32 @@ import java.util.List;
  */
 public class SelectArea extends AppCompatActivity {
     private Button queryButton;
-    private EditText editText;
+    private AutoCompleteTextView editText;
     private static ListView cityListView;
     private static List<String> cityList;
     private static List<City> cityL;
     private static ArrayAdapter<String> adapter;
     private static ProgressDialog progressDialog;
     private boolean isFromWeatherActivity;
+    private static List<String> cityListFromDataBase = new ArrayList<>();
+    public static ArrayAdapter<String> arrayAdapter;
+
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.select_layout);
+
         queryButton = (Button) findViewById(R.id.query_button);
-
-        editText = (EditText) findViewById(R.id.city_editText);
-        cityListView = (ListView) findViewById(R.id.city_list);
+        editText = (AutoCompleteTextView) findViewById(R.id.city_editText);
         cityList = new ArrayList<>();
-
-        adapter = new ArrayAdapter<>(SelectArea.this, android.R.layout.simple_list_item_1, cityList);
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, cityList);
+        cityListView = (ListView) findViewById(R.id.city_list);
         cityListView.setAdapter(adapter);
+
+
+        arrayAdapter = new ArrayAdapter<String>(SelectArea.this, android.R.layout.simple_list_item_1, cityListFromDataBase);
+        editText.setAdapter(arrayAdapter);
 
         WeatherDB db = WeatherDB.getInstance(this);
 
@@ -61,10 +66,31 @@ public class SelectArea extends AppCompatActivity {
         isFromWeatherActivity = getIntent().getBooleanExtra("isFromWeatherActivity", false);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String selectCity = sharedPreferences.getString("selectCity", "");
+        String hasLoadCity = sharedPreferences.getString("hasLoadCity", "");
         if (!isFromWeatherActivity && !TextUtils.isEmpty(selectCity)) {
             Intent intent = new Intent(SelectArea.this, WeatherActivity.class);
             startActivity(intent);
             finish();
+        }
+
+        if (TextUtils.isEmpty(hasLoadCity)) {
+            showProgress();
+            Utility.handleCityList();
+            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+            editor.putString("hasLoadCity", "OK");
+            editor.apply();
+
+        } else {
+            List<String> loadCity = WeatherDB.loadCity();
+            cityListFromDataBase.addAll(loadCity);
+//            cityListFromDataBase = cityListFromDataBase.subList(0, 10);
+/*            test[0]  = "hhh";
+            test[1] = "what";
+            test[2] = "the";*/
+
+//            LogUtil.v("zzzz",cityListFromDataBase.toString());
+            arrayAdapter.notifyDataSetChanged();
+//            LogUtil.v(this.getClass().toString(), "cityListFrom..size()" + cityListFromDataBase.size());
         }
         queryButton.setOnClickListener(new View.OnClickListener() {
 
@@ -90,6 +116,8 @@ public class SelectArea extends AppCompatActivity {
                 City city = cityL.get(position);
                 if (city != null) {
                     intent.putExtra("selectCity", city);
+                    if (isFromWeatherActivity)
+                        intent.putExtra("anotherCity", true);
                     startActivity(intent);
                     finish();
 
@@ -118,6 +146,7 @@ public class SelectArea extends AppCompatActivity {
 
     public static final int PROSSDIALOG_DISSMISS = 1;
     public static final int RESULT_OK = 2;
+    public static final int UPDATE_CITY_LIST = 3;
     public static Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -144,9 +173,11 @@ public class SelectArea extends AppCompatActivity {
                         cityListView.setSelection(0);
 
                     } else {
-                        Toast.makeText(Myapplication.getContext(), "it seem no result...try again", Toast.LENGTH_LONG).show();
+//                        Toast.makeText(, "it seem no result...try again", Toast.LENGTH_LONG).show();
                     }
                     break;
+                case UPDATE_CITY_LIST:
+                    arrayAdapter.notifyDataSetChanged();
 
             }
         }

@@ -22,11 +22,12 @@
                 android:layout_width="250dp"
                 android:layout_height="wrap_content">
 
-                <EditText
+                <AutoCompleteTextView
                     android:id="@+id/city_editText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="search the city name"
+                    android:completionThreshold="1"
                     android:paddingRight="20dp" />
             </android.support.design.widget.TextInputLayout>
 

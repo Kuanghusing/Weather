@@ -32,6 +32,9 @@ public class WeatherOpenHelper extends SQLiteOpenHelper {
     public static final String CREATE_TEMP_AND_PUSHDATE = "create table temp("
             + "temp int,"
             + "date text)";
+    public static final String CREATE_CITY = "create table city("
+            + "id integer primary key autoincrement,"
+            + "city_name text)";
     public WeatherOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
     }
@@ -48,5 +51,6 @@ public class WeatherOpenHelper extends SQLiteOpenHelper {
 //        db.execSQL(CREATE_COUNTRY);
         db.execSQL(CREATE_WEATHER);
         db.execSQL(CREATE_TEMP_AND_PUSHDATE);
+        db.execSQL(CREATE_CITY);
     }
 }

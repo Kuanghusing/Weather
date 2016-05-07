@@ -3,14 +3,19 @@ package com.kuahusg.weather.db;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 
+import com.kuahusg.weather.activities.SelectArea;
 import com.kuahusg.weather.model.City;
 import com.kuahusg.weather.model.Country;
 import com.kuahusg.weather.model.Forecast;
 import com.kuahusg.weather.model.Province;
 import com.kuahusg.weather.util.LogUtil;
+import com.kuahusg.weather.util.Myapplication;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,36 +69,38 @@ public class WeatherDB {
         return provinceList;
     }*/
 
-/*    public static void saveCity(City city) {
-        if (city != null) {
+    public static void saveCity(String city_name) {
+        if (!TextUtils.isEmpty(city_name)) {
             ContentValues contentValues = new ContentValues();
-            contentValues.put("city_name", city.getCity_name());
-            contentValues.put("city_code", city.getCity_code());
-            contentValues.put("province_id", city.getId());
+            contentValues.put("city_name", city_name);
 
-            db.insert("City", null, contentValues);
+            db.insert("city", null, contentValues);
 
         }
 
     }
 
-    public synchronized static List<City> loadCity() {
-        List<City> cityList = new ArrayList<>();
+    public synchronized static List<String> loadCity() {
+
+        List<String> cityList = new ArrayList<>();
         City city;
         Cursor cursor = db.query("City", null, null, null, null, null, null);
         if (cursor.moveToFirst()) {
             while (cursor.moveToNext()) {
-                city = new City();
-                city.setId(cursor.getInt(cursor.getColumnIndex("city_id")));
-                city.setCity_name(cursor.getString(cursor.getColumnIndex("city_name")));
-                city.setCity_code(cursor.getString(cursor.getColumnIndex("city_code")));
-                cityList.add(city);
+                String city_name = cursor.getString(cursor.getColumnIndex("city_name"));
+                String short_name = city_name.split(" ")[2];
+                cityList.add(short_name);
+
             }
         }
         cursor.close();
+        LogUtil.v("WeatherDB","loadCity finish!" + cityList.size());
+
         return cityList;
 
-    }*/
+    }
+
+
 
     /*public static void saveCountry(Country country) {
 
@@ -128,7 +135,7 @@ public class WeatherDB {
     }*/
 
     public static boolean saveForecast(Forecast forecast) {
-        deleteTable("Forecast");
+//        deleteTable("Forecast");
         boolean flag = false;
         if (forecast != null) {
             ContentValues contentValues = new ContentValues();
@@ -163,18 +170,19 @@ public class WeatherDB {
     }
 
     public static boolean saveTempAndDate(int temp, String pushDate) {
-        deleteTable("temp");
+//        deleteTable("temp");
         boolean flag = false;
         ContentValues contentValues = new ContentValues();
-        if ( !TextUtils.isEmpty(pushDate)) {
+        if (!TextUtils.isEmpty(pushDate)) {
             contentValues.put("temp", temp);
-            contentValues.put("date",pushDate);
+            contentValues.put("date", pushDate);
             db.insert("temp", null, contentValues);
             flag = true;
         }
 
         return flag;
     }
+
     public static String loadTempAndDate() {
         StringBuffer tempAndDate = new StringBuffer();
         Cursor cursor = db.query("temp", null, null, null, null, null, null);
@@ -186,13 +194,17 @@ public class WeatherDB {
 
             } while (cursor.moveToNext());
         }
-        LogUtil.v("WeatherDB",tempAndDate.toString());
+        LogUtil.v("WeatherDB", tempAndDate.toString());
         cursor.close();
         return tempAndDate.toString();
     }
 
     public static boolean deleteTable(String table) {
-        db.execSQL("delete from " + table);
+        try {
+            db.execSQL("delete from " + table);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return true;
     }
 

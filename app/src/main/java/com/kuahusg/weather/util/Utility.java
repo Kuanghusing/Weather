@@ -1,13 +1,7 @@
 package com.kuahusg.weather.util;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
-import android.database.sqlite.SQLiteDatabase;
-import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.kuahusg.weather.activities.SelectArea;
 import com.kuahusg.weather.activities.WeatherActivity;
@@ -19,8 +13,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -157,6 +149,8 @@ public class Utility {
         String address = "https://query.yahooapis.com/v1/public/yql?q="
                 + "select item.forecast.date,item.forecast.low,item.forecast.high,item.forecast.text"
                 + " from weather.forecast where woeid = " + woeid + " and u=\"c\"&format=json";
+        WeatherDB.deleteTable("temp");
+        WeatherDB.deleteTable("Forecast");
         final Message message = new Message();
         message.what = WeatherActivity.PROSSDIALOG_DISSMISS;
         final Message show_weather = new Message();
@@ -165,45 +159,45 @@ public class Utility {
         tempAndD.what = WeatherActivity.SHOW_TEMP_DATE;
         HttpUtil.sendHttpRequest(tempAndPushdate.replaceAll(" ", "%20").replaceAll("\"", "%22"),
                 "GET", new HttpCallBackListener() {
-            @Override
-            public void onFinish(String respon) {
-                try {
-                    JSONObject jsonObject = new JSONObject(respon);
-                    JSONObject condition = getJsonObject(jsonObject, "query", "results", "channel",
-                            "item", "condition");
-                    String pushDate = condition.getString("date");
-                    String temp = condition.getString("temp");
+                    @Override
+                    public void onFinish(String respon) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(respon);
+                            JSONObject condition = getJsonObject(jsonObject, "query", "results", "channel",
+                                    "item", "condition");
+                            String pushDate = condition.getString("date");
+                            String temp = condition.getString("temp");
 
 
-                    WeatherDB.saveTempAndDate(Integer.valueOf(temp), pushDate);
+                            WeatherDB.saveTempAndDate(Integer.valueOf(temp), pushDate);
 
 
-                    WeatherActivity.handler.sendMessage(tempAndD);
+                            WeatherActivity.handler.sendMessage(tempAndD);
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
-
-
-                    //WeatherActivity.handler.sendMessage(message);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
 
 
-                }
+                            //WeatherActivity.handler.sendMessage(message);
 
 
-            }
+                        }
 
-            @Override
-            public void onError(Exception e) {
-                e.printStackTrace();
-                LogUtil.d("Utility", "onError2" + e);
+
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        e.printStackTrace();
+                        LogUtil.d("Utility", "onError2" + e);
 /*                Toast.makeText(Myapplication.getContext(), "can not query the temp data from server",
                         Toast.LENGTH_LONG).show();*/
 
-                //WeatherActivity.handler.sendMessage(message);
+                        //WeatherActivity.handler.sendMessage(message);
 
 
-            }
-        });
+                    }
+                });
 /*        try {
             new Thread(httpUtil).join();
         } catch (InterruptedException e) {
@@ -262,6 +256,53 @@ public class Utility {
 
         return true;
 
+    }
+
+    public static void handleCityList() {
+        String address = "https://raw.githubusercontent.com/Kuanghusing/City_list/master/city-list";
+
+
+        HttpUtil.sendHttpRequest(address, "GET", new HttpCallBackListener() {
+            @Override
+            public void onFinish(String respon) {
+                try {
+                    JSONArray allCityList = new JSONArray(respon);
+                    StringBuffer stringInfo = new StringBuffer();
+
+                    for (int i = 0; i < allCityList.length(); i++) {
+                        JSONObject cityInfo = allCityList.getJSONObject(i);
+                        String name = cityInfo.getString("name");
+                        String parent1 = cityInfo.getString("parent1");
+                        String parent2 = cityInfo.getString("parent2");
+                        String parent3 = cityInfo.getString("parent3");
+                        if (!(parent3.equals("直辖市") || parent2.equals(parent3))) {
+                            stringInfo.append(parent3).append(" " + parent2).append(" " + parent1).append(name);
+
+                        } else {
+                            stringInfo.append(parent2).append(" " + parent1).append(name);
+                        }
+                        WeatherDB.saveCity(stringInfo.toString());
+                        stringInfo.setLength(0);
+                    }
+
+
+                    Message message = new Message();
+                    message.what = SelectArea.PROSSDIALOG_DISSMISS;
+                    SelectArea.handler.sendMessage(message);
+
+
+                } catch (JSONException e) {
+
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(Exception e) {
+                e.printStackTrace();
+
+            }
+        });
     }
 
     public static JSONObject getJsonObject(JSONObject fromJsonObject, String... strings) {
