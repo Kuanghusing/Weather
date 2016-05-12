@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">Weather</string>
+    <string name="search_hint">输入城市名称</string>
+    <string name="query_bottom">查询</string>
+    <string name="loading">加载中</string>
+    <string name="no_result">好像没有结果……</string>
+    <string name="switch_city">切换城市？</string>
+    <string name="yes">是</string>
+    <string name="no">表</string>
+    <string name="sure">确定？</string>
+    <string name="refresh">刷新天气信息？</string>
+
 </resources>

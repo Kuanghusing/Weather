@@ -22,8 +22,8 @@ import com.kuahusg.weather.R;
 import com.kuahusg.weather.db.WeatherDB;
 import com.kuahusg.weather.model.City;
 import com.kuahusg.weather.model.Forecast;
+import com.kuahusg.weather.service.AutoUpdateService;
 import com.kuahusg.weather.util.LogUtil;
-import com.kuahusg.weather.util.Myapplication;
 import com.kuahusg.weather.util.Utility;
 
 import java.util.List;
@@ -59,7 +59,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         weather_text = (TextView) findViewById(R.id.weather_text);
         weather_info = (RelativeLayout) findViewById(R.id.weather_info);
 
-        title.setText("loading");
+        title.setText(R.string.loading);
         date.setVisibility(View.INVISIBLE);
         weather_info.setVisibility(View.INVISIBLE);
 
@@ -102,30 +102,12 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void queryWeatherFromServer(final City selectCity) {
-//        showProgress();
-        Utility.queryWeather(selectCity.getWoeid());
-
-
-//        ProgressDialog progressDialog = showProgress();
-//        dismissProgress(progressDialog);
+        Utility.queryWeather(selectCity.getWoeid(), mcontext, false);
 
     }
 
-/*    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }*/
-
-/*    @Override
-    public void onBackPressed() {
-        super.onDestroy();
-//        super.onBackPressed();
-    }*/
 
     private static void showWeather() {
-//        progressDialog = ProgressDialog.show(this, "loading","title");
-//        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-//        showProgress();
         if (!forecastList.isEmpty()) {
             Forecast forecastToday = forecastList.get(0);
             temp1.setText(forecastToday.getLow() + "℃");
@@ -136,8 +118,11 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
             date.setVisibility(View.VISIBLE);
             weather_info.setVisibility(View.VISIBLE);
 
+            Intent intent = new Intent(mcontext, AutoUpdateService.class);
+            mcontext.startService(intent);
+
         } else {
-            LogUtil.v(Myapplication.getContext().getClass().getName(), "no size in forecastList");
+            LogUtil.v(mcontext.toString(), "no size in forecastList");
         }
 //        dismissProgress();
     }
@@ -152,21 +137,26 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-    private ProgressDialog showProgress() {
-        if (progressDialog == null) {
 
-            progressDialog = new ProgressDialog(this);
+    private ProgressDialog showProgress() {
+        if (!this.isFinishing()) {
+            if (progressDialog == null) {
+
+                progressDialog = new ProgressDialog(WeatherActivity.this);
+
+            }
+            LogUtil.v(this.toString(), WeatherActivity.this.toString());
+            progressDialog.setMessage(getString(R.string.loading));
+            progressDialog.setTitle("");
+            progressDialog.show();
         }
-        progressDialog.setMessage("loading");
-        progressDialog.setTitle("title");
-        progressDialog.show();
 
 
 //        progressDialog.show();
         return progressDialog;
     }
 
-    private static void dismissProgress() {
+    public static void dismissProgress() {
         if (progressDialog != null && progressDialog.isShowing()) {
 
             progressDialog.dismiss();
@@ -177,23 +167,24 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.title:
-                alertDialog("?", "switch the city?", "NO!!", "Yes~", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(WeatherActivity.this, SelectArea.class);
-                        intent.putExtra("isFromWeatherActivity", true);
-                        startActivity(intent);
-                        finish();
-                    }
-                });
+                alertDialog(this.getString(R.string.sure), this.getString(R.string.switch_city),
+                        this.getString(R.string.no), this.getString(R.string.yes), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(WeatherActivity.this, SelectArea.class);
+                                intent.putExtra("isFromWeatherActivity", true);
+                                startActivity(intent);
+                                finish();
+                            }
+                        });
                 break;
             case R.id.weather_info:
-                alertDialog("Sure?", "refesh the weather info?", "NO!NO!NO!", "Sure!", new DialogInterface.OnClickListener() {
+                alertDialog(this.getString(R.string.sure), this.getString(R.string.refresh), this.getString(R.string.no), this.getString(R.string.yes), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         showProgress();
                         queryWeatherFromServer(selectCity);
-                        title.setText("loading");
+                        title.setText(R.string.loading);
                     }
                 });
                 break;
@@ -239,4 +230,36 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
             }
         }
     };
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        LogUtil.v(this.toString(), "onStart()");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LogUtil.v(this.toString(), "onResume()");
+        LogUtil.v(this.toString() + "\tisFinishing?", this.isFinishing() + "");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LogUtil.v(this.toString(), "onPause()");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        LogUtil.v(this.toString(), "onStop()");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        dismissProgress();
+        LogUtil.v(this.toString(), "OnDestroy()");
+    }
 }

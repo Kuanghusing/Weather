@@ -16,13 +16,11 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.kuahusg.weather.R;
 import com.kuahusg.weather.db.WeatherDB;
 import com.kuahusg.weather.model.City;
 import com.kuahusg.weather.util.LogUtil;
-import com.kuahusg.weather.util.Myapplication;
 import com.kuahusg.weather.util.Utility;
 
 import java.util.ArrayList;
@@ -42,6 +40,8 @@ public class SelectArea extends AppCompatActivity {
     private boolean isFromWeatherActivity;
     private static List<String> cityListFromDataBase = new ArrayList<>();
     public static ArrayAdapter<String> arrayAdapter;
+    private WeatherDB db;
+    private static Context mContext;
 
 
     @Override
@@ -55,14 +55,19 @@ public class SelectArea extends AppCompatActivity {
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, cityList);
         cityListView = (ListView) findViewById(R.id.city_list);
         cityListView.setAdapter(adapter);
+        mContext = getApplicationContext();
 
 
         arrayAdapter = new ArrayAdapter<String>(SelectArea.this, android.R.layout.simple_list_item_1, cityListFromDataBase);
         editText.setAdapter(arrayAdapter);
 
-        WeatherDB db = WeatherDB.getInstance(this);
+        db = WeatherDB.getInstance(this);
 
-//        progressDialog = new ProgressDialog(this);
+
+        /*
+        * from WeatherActivity? go to WeatherAcitvity directly
+         */
+
         isFromWeatherActivity = getIntent().getBooleanExtra("isFromWeatherActivity", false);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String selectCity = sharedPreferences.getString("selectCity", "");
@@ -73,36 +78,33 @@ public class SelectArea extends AppCompatActivity {
             finish();
         }
 
-        if (TextUtils.isEmpty(hasLoadCity)) {
-            showProgress();
+        /*
+        * load the all the cities list from server
+         */
+
+        List<String> loadCity = WeatherDB.loadCity();
+
+        if (TextUtils.isEmpty(hasLoadCity) || loadCity.size() <= 0) {
+            showProgress(false);
             Utility.handleCityList();
-            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-            editor.putString("hasLoadCity", "OK");
-            editor.apply();
 
         } else {
-            List<String> loadCity = WeatherDB.loadCity();
-            cityListFromDataBase.addAll(loadCity);
-//            cityListFromDataBase = cityListFromDataBase.subList(0, 10);
-/*            test[0]  = "hhh";
-            test[1] = "what";
-            test[2] = "the";*/
+            hasLoadCityList(loadCity);
 
-//            LogUtil.v("zzzz",cityListFromDataBase.toString());
-            arrayAdapter.notifyDataSetChanged();
-//            LogUtil.v(this.getClass().toString(), "cityListFrom..size()" + cityListFromDataBase.size());
         }
+
+
         queryButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
 
 
             public void onClick(View v) {
-                showProgress();
+                showProgress(true);
 
 //                cityList.clear();
                 String city = editText.getText().toString();
-                Utility.quaryCity(city);
+                Utility.quaryCity(city, mContext);
 
 
             }
@@ -119,7 +121,7 @@ public class SelectArea extends AppCompatActivity {
                     if (isFromWeatherActivity)
                         intent.putExtra("anotherCity", true);
                     startActivity(intent);
-                    finish();
+//                    finish();
 
                 }
 
@@ -129,13 +131,25 @@ public class SelectArea extends AppCompatActivity {
 
     }
 
+    public static void hasLoadCityList(List<String> loadCity) {
 
-    public void showProgress() {
-        if (progressDialog == null)
-            progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("loading");
-        progressDialog.setCancelable(true);
-        progressDialog.show();
+        cityListFromDataBase.clear();
+        cityListFromDataBase.addAll(loadCity);
+
+
+        arrayAdapter.notifyDataSetChanged();
+        LogUtil.v(mContext.getClass().toString(), "cityListFrom..size()" + cityListFromDataBase.size());
+    }
+
+
+    public void showProgress(boolean cancelable) {
+        if (!isFinishing()) {
+            if (progressDialog == null)
+                progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage("loading");
+            progressDialog.setCancelable(cancelable);
+            progressDialog.show();
+        }
     }
 
     public static void dismissProgress() {
@@ -157,27 +171,29 @@ public class SelectArea extends AppCompatActivity {
                     break;
                 case RESULT_OK:
 
-                    cityL = Utility.cityList;
+                    cityL = (List<City>) msg.obj;
 
-//                LogUtil.v(this.toString() + "\tcityL.size()", cityL.size() + "\t");
-                    cityList.clear();
+                    SelectArea.cityList.clear();
                     for (City c :
                             cityL) {
-                        cityList.add(c.getFullNmae());
+                        SelectArea.cityList.add(c.getFullNmae());
                     }
 /*                LogUtil.v(this.getClass().getName() + "\tcityList.size()", +cityList.size() + "\t");
                 LogUtil.v(this.getClass().getName() + "\tcityList(0)", cityList.get(0));*/
 
-                    if (cityList.size() > 0) {
+                    if (SelectArea.cityList.size() > 0) {
                         adapter.notifyDataSetChanged();
                         cityListView.setSelection(0);
 
-                    } else {
-//                        Toast.makeText(, "it seem no result...try again", Toast.LENGTH_LONG).show();
                     }
                     break;
                 case UPDATE_CITY_LIST:
-                    arrayAdapter.notifyDataSetChanged();
+
+                    List<String> loadCity = WeatherDB.loadCity();
+                    SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
+                    editor.putString("hasLoadCity", "OK");
+                    editor.apply();
+                    hasLoadCityList(loadCity);
 
             }
         }

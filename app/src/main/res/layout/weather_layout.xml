@@ -28,6 +28,7 @@
             android:id="@+id/public_data"
             android:layout_alignParentEnd="true"
             android:textSize="20sp"
+            android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:paddingTop="20dp"
             android:textColor="#484E61"/>

@@ -5,17 +5,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Handler;
-import android.os.Message;
 import android.text.TextUtils;
 
-import com.kuahusg.weather.activities.SelectArea;
 import com.kuahusg.weather.model.City;
-import com.kuahusg.weather.model.Country;
 import com.kuahusg.weather.model.Forecast;
-import com.kuahusg.weather.model.Province;
 import com.kuahusg.weather.util.LogUtil;
-import com.kuahusg.weather.util.Myapplication;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,15 +63,28 @@ public class WeatherDB {
         return provinceList;
     }*/
 
-    public static void saveCity(String city_name) {
-        if (!TextUtils.isEmpty(city_name)) {
-            ContentValues contentValues = new ContentValues();
-            contentValues.put("city_name", city_name);
+    public static void saveCity(List<String> cityList) {
+        try {
 
-            db.insert("city", null, contentValues);
 
+            if (cityList.size() > 0) {
+                db.beginTransaction();
+                ContentValues contentValues = new ContentValues();
+                for (String city :
+                        cityList) {
+
+                    contentValues.put("city_name", city);
+                    db.insert("city", null, contentValues);
+                }
+                db.setTransactionSuccessful();
+
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
         }
-
     }
 
     public synchronized static List<String> loadCity() {
@@ -88,51 +95,17 @@ public class WeatherDB {
         if (cursor.moveToFirst()) {
             while (cursor.moveToNext()) {
                 String city_name = cursor.getString(cursor.getColumnIndex("city_name"));
-                String short_name = city_name.split(" ")[2];
-                cityList.add(short_name);
+                cityList.add(city_name);
 
             }
         }
         cursor.close();
-        LogUtil.v("WeatherDB","loadCity finish!" + cityList.size());
+        LogUtil.v("WeatherDB", "loadCity finish!" + cityList.size());
 
         return cityList;
 
     }
 
-
-
-    /*public static void saveCountry(Country country) {
-
-        if (country != null) {
-            ContentValues contentValues = new ContentValues();
-            contentValues.put("country_name", country.getCountry_name());
-            contentValues.put("country_code", country.getCountry_code());
-            contentValues.put("city_id", country.getCity_id());
-            db.insert("Country", null, contentValues);
-
-        }
-    }
-
-    public synchronized static List<Country> loadCountry(int cityId) {
-        List<Country> countryList = new ArrayList<>();
-        Cursor cursor = db.query("Country", null, "where city_id = ?", new String[]
-                {String.valueOf(cityId)}, null, null, null);
-        Country country;
-        if (cursor.moveToFirst()) {
-            while (cursor.moveToNext()) {
-                country = new Country();
-                country.setId(cursor.getInt(cursor.getColumnIndex("id")));
-                country.setCountry_name(cursor.getString(cursor.getColumnIndex("country_name")));
-                country.setCountry_code(cursor.getString(cursor.getColumnIndex("country_code")));
-                country.setCity_id(cityId);
-                countryList.add(country);
-
-            }
-        }
-        cursor.close();
-        return countryList;
-    }*/
 
     public static boolean saveForecast(Forecast forecast) {
 //        deleteTable("Forecast");
@@ -184,7 +157,7 @@ public class WeatherDB {
     }
 
     public static String loadTempAndDate() {
-        StringBuffer tempAndDate = new StringBuffer();
+        StringBuilder tempAndDate = new StringBuilder();
         Cursor cursor = db.query("temp", null, null, null, null, null, null);
         if (cursor.moveToFirst()) {
             do {

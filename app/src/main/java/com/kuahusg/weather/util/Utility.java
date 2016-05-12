@@ -1,8 +1,13 @@
 package com.kuahusg.weather.util;
 
+import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
+import android.widget.Toast;
 
+import com.kuahusg.weather.R;
 import com.kuahusg.weather.activities.SelectArea;
 import com.kuahusg.weather.activities.WeatherActivity;
 import com.kuahusg.weather.db.WeatherDB;
@@ -21,57 +26,28 @@ import java.util.List;
  */
 public class Utility {
 
-    public static List<City> cityList = new ArrayList<>();
-    public static android.os.Handler handler = new android.os.Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case 1:
-                    Utility.cityList = (List<City>) msg.obj;
-                    LogUtil.v("Utility", "static" + cityList.size() + "\t");
+//    public static List<City> cityList = new ArrayList<>();
 
-                    break;
-            }
-        }
-    };
-
-    /*public static String handleJosn(String data, String objectName) {
-        String objectValue;
-        try {
-            JSONObject all_info = new JSONObject(data);
-//            JSONObject info = all_info.getJSONObject("weatherinfo");
-            objectValue = all_info.getString(objectName);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return objectName;
-
-    }*/
-
-    public synchronized static List<City> quaryCity(String city_name) {
+    public static void quaryCity(String city_name, final Context context) {
         final String yql = " select woeid,name,country.content," +
                 "admin1.content,admin2.content,admin3.content from geo.places(1) " +
                 "where text=\"" + city_name + "\" and lang = \"zh-CN\" &format=json";
         final String new_address = "https://query.yahooapis.com/v1/public/yql?q=" + yql.replaceAll(" ", "%20").replaceAll("\"", "%22");
-//        final String new_address = "https://query.yahooapis.com/v1/public/yql?q=" + URLEncoder.encode(yql, "UTF-8").replaceAll("\\+","%20");
 
-        HttpUtil httpUtil = new HttpUtil();
-        httpUtil.sendHttpRequest(new_address, "GET", new HttpCallBackListener() {
+        HttpUtil.sendHttpRequest(new_address, "GET", new HttpCallBackListener() {
             @Override
             public void onFinish(String respon) {
+                List<City> cityList = new ArrayList<City>();
+
                 try {
-                    List<City> cityList = new ArrayList<City>();
                     City city;
                     JSONObject json = new JSONObject(respon);
-/*                    JSONObject query = json.getJSONObject("query");
-                    JSONObject results = query.getJSONObject("results");*/
                     JSONObject results = getJsonObject(json, "query", "results");
                     if (!TextUtils.isEmpty(respon)) {
                         JSONObject place = results.getJSONObject("place");
                         String woeid = place.getString("woeid");
                         String name = place.getString("name");
-                        StringBuffer fullNmae = new StringBuffer();
+                        StringBuilder fullName = new StringBuilder();
 
                         String country = place.getString("country");
                         String admin1 = place.getString("admin1");
@@ -79,24 +55,23 @@ public class Utility {
                         String admin3 = place.getString("admin3");
 
                         if (!"null".equals(country)) {
-                            fullNmae.append(country);
+                            fullName.append(country);
                         }
                         if (!"null".equals(admin1)) {
-                            fullNmae.append(admin1);
+                            fullName.append(admin1);
                         }
                         if (!"null".equals(admin2)) {
-                            fullNmae.append(admin2);
+                            fullName.append(admin2);
                         }
                         if (!"null".equals(admin3)) {
-                            fullNmae.append(admin3);
+                            fullName.append(admin3);
                         }
-                        city = new City(name, woeid, fullNmae.toString());
+                        city = new City(name, woeid, fullName.toString());
                         LogUtil.v("Utility.queryCity:city", city.getCity_name() + city.getFullNmae() +
                                 city.getWoeid());
                         cityList.add(city);
                         LogUtil.v(this.getClass().getName() + "\tcityList.size()", cityList.size() + "\t");
 
-                        Utility.cityList = cityList;
 //                        Utility.cityList = cityList;
 
 
@@ -106,13 +81,23 @@ public class Utility {
 
 
                 } catch (JSONException e) {
+                    if (context != null) {
+                        Handler handler = new Handler(Looper.getMainLooper());
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(context, context.getString(R.string.no_result), Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
                     e.printStackTrace();
                 }
-                Message message = new Message();
-                message.what = SelectArea.PROSSDIALOG_DISSMISS;
-                SelectArea.handler.sendMessage(message);
+
+                SelectArea.dismissProgress();
+
                 Message result = new Message();
                 result.what = SelectArea.RESULT_OK;
+                result.obj = cityList;
                 SelectArea.handler.sendMessage(result);
 
             }
@@ -121,28 +106,13 @@ public class Utility {
             public void onError(Exception e) {
                 e.printStackTrace();
                 LogUtil.d(this.toString() + "\tonError", "onError1:" + e);
-/*                Toast.makeText(Myapplication.getContext(), "看看can not resolve info from server啦了",
-                        Toast.LENGTH_LONG).show();*/
 
             }
         });
-        /*try {
-            new Thread(httpUtil).join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
 
-        LogUtil.v("Utility#cityList.size()2", cityList.size() + "\t");
-/*        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
-
-        return Utility.cityList;
     }
 
-    public static boolean queryWeather(String woeid) {
+    public static boolean queryWeather(String woeid, final Context context, final boolean isFromService) {
         String tempAndPushdate = "https://query.yahooapis.com/v1/public/yql?q="
                 + "select item.condition.temp,item.condition.date from weather.forecast where woeid = " +
                 woeid + " and u=\"c\"&format=json";
@@ -151,12 +121,11 @@ public class Utility {
                 + " from weather.forecast where woeid = " + woeid + " and u=\"c\"&format=json";
         WeatherDB.deleteTable("temp");
         WeatherDB.deleteTable("Forecast");
-        final Message message = new Message();
-        message.what = WeatherActivity.PROSSDIALOG_DISSMISS;
         final Message show_weather = new Message();
         show_weather.what = WeatherActivity.SHOW_WEATHER;
         final Message tempAndD = new Message();
         tempAndD.what = WeatherActivity.SHOW_TEMP_DATE;
+
         HttpUtil.sendHttpRequest(tempAndPushdate.replaceAll(" ", "%20").replaceAll("\"", "%22"),
                 "GET", new HttpCallBackListener() {
                     @Override
@@ -172,13 +141,22 @@ public class Utility {
                             WeatherDB.saveTempAndDate(Integer.valueOf(temp), pushDate);
 
 
-                            WeatherActivity.handler.sendMessage(tempAndD);
+                            if (!isFromService) {
+                                WeatherActivity.handler.sendMessage(tempAndD);
+                            }
 
                         } catch (JSONException e) {
+                            if (context != null) {
+
+                                Handler handler = new Handler(Looper.getMainLooper());
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(context, context.getString(R.string.no_result), Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                            }
                             e.printStackTrace();
-
-
-                            //WeatherActivity.handler.sendMessage(message);
 
 
                         }
@@ -190,19 +168,10 @@ public class Utility {
                     public void onError(Exception e) {
                         e.printStackTrace();
                         LogUtil.d("Utility", "onError2" + e);
-/*                Toast.makeText(Myapplication.getContext(), "can not query the temp data from server",
-                        Toast.LENGTH_LONG).show();*/
-
-                        //WeatherActivity.handler.sendMessage(message);
 
 
                     }
                 });
-/*        try {
-            new Thread(httpUtil).join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
 
         HttpUtil.sendHttpRequest(address.replaceAll(" ", "%20").replaceAll("\"", "%22"), "GET", new HttpCallBackListener() {
 
@@ -224,13 +193,15 @@ public class Utility {
 
                     }
                     LogUtil.v(this.getClass().toString(), "slove weather info finish");
-                    WeatherActivity.handler.sendMessage(show_weather);
-                    WeatherActivity.handler.sendMessage(message);
+                    if (!isFromService) {
+                        WeatherActivity.handler.sendMessage(show_weather);
+//                        WeatherActivity.handler.sendMessage(message);
+                        WeatherActivity.dismissProgress();
+                    }
 
 
                 } catch (JSONException e) {
 
-                    //                   WeatherActivity.handler.sendMessage(message);
 
                     e.printStackTrace();
                 }
@@ -240,54 +211,51 @@ public class Utility {
             public void onError(Exception e) {
                 e.printStackTrace();
                 LogUtil.d("Utility", "onError3" + e);
-/*                Toast.makeText(Myapplication.getContext(), "can not query weather info from server",
-                        Toast.LENGTH_LONG).show();*/
-
-//                WeatherActivity.handler.sendMessage(message);
 
             }
         });
-/*        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
-
-
         return true;
 
     }
 
     public static void handleCityList() {
+
+        WeatherDB.deleteTable("city");
         String address = "https://raw.githubusercontent.com/Kuanghusing/City_list/master/city-list";
 
 
         HttpUtil.sendHttpRequest(address, "GET", new HttpCallBackListener() {
             @Override
             public void onFinish(String respon) {
+                List<String> list = new ArrayList<String>();
                 try {
                     JSONArray allCityList = new JSONArray(respon);
-                    StringBuffer stringInfo = new StringBuffer();
+                    StringBuilder stringInfo = new StringBuilder();
 
                     for (int i = 0; i < allCityList.length(); i++) {
                         JSONObject cityInfo = allCityList.getJSONObject(i);
                         String name = cityInfo.getString("name");
                         String parent1 = cityInfo.getString("parent1");
-                        String parent2 = cityInfo.getString("parent2");
-                        String parent3 = cityInfo.getString("parent3");
-                        if (!(parent3.equals("直辖市") || parent2.equals(parent3))) {
+                        /*String parent2 = cityInfo.getString("parent2");
+                        String parent3 = cityInfo.getString("parent3");*/
+/*                        if (!(parent3.equals("直辖市") || parent2.equals(parent3))) {
                             stringInfo.append(parent3).append(" " + parent2).append(" " + parent1).append(name);
 
                         } else {
-                            stringInfo.append(parent2).append(" " + parent1).append(name);
-                        }
-                        WeatherDB.saveCity(stringInfo.toString());
+                        }*/
+                        stringInfo.append(parent1).append(name);
+                        list.add(stringInfo.toString());
                         stringInfo.setLength(0);
                     }
+                    WeatherDB.saveCity(list);
 
 
                     Message message = new Message();
                     message.what = SelectArea.PROSSDIALOG_DISSMISS;
+                    SelectArea.handler.sendMessage(message);
+//                    SelectArea.dismissProgress();
+                    message = new Message();
+                    message.what = SelectArea.UPDATE_CITY_LIST;
                     SelectArea.handler.sendMessage(message);
 
 
@@ -305,15 +273,11 @@ public class Utility {
         });
     }
 
-    public static JSONObject getJsonObject(JSONObject fromJsonObject, String... strings) {
+    public static JSONObject getJsonObject(JSONObject fromJsonObject, String... strings) throws JSONException {
         JSONObject jsonObject = fromJsonObject;
         for (String s :
                 strings) {
-            try {
-                jsonObject = jsonObject.getJSONObject(s);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            jsonObject = jsonObject.getJSONObject(s);
 
         }
         return jsonObject;
