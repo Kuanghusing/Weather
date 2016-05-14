@@ -36,33 +36,6 @@ public class WeatherDB {
         return weatherDB;
     }
 
-    /*public static void saveProvince(Province province) {
-        if (province != null) {
-            ContentValues contentValues = new ContentValues();
-            contentValues.put("province_name", province.getProvince_name());
-            contentValues.put("province_code", province.getProvince_code());
-            db.insert("Province", null, contentValues);
-        }
-    }
-
-    public static List<Province> loadProvince() {
-        List<Province> provinceList = new ArrayList<>();
-        Cursor cursor = db.query("Province", null, null, null, null, null, null);
-        Province province;
-        if (cursor.moveToFirst()) {
-            while (cursor.moveToNext()) {
-                province = new Province();
-                province.setId(cursor.getInt(cursor.getColumnIndex("id")));
-                province.setProvince_name(cursor.getString(cursor.getColumnIndex("province_name")));
-                province.setProvince_code(cursor.getString(cursor.getColumnIndex("province_code")));
-
-                provinceList.add(province);
-            }
-        }
-        cursor.close();
-        return provinceList;
-    }*/
-
     public static void saveCity(List<String> cityList) {
         try {
 
@@ -143,7 +116,6 @@ public class WeatherDB {
     }
 
     public static boolean saveTempAndDate(int temp, String pushDate) {
-//        deleteTable("temp");
         boolean flag = false;
         ContentValues contentValues = new ContentValues();
         if (!TextUtils.isEmpty(pushDate)) {
@@ -157,6 +129,7 @@ public class WeatherDB {
     }
 
     public static String loadTempAndDate() {
+
         StringBuilder tempAndDate = new StringBuilder();
         Cursor cursor = db.query("temp", null, null, null, null, null, null);
         if (cursor.moveToFirst()) {

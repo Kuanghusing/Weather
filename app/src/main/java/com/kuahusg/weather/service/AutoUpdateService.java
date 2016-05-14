@@ -11,7 +11,6 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
-import com.kuahusg.weather.activities.WeatherActivity;
 import com.kuahusg.weather.util.LogUtil;
 import com.kuahusg.weather.util.Utility;
 
@@ -34,9 +33,8 @@ public class AutoUpdateService extends Service {
             }
         }).start();
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        long hours = 1 * 60 * 60 * 1000 + SystemClock.elapsedRealtime();
+        long hours = 2 * 60 * 60 * 1000 + SystemClock.elapsedRealtime();
         Intent i = new Intent(this, AutoUpdateReceiver.class);
-        i.putExtra("FromService", true);
         PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
         alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, hours, pi);
         LogUtil.v(this.toString(), "Service onStartCommand!");
@@ -48,6 +46,6 @@ public class AutoUpdateService extends Service {
     private void updateWeather() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String woeid = sharedPreferences.getString("woeid", "");
-        Utility.queryWeather(woeid, WeatherActivity.mcontext, true);
+        Utility.queryWeather(woeid, AutoUpdateService.this, true);
     }
 }

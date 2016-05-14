@@ -32,11 +32,18 @@
                     android:paddingLeft="20dp" />
             </android.support.design.widget.TextInputLayout>
 
-            <Button
-                android:id="@+id/query_button"
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/query_bottom" />
+                android:src="@drawable/ic_search"
+                android:id="@+id/query_button"
+                android:paddingTop="15dp" />
+
+            <!--            <Button
+                            android:id="@+id/query_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/query_bottom" />-->
         </LinearLayout>
 
         <ListView

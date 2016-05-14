@@ -10,11 +10,16 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -31,7 +36,7 @@ import java.util.List;
 /**
  * Created by kuahusg on 16-4-28.
  */
-public class WeatherActivity extends AppCompatActivity implements View.OnClickListener {
+public class WeatherActivity extends AppCompatActivity implements View.OnClickListener, Toolbar.OnMenuItemClickListener {
     private static TextView title;
     private static TextView date;
     private static TextView temp_now;
@@ -41,29 +46,40 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     private static City selectCity;
     private static String tempAndPushDate;
     private static List<Forecast> forecastList;
-    private static RelativeLayout weather_info;
+    private static Toolbar toolbar;
+    public static RelativeLayout weather_info;
     public static ProgressDialog progressDialog;
+
+    private static ImageView weahterPic;
     public static Context mcontext;
+    public static CoordinatorLayout coordinatorLayout;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.weather_layout);
         mcontext = getApplicationContext();
-        title = (TextView) findViewById(R.id.title);
+//        title = (TextView) findViewById(R.id.title);
         date = (TextView) findViewById(R.id.public_data);
         temp_now = (TextView) findViewById(R.id.temp_now);
         temp1 = (TextView) findViewById(R.id.temp1);
         temp2 = (TextView) findViewById(R.id.temp2);
         weather_text = (TextView) findViewById(R.id.weather_text);
         weather_info = (RelativeLayout) findViewById(R.id.weather_info);
+        weahterPic = (ImageView) findViewById(R.id.weather_pic);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setSubtitle("loading...");
+        toolbar.setNavigationIcon(R.mipmap.ic_launcher);
+        toolbar.setOnMenuItemClickListener(this);
 
-        title.setText(R.string.loading);
+
+//        title.setText(R.string.loading);
         date.setVisibility(View.INVISIBLE);
         weather_info.setVisibility(View.INVISIBLE);
 
-        title.setOnClickListener(this);
+//        title.setOnClickListener(this);
         weather_info.setOnClickListener(this);
 //        progressDialog = new ProgressDialog(this);
 
@@ -110,16 +126,20 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     private static void showWeather() {
         if (!forecastList.isEmpty()) {
             Forecast forecastToday = forecastList.get(0);
-            temp1.setText(forecastToday.getLow() + "℃");
-            temp2.setText(forecastToday.getHigh() + "℃");
-            weather_text.setText(forecastToday.getWeatherText());
-            title.setText(selectCity.getCity_name());
+            String weatherText = forecastToday.getWeatherText();
+            temp1.setText(forecastToday.getLow());
+            temp2.setText(forecastToday.getHigh());
+            weather_text.setText(weatherText);
+//            title.setText(selectCity.getCity_name());
+            toolbar.setSubtitle(selectCity.getCity_name());
 
             date.setVisibility(View.VISIBLE);
             weather_info.setVisibility(View.VISIBLE);
+            showWeatherPic(weatherText);
 
             Intent intent = new Intent(mcontext, AutoUpdateService.class);
             mcontext.startService(intent);
+
 
         } else {
             LogUtil.v(mcontext.toString(), "no size in forecastList");
@@ -131,10 +151,26 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         if (!TextUtils.isEmpty(tempAndPushDate)) {
 
             String[] t = tempAndPushDate.split("\\|");
-            temp_now.setText(t[0] + "℃");
-            String date = t[1].replace(" CST", "").replaceAll(" \\d{4}", "");
+            temp_now.setText(t[0]);
+//            String date = t[1].replace(" CST", "").replaceAll(" \\d{4}", "");
+            String date = t[1].substring(17, 25);
             WeatherActivity.date.setText(date);
         }
+    }
+
+    private static void showWeatherPic(String weatherText) {
+        if (weatherText.contains("Thunderstorms")) {
+            weahterPic.setImageResource(R.drawable.weather_thunderstorm);
+
+        } else if (weatherText.contains("Cloudy")) {
+            weahterPic.setImageResource(R.drawable.weather_cloudy);
+        } else if (weatherText.contains("Sunny")) {
+            weahterPic.setImageResource(R.drawable.weather_sun_day);
+
+        } else if (weatherText.contains("Showers") || weatherText.contains("Rain")) {
+            weahterPic.setImageResource(R.drawable.weather_rain);
+        }
+
     }
 
 
@@ -166,30 +202,20 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.title:
-                alertDialog(this.getString(R.string.sure), this.getString(R.string.switch_city),
-                        this.getString(R.string.no), this.getString(R.string.yes), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Intent intent = new Intent(WeatherActivity.this, SelectArea.class);
-                                intent.putExtra("isFromWeatherActivity", true);
-                                startActivity(intent);
-                                finish();
-                            }
-                        });
-                break;
             case R.id.weather_info:
                 alertDialog(this.getString(R.string.sure), this.getString(R.string.refresh), this.getString(R.string.no), this.getString(R.string.yes), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        showProgress();
+//                        showProgress();
                         queryWeatherFromServer(selectCity);
-                        title.setText(R.string.loading);
+//                        title.setText(R.string.loading);
+                        toolbar.setSubtitle(R.string.loading);
                     }
                 });
                 break;
         }
     }
+
 
     private void alertDialog(String title, String message, String negativeString, String positiveString, DialogInterface.OnClickListener listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -216,11 +242,12 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
             super.handleMessage(msg);
             switch (msg.what) {
                 case PROSSDIALOG_DISSMISS:
-                    dismissProgress();
+//                    dismissProgress();
                     break;
                 case SHOW_WEATHER:
                     forecastList = WeatherDB.loadForecast();
                     showWeather();
+                    Snackbar.make(weather_info, mcontext.getString(R.string.load_finish), Snackbar.LENGTH_LONG).show();
                     break;
                 case SHOW_TEMP_DATE:
                     tempAndPushDate = WeatherDB.loadTempAndDate();
@@ -231,7 +258,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         }
     };
 
-    @Override
+/*    @Override
     protected void onStart() {
         super.onStart();
         LogUtil.v(this.toString(), "onStart()");
@@ -261,5 +288,42 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         super.onDestroy();
         dismissProgress();
         LogUtil.v(this.toString(), "OnDestroy()");
+    }*/
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_setting:
+                break;
+            case R.id.refresh_btn:
+                alertDialog(this.getString(R.string.sure), this.getString(R.string.refresh), this.getString(R.string.no), this.getString(R.string.yes), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        queryWeatherFromServer(selectCity);
+                        toolbar.setSubtitle(R.string.loading);
+                    }
+                });
+                break;
+            case R.id.change_btn:
+
+                alertDialog(this.getString(R.string.sure), this.getString(R.string.switch_city),
+                        this.getString(R.string.no), this.getString(R.string.yes), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(WeatherActivity.this, SelectArea.class);
+                                intent.putExtra("isFromWeatherActivity", true);
+                                startActivity(intent);
+                                finish();
+                            }
+                        });
+
+        }
+        return false;
     }
 }

@@ -14,7 +14,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.kuahusg.weather.R;
@@ -30,7 +30,7 @@ import java.util.List;
  * Created by kuahusg on 16-4-30.
  */
 public class SelectArea extends AppCompatActivity {
-    private Button queryButton;
+    private ImageView queryButton;
     private AutoCompleteTextView editText;
     private static ListView cityListView;
     private static List<String> cityList;
@@ -49,7 +49,7 @@ public class SelectArea extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.select_layout);
 
-        queryButton = (Button) findViewById(R.id.query_button);
+        queryButton = (ImageView) findViewById(R.id.query_button);
         editText = (AutoCompleteTextView) findViewById(R.id.city_editText);
         cityList = new ArrayList<>();
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, cityList);

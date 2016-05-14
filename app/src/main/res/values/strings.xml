@@ -4,10 +4,14 @@
     <string name="query_bottom">查询</string>
     <string name="loading">加载中</string>
     <string name="no_result">好像没有结果……</string>
-    <string name="switch_city">切换城市？</string>
+    <string name="switch_city">切换城市</string>
     <string name="yes">是</string>
     <string name="no">表</string>
     <string name="sure">确定？</string>
     <string name="refresh">刷新天气信息？</string>
+    <string name="setting">设置</string>
+    <string name="load_finish">刷新完毕</string>
+    <string name="refresh_icon">刷新</string>
+    <string name="publish_date_text">更新时间</string>
 
 </resources>

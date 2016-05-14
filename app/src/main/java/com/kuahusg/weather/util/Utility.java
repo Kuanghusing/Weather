@@ -119,6 +119,9 @@ public class Utility {
         String address = "https://query.yahooapis.com/v1/public/yql?q="
                 + "select item.forecast.date,item.forecast.low,item.forecast.high,item.forecast.text"
                 + " from weather.forecast where woeid = " + woeid + " and u=\"c\"&format=json";
+        if (isFromService) {
+            WeatherDB.getInstance(context);
+        }
         WeatherDB.deleteTable("temp");
         WeatherDB.deleteTable("Forecast");
         final Message show_weather = new Message();
@@ -195,8 +198,9 @@ public class Utility {
                     LogUtil.v(this.getClass().toString(), "slove weather info finish");
                     if (!isFromService) {
                         WeatherActivity.handler.sendMessage(show_weather);
-//                        WeatherActivity.handler.sendMessage(message);
-                        WeatherActivity.dismissProgress();
+/*                        Snackbar.make(WeatherActivity.weather_info,
+                                context.getString(R.string.load_finish), Snackbar.LENGTH_LONG).show();*/
+//                        WeatherActivity.dismissProgress();
                     }
 
 
