@@ -13,5 +13,11 @@
     <string name="load_finish">刷新完毕</string>
     <string name="refresh_icon">刷新</string>
     <string name="publish_date_text">更新时间</string>
+    <string name="today">今天</string>
+    《
+    <string name="tomorrow">明天</string>
+    <string name="about">关于</string>
+    <string name="more">More</string>
+    <string name="no_network">网络出错了……</string>
 
 </resources>

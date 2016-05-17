@@ -10,8 +10,12 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -20,8 +24,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.kuahusg.weather.R;
 import com.kuahusg.weather.db.WeatherDB;
@@ -31,29 +37,39 @@ import com.kuahusg.weather.service.AutoUpdateService;
 import com.kuahusg.weather.util.LogUtil;
 import com.kuahusg.weather.util.Utility;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by kuahusg on 16-4-28.
  */
 public class WeatherActivity extends AppCompatActivity implements View.OnClickListener, Toolbar.OnMenuItemClickListener {
+
     private static TextView title;
     private static TextView date;
     private static TextView temp_now;
     private static TextView temp1;
     private static TextView temp2;
     private static TextView weather_text;
+    private static TextView cal_date;
     private static City selectCity;
     private static String tempAndPushDate;
+    private static DrawerLayout drawerLayout;
+    private static NavigationView navigationView;
+    private ActionBar actionBar;
+    public static FloatingActionButton fab;
     private static List<Forecast> forecastList;
     private static Toolbar toolbar;
     public static RelativeLayout weather_info;
+    private static LinearLayout public_layout;
     public static ProgressDialog progressDialog;
 
     private static ImageView weahterPic;
     public static Context mcontext;
-    public static CoordinatorLayout coordinatorLayout;
 
+    public static RelativeLayout weather_more_info;
+
+    static int whichDay = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,21 +84,45 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         weather_text = (TextView) findViewById(R.id.weather_text);
         weather_info = (RelativeLayout) findViewById(R.id.weather_info);
         weahterPic = (ImageView) findViewById(R.id.weather_pic);
+        weather_more_info = (RelativeLayout) findViewById(R.id.main_info);
+        public_layout = (LinearLayout) findViewById(R.id.public_layout);
+        cal_date = (TextView) findViewById(R.id.date_textview);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        if (fab != null) {
+            fab.setOnClickListener(this);
+        }
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setSubtitle("loading...");
-        toolbar.setNavigationIcon(R.mipmap.ic_launcher);
         toolbar.setOnMenuItemClickListener(this);
 
+        drawerLayout = (DrawerLayout) findViewById(R.id.main_container);
+        navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        actionBar = getSupportActionBar();
 
-//        title.setText(R.string.loading);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
+        }
+
         date.setVisibility(View.INVISIBLE);
         weather_info.setVisibility(View.INVISIBLE);
-
-//        title.setOnClickListener(this);
+        weather_more_info.setVisibility(View.INVISIBLE);
+        public_layout.setVisibility(View.INVISIBLE);
         weather_info.setOnClickListener(this);
-//        progressDialog = new ProgressDialog(this);
 
+        InitWeather();
+
+
+    }
+
+    private void queryWeatherFromServer(final City selectCity) {
+        Utility.queryWeather(selectCity.getWoeid(), mcontext, false);
+
+    }
+
+    private void InitWeather() {
         selectCity = (City) getIntent().getSerializableExtra("selectCity");
         boolean anotherCity = getIntent().getBooleanExtra("anotherCity", false);
         if (selectCity != null) {
@@ -107,34 +147,31 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         }
         tempAndPushDate = WeatherDB.loadTempAndDate();
         forecastList = WeatherDB.loadForecast();
+
+
         if (forecastList.size() <= 0 || TextUtils.isEmpty(tempAndPushDate)) {
             queryWeatherFromServer(selectCity);
         } else {
-            showWeather();
+            showWeather(whichDay);
             showTempAndDate();
         }
-
-
-    }
-
-    private void queryWeatherFromServer(final City selectCity) {
-        Utility.queryWeather(selectCity.getWoeid(), mcontext, false);
-
     }
 
 
-    private static void showWeather() {
+    private static void showWeather(int whichDay) {
         if (!forecastList.isEmpty()) {
-            Forecast forecastToday = forecastList.get(0);
+            Forecast forecastToday = forecastList.get(whichDay);
             String weatherText = forecastToday.getWeatherText();
             temp1.setText(forecastToday.getLow());
             temp2.setText(forecastToday.getHigh());
             weather_text.setText(weatherText);
-//            title.setText(selectCity.getCity_name());
             toolbar.setSubtitle(selectCity.getCity_name());
+            cal_date.setText(forecastList.get(whichDay).getDate().substring(0, 6));
 
             date.setVisibility(View.VISIBLE);
             weather_info.setVisibility(View.VISIBLE);
+            weather_more_info.setVisibility(View.VISIBLE);
+            public_layout.setVisibility(View.VISIBLE);
             showWeatherPic(weatherText);
 
             Intent intent = new Intent(mcontext, AutoUpdateService.class);
@@ -144,7 +181,6 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         } else {
             LogUtil.v(mcontext.toString(), "no size in forecastList");
         }
-//        dismissProgress();
     }
 
     private static void showTempAndDate() {
@@ -169,6 +205,8 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
 
         } else if (weatherText.contains("Showers") || weatherText.contains("Rain")) {
             weahterPic.setImageResource(R.drawable.weather_rain);
+        } else if (weatherText.contains("Breezy")) {
+            weahterPic.setImageResource(R.drawable.weather_wind);
         }
 
     }
@@ -203,21 +241,19 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.weather_info:
-                alertDialog(this.getString(R.string.sure), this.getString(R.string.refresh), this.getString(R.string.no), this.getString(R.string.yes), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-//                        showProgress();
-                        queryWeatherFromServer(selectCity);
-//                        title.setText(R.string.loading);
-                        toolbar.setSubtitle(R.string.loading);
-                    }
-                });
+                queryWeatherFromServer(selectCity);
+                toolbar.setSubtitle(R.string.loading);
+                break;
+            case R.id.fab:
+                queryWeatherFromServer(selectCity);
+                toolbar.setSubtitle(R.string.loading);
                 break;
         }
     }
 
 
-    private void alertDialog(String title, String message, String negativeString, String positiveString, DialogInterface.OnClickListener listener) {
+    private void alertDialog(String title, String message, String negativeString, String positiveString,
+                             DialogInterface.OnClickListener listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(title)
                 .setMessage(message)
@@ -233,62 +269,53 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
-    public static final int SHOW_WEATHER = 2;
-    public static final int PROSSDIALOG_DISSMISS = 1;
-    public static final int SHOW_TEMP_DATE = 3;
-    public static Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case PROSSDIALOG_DISSMISS:
-//                    dismissProgress();
-                    break;
-                case SHOW_WEATHER:
-                    forecastList = WeatherDB.loadForecast();
-                    showWeather();
-                    Snackbar.make(weather_info, mcontext.getString(R.string.load_finish), Snackbar.LENGTH_LONG).show();
-                    break;
-                case SHOW_TEMP_DATE:
-                    tempAndPushDate = WeatherDB.loadTempAndDate();
-                    showTempAndDate();
-                    break;
 
-            }
+    private static void setupDrawerContent(NavigationView navigationView) {
+        String date;
+        List<Integer> idList = new ArrayList<>();
+        idList.add(R.id.day1);
+        idList.add(R.id.day2);
+        idList.add(R.id.day3);
+        idList.add(R.id.day4);
+        idList.add(R.id.day5);
+        for (int i = 2; i < 5; i++) {
+            date = forecastList.get(i).getDate().substring(0, 6);
+            navigationView.getMenu().findItem(idList.get(i)).setTitle(date);
+
         }
-    };
 
-/*    @Override
-    protected void onStart() {
-        super.onStart();
-        LogUtil.v(this.toString(), "onStart()");
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem item) {
+                item.setChecked(true);
+                switch (item.getItemId()) {
+                    case R.id.day1:
+                        whichDay = 0;
+                        break;
+                    case R.id.day2:
+                        whichDay = 1;
+                        break;
+                    case R.id.day3:
+                        whichDay = 2;
+                        break;
+                    case R.id.day4:
+                        whichDay = 3;
+                        break;
+                    case R.id.day5:
+                        whichDay = 4;
+                        break;
+
+                }
+
+
+                showWeather(whichDay);
+                drawerLayout.closeDrawers();
+
+                return false;
+            }
+        });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        LogUtil.v(this.toString(), "onResume()");
-        LogUtil.v(this.toString() + "\tisFinishing?", this.isFinishing() + "");
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        LogUtil.v(this.toString(), "onPause()");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        LogUtil.v(this.toString(), "onStop()");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        dismissProgress();
-        LogUtil.v(this.toString(), "OnDestroy()");
-    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -298,10 +325,12 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
+
         switch (item.getItemId()) {
             case R.id.menu_setting:
+                Toast.makeText(this, "还没完成...", Toast.LENGTH_LONG).show();
                 break;
-            case R.id.refresh_btn:
+            /*case R.id.refresh_btn:
                 alertDialog(this.getString(R.string.sure), this.getString(R.string.refresh), this.getString(R.string.no), this.getString(R.string.yes), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -309,7 +338,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
                         toolbar.setSubtitle(R.string.loading);
                     }
                 });
-                break;
+                break;*/
             case R.id.change_btn:
 
                 alertDialog(this.getString(R.string.sure), this.getString(R.string.switch_city),
@@ -322,8 +351,48 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
                                 finish();
                             }
                         });
+                break;
 
         }
         return false;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                drawerLayout.openDrawer(GravityCompat.START);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    public static final int SHOW_WEATHER = 2;
+    public static final int PROSSDIALOG_DISSMISS = 1;
+    public static final int SHOW_TEMP_DATE = 3;
+    public static Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case PROSSDIALOG_DISSMISS:
+                    break;
+                case SHOW_WEATHER:
+                    forecastList = WeatherDB.loadForecast();
+                    showWeather(whichDay);
+
+                    if (navigationView != null) {
+                        setupDrawerContent(navigationView);
+                    }
+                    Snackbar.make(fab, mcontext.getString(R.string.load_finish), Snackbar.LENGTH_LONG).show();
+                    break;
+                case SHOW_TEMP_DATE:
+                    tempAndPushDate = WeatherDB.loadTempAndDate();
+                    showTempAndDate();
+                    break;
+
+            }
+        }
+    };
 }

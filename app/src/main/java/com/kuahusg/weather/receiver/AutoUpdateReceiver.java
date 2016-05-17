@@ -1,8 +1,10 @@
-package com.kuahusg.weather.service;
+package com.kuahusg.weather.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+
+import com.kuahusg.weather.service.AutoUpdateService;
 
 /**
  * Created by kuahusg on 16-5-10.

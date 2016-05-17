@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class SelectArea extends AppCompatActivity {
     private ImageView queryButton;
-    private AutoCompleteTextView editText;
+    public static AutoCompleteTextView editText;
     private static ListView cityListView;
     private static List<String> cityList;
     private static List<City> cityL;
@@ -52,13 +52,13 @@ public class SelectArea extends AppCompatActivity {
         queryButton = (ImageView) findViewById(R.id.query_button);
         editText = (AutoCompleteTextView) findViewById(R.id.city_editText);
         cityList = new ArrayList<>();
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, cityList);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, cityList);
         cityListView = (ListView) findViewById(R.id.city_list);
         cityListView.setAdapter(adapter);
         mContext = getApplicationContext();
 
 
-        arrayAdapter = new ArrayAdapter<String>(SelectArea.this, android.R.layout.simple_list_item_1, cityListFromDataBase);
+        arrayAdapter = new ArrayAdapter<>(SelectArea.this, android.R.layout.simple_list_item_1, cityListFromDataBase);
         editText.setAdapter(arrayAdapter);
 
         db = WeatherDB.getInstance(this);

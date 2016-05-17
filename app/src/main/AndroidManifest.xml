@@ -20,7 +20,7 @@
 
         </activity>
 
-        <receiver android:name=".service.AutoUpdateReceiver">
+        <receiver android:name=".receiver.AutoUpdateReceiver">
 
         </receiver>
         <service android:name=".service.AutoUpdateService">

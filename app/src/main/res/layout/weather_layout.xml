@@ -1,161 +1,204 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:fitsSystemWindows="true">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
+
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorPrimary"
-        app:subtitleTextColor="@color/white"
-        app:titleTextColor="@color/white">
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/nav_margin_top">
 
 
-    </android.support.v7.widget.Toolbar>
-
-
-    <!--<RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="#484E61">
-
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:fontFamily="monospace"
-            android:textColor="#fff"
-            android:textSize="26sp" />
-    </RelativeLayout>-->
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-
-        <RelativeLayout
-            android:id="@+id/weather_info"
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:paddingBottom="60dp">
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            app:subtitleTextColor="@color/white"
+            app:titleTextColor="@color/white">
 
-            <ImageView
-                android:id="@+id/weather_pic"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true" />
+
+        </android.support.v7.widget.Toolbar>
+
+
+        <!--<RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="#484E61">
 
             <TextView
-                android:id="@+id/weather_text"
+                android:id="@+id/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/weather_pic"
-                android:layout_centerHorizontal="true"
+                android:layout_centerInParent="true"
+                android:fontFamily="monospace"
+                android:textColor="#fff"
+                android:textSize="26sp" />
+        </RelativeLayout>-->
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/date_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="20dp"
+                android:paddingTop="60dp"
                 android:textColor="@color/white"
                 android:textSize="15sp" />
-
-            <!--<ListView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/feture_weather"
-                android:layout_below="@id/temp_now">
-
-            </ListView>-->
-        </RelativeLayout>
-
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:layout_alignParentBottom="true"
-            android:id="@+id/test">
-
-
-            <TextView
-                android:id="@+id/temp_now"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_below="@+id/temp"
-                android:textColor="@color/white"
-                android:textSize="80sp"
-                android:typeface="monospace" />
-
-            <TextView
-                android:id="@+id/degree"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/temp_now"
-                android:layout_toEndOf="@+id/temp_now"
-                android:text="℃"
-                android:textColor="@color/white"
-                android:textSize="30sp" />
 
             <LinearLayout
-                android:id="@+id/temp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true">
+                android:layout_alignParentEnd="true"
+                android:paddingTop="55dp"
+                android:id="@+id/public_layout">
+
 
                 <ImageView
+                    android:id="@+id/clock_img"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_down" />
+                    android:src="@drawable/ic_clock" />
 
                 <TextView
-                    android:id="@+id/temp1"
+                    android:id="@+id/public_data"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:padding="7dp"
+                    android:paddingEnd="10dp"
+                    android:paddingTop="6dp"
                     android:textColor="@color/white"
                     android:textSize="15sp" />
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_up" />
-
-                <!--<TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="~"
-                    android:textColor="@color/white" />-->
-
-                <TextView
-                    android:id="@+id/temp2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/white"
-                    android:textSize="15sp" />
             </LinearLayout>
 
-            <ImageView
-                android:id="@+id/clock_img"
-                android:layout_width="wrap_content"
+            <RelativeLayout
+                android:id="@+id/weather_info"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_toLeftOf="@+id/public_data"
-                android:src="@drawable/ic_clock" />
+                android:layout_centerInParent="true"
+                android:paddingBottom="60dp">
 
-            <TextView
-                android:id="@+id/public_data"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                <ImageView
+                    android:id="@+id/weather_pic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true" />
+
+                <TextView
+                    android:id="@+id/weather_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/weather_pic"
+                    android:layout_centerHorizontal="true"
+                    android:textColor="@color/white"
+                    android:textSize="15sp" />
+
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:id="@+id/main_info"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
                 android:layout_alignParentBottom="true"
-                android:layout_alignParentEnd="true"
-                android:padding="7dp"
-                android:paddingEnd="10dp"
-                android:paddingTop="6dp"
-                android:textColor="@color/white"
-                android:textSize="15sp" />
+                android:layout_margin="20dp">
+
+
+                <TextView
+                    android:id="@+id/temp_now"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/temp"
+                    android:textColor="@color/white"
+                    android:textSize="80sp"
+                    android:typeface="monospace" />
+
+                <TextView
+                    android:id="@+id/degree"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/temp_now"
+                    android:layout_toEndOf="@+id/temp_now"
+                    android:paddingBottom="12dp"
+                    android:text="℃"
+                    android:textColor="@color/white"
+                    android:textSize="30sp" />
+
+                <LinearLayout
+                    android:id="@+id/temp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_down" />
+
+                    <TextView
+                        android:id="@+id/temp1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_up" />
+
+                    <!--<TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="~"
+                        android:textColor="@color/white" />-->
+
+                    <TextView
+                        android:id="@+id/temp2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+
+            </RelativeLayout>
 
         </RelativeLayout>
 
-    </RelativeLayout>
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:backgroundTint="#00BFFF"
+            android:src="@drawable/ic_refresh"
+            app:borderWidth="0dp"
+            app:rippleColor="@color/colorPrimaryDark" />
+    </android.support.design.widget.CoordinatorLayout>
 
 
-</LinearLayout>
+    <android.support.design.widget.NavigationView
+        android:id="@+id/navigation_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        app:headerLayout="@layout/nav_header"
+        app:itemIconTint="@color/white"
+        app:itemTextColor="@color/white"
+        app:menu="@menu/nav_menu"
+        android:layout_marginTop="@dimen/nav_margin_top" />
+
+
+</android.support.v4.widget.DrawerLayout>

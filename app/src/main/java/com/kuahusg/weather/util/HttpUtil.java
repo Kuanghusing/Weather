@@ -37,6 +37,7 @@ public class HttpUtil {
                         }
                     }
                 } catch (Exception e) {
+
                     if (listener != null) {
                         listener.onError(e);
                     }

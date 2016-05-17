@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/day1"
+            android:title="@string/today"
+            android:icon="@drawable/ic_date" />
+        <item
+            android:id="@+id/day2"
+            android:title="@string/tomorrow"
+            android:icon="@drawable/ic_date" />
+        <item
+            android:id="@+id/day3"
+            android:title="day_after1"
+            android:icon="@drawable/ic_grade" />
+        <item
+            android:id="@+id/day4"
+            android:title="day_after2"
+            android:icon="@drawable/ic_grade" />
+        <item
+            android:id="@+id/day5"
+            android:title="day_afer3"
+            android:icon="@drawable/ic_grade" />
+        <!--<item
+            android:id="@+id/day6"
+            android:title="day_after4" />
+        <item
+            android:id="@+id/day7"
+            android:title="day_after6" />
+        <item
+            android:id="@+id/day8"
+            android:title="day_after5" />
+        <item
+            android:id="@+id/day9"
+            android:title="day_after5" />
+        <item
+            android:id="@+id/day10"
+            android:title="day_after5" />-->
+
+    </group>
+
+    <item android:title="@string/more">
+        <menu>
+            <item
+                android:title="@string/about"
+                android:id="@+id/about"
+                android:icon="@drawable/ic_clock">
+
+            </item>
+        </menu>
+    </item>
+</menu>

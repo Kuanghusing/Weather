@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -18,6 +19,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,9 +29,15 @@ import java.util.List;
  */
 public class Utility {
 
+
 //    public static List<City> cityList = new ArrayList<>();
 
     public static void quaryCity(String city_name, final Context context) {
+        try {
+            city_name = URLEncoder.encode(city_name, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         final String yql = " select woeid,name,country.content," +
                 "admin1.content,admin2.content,admin3.content from geo.places(1) " +
                 "where text=\"" + city_name + "\" and lang = \"zh-CN\" &format=json";
@@ -37,7 +46,7 @@ public class Utility {
         HttpUtil.sendHttpRequest(new_address, "GET", new HttpCallBackListener() {
             @Override
             public void onFinish(String respon) {
-                List<City> cityList = new ArrayList<City>();
+                List<City> cityList = new ArrayList<>();
 
                 try {
                     City city;
@@ -106,6 +115,7 @@ public class Utility {
             public void onError(Exception e) {
                 e.printStackTrace();
                 LogUtil.d(this.toString() + "\tonError", "onError1:" + e);
+                Snackbar.make(SelectArea.editText, context.getString(R.string.no_network), Snackbar.LENGTH_LONG).show();
 
             }
         });
@@ -198,9 +208,6 @@ public class Utility {
                     LogUtil.v(this.getClass().toString(), "slove weather info finish");
                     if (!isFromService) {
                         WeatherActivity.handler.sendMessage(show_weather);
-/*                        Snackbar.make(WeatherActivity.weather_info,
-                                context.getString(R.string.load_finish), Snackbar.LENGTH_LONG).show();*/
-//                        WeatherActivity.dismissProgress();
                     }
 
 
@@ -215,6 +222,8 @@ public class Utility {
             public void onError(Exception e) {
                 e.printStackTrace();
                 LogUtil.d("Utility", "onError3" + e);
+                Snackbar.make(WeatherActivity.fab, context.getString(R.string.no_network), Snackbar.LENGTH_LONG).show();
+
 
             }
         });
@@ -231,7 +240,7 @@ public class Utility {
         HttpUtil.sendHttpRequest(address, "GET", new HttpCallBackListener() {
             @Override
             public void onFinish(String respon) {
-                List<String> list = new ArrayList<String>();
+                List<String> list = new ArrayList<>();
                 try {
                     JSONArray allCityList = new JSONArray(respon);
                     StringBuilder stringInfo = new StringBuilder();
