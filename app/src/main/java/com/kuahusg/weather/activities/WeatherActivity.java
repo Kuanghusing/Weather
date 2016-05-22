@@ -69,7 +69,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
 
     public static RelativeLayout weather_more_info;
 
-    static int whichDay = 0;
+    private static int whichDay = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -103,7 +103,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
 
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
         }
 
         date.setVisibility(View.INVISIBLE);
@@ -113,6 +113,9 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         weather_info.setOnClickListener(this);
 
         InitWeather();
+
+        Intent intent = new Intent(mcontext, AutoUpdateService.class);
+        mcontext.startService(intent);
 
 
     }
@@ -154,6 +157,8 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         } else {
             showWeather(whichDay);
             showTempAndDate();
+            setupDrawerContent(navigationView);
+
         }
     }
 
@@ -173,9 +178,6 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
             weather_more_info.setVisibility(View.VISIBLE);
             public_layout.setVisibility(View.VISIBLE);
             showWeatherPic(weatherText);
-
-            Intent intent = new Intent(mcontext, AutoUpdateService.class);
-            mcontext.startService(intent);
 
 
         } else {
@@ -212,7 +214,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     }
 
 
-    private ProgressDialog showProgress() {
+/*    private ProgressDialog showProgress() {
         if (!this.isFinishing()) {
             if (progressDialog == null) {
 
@@ -235,7 +237,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
 
             progressDialog.dismiss();
         }
-    }
+    }*/
 
     @Override
     public void onClick(View v) {
@@ -304,12 +306,26 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
                     case R.id.day5:
                         whichDay = 4;
                         break;
+                    case R.id.about:
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                Intent i = new Intent(mcontext, About.class);
+                                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                mcontext.startActivity(i);
+                            }
+                        }, 250);
+                        break;
 
                 }
 
 
                 showWeather(whichDay);
-                drawerLayout.closeDrawers();
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+
+                    drawerLayout.closeDrawers();
+                }
 
                 return false;
             }
@@ -385,7 +401,9 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
                     if (navigationView != null) {
                         setupDrawerContent(navigationView);
                     }
-                    Snackbar.make(fab, mcontext.getString(R.string.load_finish), Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(fab, mcontext.getString(R.string.load_finish), Snackbar.LENGTH_LONG)
+                            .setAction(mcontext.getString(R.string.yes), null)
+                            .show();
                     break;
                 case SHOW_TEMP_DATE:
                     tempAndPushDate = WeatherDB.loadTempAndDate();

@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.kuahusg.weather">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -19,6 +19,7 @@
         <activity android:name=".activities.WeatherActivity">
 
         </activity>
+        <activity android:name=".activities.About"></activity>
 
         <receiver android:name=".receiver.AutoUpdateReceiver">
 

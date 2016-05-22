@@ -18,9 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/colorPrimary"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:subtitleTextColor="@color/white"
-            app:theme="@style/ThemeOverlay.AppCompat.Dark"
             app:titleTextColor="@color/white">
 
 
@@ -147,6 +145,8 @@
                 </LinearLayout>
 
 
+
+
             </RelativeLayout>
 
             <LinearLayout
@@ -177,17 +177,17 @@
             </LinearLayout>
 
         </RelativeLayout>
-
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
-            android:layout_margin="16dp"
             android:backgroundTint="#00BFFF"
+            android:layout_margin="16dp"
             android:src="@drawable/ic_refresh"
             app:borderWidth="0dp"
-            app:rippleColor="@color/colorPrimaryDark" />
+            app:rippleColor="@color/colorPrimaryDark"
+            />
 
     </android.support.design.widget.CoordinatorLayout>
 

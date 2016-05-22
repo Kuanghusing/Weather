@@ -4,4 +4,5 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="nav_margin_top">0dp</dimen>
     <dimen name="margin_bottom">0dp</dimen>
+    <dimen name="card_view_margin">20dp</dimen>
 </resources>

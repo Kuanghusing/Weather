@@ -1,5 +1,6 @@
 package com.kuahusg.weather.util;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -29,8 +30,6 @@ import java.util.List;
  */
 public class Utility {
 
-
-//    public static List<City> cityList = new ArrayList<>();
 
     public static void quaryCity(String city_name, final Context context) {
         try {
@@ -115,7 +114,9 @@ public class Utility {
             public void onError(Exception e) {
                 e.printStackTrace();
                 LogUtil.d(this.toString() + "\tonError", "onError1:" + e);
-                Snackbar.make(SelectArea.editText, context.getString(R.string.no_network), Snackbar.LENGTH_LONG).show();
+                if (SelectArea.editText != null) {
+                    Snackbar.make(SelectArea.editText, context.getString(R.string.no_network), Snackbar.LENGTH_LONG).show();
+                }
 
             }
         });
@@ -222,7 +223,17 @@ public class Utility {
             public void onError(Exception e) {
                 e.printStackTrace();
                 LogUtil.d("Utility", "onError3" + e);
-                Snackbar.make(WeatherActivity.fab, context.getString(R.string.no_network), Snackbar.LENGTH_LONG).show();
+                Looper.prepare();
+                if (WeatherActivity.fab != null) {
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Snackbar.make(WeatherActivity.fab, context.getString(R.string.no_network), Snackbar.LENGTH_LONG).show();
+
+                        }
+                    });
+                }
 
 
             }
