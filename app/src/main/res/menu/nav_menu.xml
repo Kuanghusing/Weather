@@ -3,6 +3,14 @@
     <group android:checkableBehavior="single">
 
         <item
+            android:id="@+id/today"
+            android:title="@string/today"
+            android:icon="@drawable/ic_date" />
+        <item
+            android:id="@+id/future"
+            android:title="@string/future"
+            android:icon="@drawable/ic_date"/>
+        <!--<item
             android:id="@+id/day1"
             android:title="@string/today"
             android:icon="@drawable/ic_date" />
@@ -21,7 +29,7 @@
         <item
             android:id="@+id/day5"
             android:title="day_afer3"
-            android:icon="@drawable/ic_grade" />
+            android:icon="@drawable/ic_grade" />-->
         <!--<item
             android:id="@+id/day6"
             android:title="day_after4" />

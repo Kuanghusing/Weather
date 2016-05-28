@@ -1,19 +1,21 @@
 package com.kuahusg.weather.activities;
 
-import android.app.ProgressDialog;
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -23,12 +25,10 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.kuahusg.weather.Fragment.FutureWeatherFrag;
+import com.kuahusg.weather.Fragment.WeatherFragment;
 import com.kuahusg.weather.R;
 import com.kuahusg.weather.db.WeatherDB;
 import com.kuahusg.weather.model.City;
@@ -43,76 +43,115 @@ import java.util.List;
 /**
  * Created by kuahusg on 16-4-28.
  */
-public class WeatherActivity extends AppCompatActivity implements View.OnClickListener, Toolbar.OnMenuItemClickListener {
+public class WeatherActivity extends AppCompatActivity implements View.OnClickListener{
 
-    private static TextView title;
-    private static TextView date;
+    /*private static TextView date;
     private static TextView temp_now;
     private static TextView temp1;
     private static TextView temp2;
     private static TextView weather_text;
-    private static TextView cal_date;
+    private static TextView cal_date;*/
+
     private static City selectCity;
     private static String tempAndPushDate;
+    private static List<Forecast> forecastList;
+
     private static DrawerLayout drawerLayout;
     private static NavigationView navigationView;
-    private ActionBar actionBar;
     public static FloatingActionButton fab;
-    private static List<Forecast> forecastList;
-    private static Toolbar toolbar;
-    public static RelativeLayout weather_info;
-    private static LinearLayout public_layout;
-    public static ProgressDialog progressDialog;
+    public  static Toolbar toolbar;
+    private static TabLayout tabLayout;
+    private static ViewPager viewPager;
 
-    private static ImageView weahterPic;
     public static Context mcontext;
-
-    public static RelativeLayout weather_more_info;
-
     private static int whichDay = 0;
+
+    public static final int SHOW_WEATHER = 2;
+    public static final int SHOW_TEMP_DATE = 3;
+    public static Handler handler;
+
+
+    /*public static RelativeLayout weather_info;
+    private static LinearLayout public_layout;*/
+//    public static ProgressDialog progressDialog;
+    /*private static ImageView weahterPic;
+    public static RelativeLayout weather_more_info;*/
+
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.weather_layout);
         mcontext = getApplicationContext();
-//        title = (TextView) findViewById(R.id.title);
-        date = (TextView) findViewById(R.id.public_data);
-        temp_now = (TextView) findViewById(R.id.temp_now);
-        temp1 = (TextView) findViewById(R.id.temp1);
-        temp2 = (TextView) findViewById(R.id.temp2);
-        weather_text = (TextView) findViewById(R.id.weather_text);
-        weather_info = (RelativeLayout) findViewById(R.id.weather_info);
-        weahterPic = (ImageView) findViewById(R.id.weather_pic);
-        weather_more_info = (RelativeLayout) findViewById(R.id.main_info);
-        public_layout = (LinearLayout) findViewById(R.id.public_layout);
-        cal_date = (TextView) findViewById(R.id.date_textview);
+
+
+
+
+        /*
+        * fab
+         */
+
         fab = (FloatingActionButton) findViewById(R.id.fab);
         if (fab != null) {
             fab.setOnClickListener(this);
         }
 
+        /*
+        * toolbar
+         */
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setSubtitle("loading...");
-        toolbar.setOnMenuItemClickListener(this);
+
+
+        /*
+        * tabLayout and viewPager
+         */
+
+
+
+
+
+
+
 
         drawerLayout = (DrawerLayout) findViewById(R.id.main_container);
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
-        actionBar = getSupportActionBar();
 
+        InitWeather();
+
+        tabLayout = (TabLayout)findViewById(R.id.tab_layout);
+        viewPager = (ViewPager) findViewById(R.id.view_paper);
+        setupViewPager(viewPager,new WeatherFragment(),new FutureWeatherFrag());
+        tabLayout.setupWithViewPager(viewPager);
+
+
+        ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
         }
 
-        date.setVisibility(View.INVISIBLE);
+
+//        WeatherFragment todayFrag = (WeatherFragment) viewPager.getAdapter().instantiateItem(viewPager, 0);
+        PagerAdapter adapter = (PagerAdapter)viewPager.getAdapter();
+        WeatherFragment todayFrag = (WeatherFragment) adapter.getItem(0);
+        todayFrag.getHandle(new WeatherFragment.GetHandleCallBack() {
+            @Override
+            public void onResult(Handler handler) {
+
+                setHandle(handler);
+            }
+        });
+
+        /*date.setVisibility(View.INVISIBLE);
         weather_info.setVisibility(View.INVISIBLE);
         weather_more_info.setVisibility(View.INVISIBLE);
         public_layout.setVisibility(View.INVISIBLE);
-        weather_info.setOnClickListener(this);
+        weather_info.setOnClickListener(this);*/
 
-        InitWeather();
 
         Intent intent = new Intent(mcontext, AutoUpdateService.class);
         mcontext.startService(intent);
@@ -120,7 +159,24 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
-    private void queryWeatherFromServer(final City selectCity) {
+    private void setHandle(Handler handle) {
+        WeatherActivity.handler = handle;
+    }
+
+    /*private void InitView(View weatherFragLayout) {
+        date = (TextView) weatherFragLayout.findViewById(R.id.public_data);
+        temp_now = (TextView) weatherFragLayout.findViewById(R.id.temp_now);
+        temp1 = (TextView) weatherFragLayout.findViewById(R.id.temp1);
+        temp2 = (TextView) weatherFragLayout.findViewById(R.id.temp2);
+        weather_text = (TextView) weatherFragLayout.findViewById(R.id.weather_text);
+        weather_info = (RelativeLayout) weatherFragLayout.findViewById(R.id.weather_info);
+        weahterPic = (ImageView) weatherFragLayout.findViewById(R.id.weather_pic);
+        weather_more_info = (RelativeLayout) weatherFragLayout.findViewById(R.id.main_info);
+        public_layout = (LinearLayout) weatherFragLayout.findViewById(R.id.public_layout);
+        cal_date = (TextView) weatherFragLayout.findViewById(R.id.date_textview);
+    }*/
+
+    public static void queryWeatherFromServer(final City selectCity) {
         Utility.queryWeather(selectCity.getWoeid(), mcontext, false);
 
     }
@@ -142,8 +198,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
             String woeid = preferences.getString("woeid", "");
             String city_name = preferences.getString("city_name", "");
             LogUtil.v(this.getClass().getName(), fullName + "\t" + woeid);
-            City city = new City(city_name, woeid, fullName);
-            selectCity = city;
+            selectCity = new City(city_name, woeid, fullName);
         }
         if (anotherCity) {
             queryWeatherFromServer(selectCity);
@@ -155,15 +210,14 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         if (forecastList.size() <= 0 || TextUtils.isEmpty(tempAndPushDate)) {
             queryWeatherFromServer(selectCity);
         } else {
-            showWeather(whichDay);
-            showTempAndDate();
-            setupDrawerContent(navigationView);
+
+            setupDrawerContent();
 
         }
     }
 
 
-    private static void showWeather(int whichDay) {
+    /*private static void showWeather(int whichDay) {
         if (!forecastList.isEmpty()) {
             Forecast forecastToday = forecastList.get(whichDay);
             String weatherText = forecastToday.getWeatherText();
@@ -183,9 +237,9 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         } else {
             LogUtil.v(mcontext.toString(), "no size in forecastList");
         }
-    }
+    }*/
 
-    private static void showTempAndDate() {
+    /*private static void showTempAndDate() {
         if (!TextUtils.isEmpty(tempAndPushDate)) {
 
             String[] t = tempAndPushDate.split("\\|");
@@ -194,9 +248,9 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
             String date = t[1].substring(17, 25);
             WeatherActivity.date.setText(date);
         }
-    }
+    }*/
 
-    private static void showWeatherPic(String weatherText) {
+    /*private static void showWeatherPic(String weatherText) {
         if (weatherText.contains("Thunderstorms")) {
             weahterPic.setImageResource(R.drawable.weather_thunderstorm);
 
@@ -211,7 +265,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
             weahterPic.setImageResource(R.drawable.weather_wind);
         }
 
-    }
+    }*/
 
 
 /*    private ProgressDialog showProgress() {
@@ -242,10 +296,10 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.weather_info:
+            /*case R.id.weather_info:
                 queryWeatherFromServer(selectCity);
                 toolbar.setSubtitle(R.string.loading);
-                break;
+                break;*/
             case R.id.fab:
                 queryWeatherFromServer(selectCity);
                 toolbar.setSubtitle(R.string.loading);
@@ -272,8 +326,8 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     }
 
 
-    private static void setupDrawerContent(NavigationView navigationView) {
-        String date;
+    public static void setupDrawerContent() {
+        /*String date;
         List<Integer> idList = new ArrayList<>();
         idList.add(R.id.day1);
         idList.add(R.id.day2);
@@ -284,15 +338,22 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
             date = forecastList.get(i).getDate().substring(0, 6);
             navigationView.getMenu().findItem(idList.get(i)).setTitle(date);
 
-        }
+        }*/
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
                 item.setChecked(true);
                 switch (item.getItemId()) {
-                    case R.id.day1:
+                    case R.id.today:
+                        viewPager.setCurrentItem(0);
+                        break;
+                    case R.id.future:
+                        viewPager.setCurrentItem(1);
+                        break;
+                    /*case R.id.day1:
                         whichDay = 0;
+
                         break;
                     case R.id.day2:
                         whichDay = 1;
@@ -305,7 +366,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
                         break;
                     case R.id.day5:
                         whichDay = 4;
-                        break;
+                        break;*/
                     case R.id.about:
                         handler.postDelayed(new Runnable() {
                             @Override
@@ -321,7 +382,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
                 }
 
 
-                showWeather(whichDay);
+//                showWeather(whichDay);
                 if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
 
                     drawerLayout.closeDrawers();
@@ -332,6 +393,30 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         });
     }
 
+    private void setupViewPager(ViewPager viewPager,WeatherFragment todayFrag,FutureWeatherFrag futureWeatherFrag) {
+
+
+        Bundle data = new Bundle();
+        data.putParcelableArrayList("forecastList",(ArrayList<Forecast>)forecastList);
+        data.putString("tempAndPushDate",tempAndPushDate);
+        data.putSerializable("selectCity",selectCity);
+        todayFrag.setArguments(data);
+        futureWeatherFrag.setArguments(data);
+
+
+        List<String> list = new ArrayList<>();
+        List<android.support.v4.app.Fragment> fragmentList = new ArrayList<>();
+        list.add(getString(R.string.today));
+        list.add(getString(R.string.future));
+        fragmentList.add(todayFrag);
+        fragmentList.add(futureWeatherFrag);
+
+        FragmentPagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(),fragmentList,list);
+        viewPager.setAdapter(adapter);
+
+    }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -339,39 +424,6 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         return super.onCreateOptionsMenu(menu);
     }
 
-    @Override
-    public boolean onMenuItemClick(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.menu_setting:
-                Toast.makeText(this, "还没完成...", Toast.LENGTH_LONG).show();
-                break;
-            /*case R.id.refresh_btn:
-                alertDialog(this.getString(R.string.sure), this.getString(R.string.refresh), this.getString(R.string.no), this.getString(R.string.yes), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        queryWeatherFromServer(selectCity);
-                        toolbar.setSubtitle(R.string.loading);
-                    }
-                });
-                break;*/
-            case R.id.change_btn:
-
-                alertDialog(this.getString(R.string.sure), this.getString(R.string.switch_city),
-                        this.getString(R.string.no), this.getString(R.string.yes), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Intent intent = new Intent(WeatherActivity.this, SelectArea.class);
-                                intent.putExtra("isFromWeatherActivity", true);
-                                startActivity(intent);
-                                finish();
-                            }
-                        });
-                break;
-
-        }
-        return false;
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -379,38 +431,62 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
             case android.R.id.home:
                 drawerLayout.openDrawer(GravityCompat.START);
                 break;
+            case R.id.menu_setting:
+                Toast.makeText(this, "还没完成...", Toast.LENGTH_LONG).show();
+                break;
+            case R.id.change_btn:
+
+            alertDialog(this.getString(R.string.sure), this.getString(R.string.switch_city),
+                    this.getString(R.string.no), this.getString(R.string.yes), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(WeatherActivity.this, SelectArea.class);
+                            intent.putExtra("isFromWeatherActivity", true);
+                            startActivity(intent);
+                            finish();
+                        }
+                    });
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
 
 
-    public static final int SHOW_WEATHER = 2;
-    public static final int PROSSDIALOG_DISSMISS = 1;
-    public static final int SHOW_TEMP_DATE = 3;
-    public static Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case PROSSDIALOG_DISSMISS:
-                    break;
-                case SHOW_WEATHER:
-                    forecastList = WeatherDB.loadForecast();
-                    showWeather(whichDay);
 
-                    if (navigationView != null) {
-                        setupDrawerContent(navigationView);
-                    }
-                    Snackbar.make(fab, mcontext.getString(R.string.load_finish), Snackbar.LENGTH_LONG)
-                            .setAction(mcontext.getString(R.string.yes), null)
-                            .show();
-                    break;
-                case SHOW_TEMP_DATE:
-                    tempAndPushDate = WeatherDB.loadTempAndDate();
-                    showTempAndDate();
-                    break;
 
-            }
+
+
+
+
+    class PagerAdapter extends FragmentPagerAdapter {
+        List<android.support.v4.app.Fragment> list;
+        List<String> titleList;
+
+        public PagerAdapter(FragmentManager fm, List<android.support.v4.app.Fragment> list, List<String> titleList) {
+            super(fm);
+            this.list = list;
+            this.titleList = titleList;
         }
-    };
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return titleList.get(position);
+        }
+
+        @Override
+        public android.support.v4.app.Fragment getItem(int position) {
+            return this.list.get(position);
+        }
+
+
+
+        @Override
+        public int getCount() {
+            return list.size();
+        }
+    }
+
+
+
 }
+

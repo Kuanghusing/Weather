@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/first_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/card_view_margin">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/box_height">
+
+                    <TextView
+                        android:id="@+id/first_date"
+                        style="@style/DateTextView" />
+
+                    <ImageView
+                        android:id="@+id/first_pic"
+                        style="@style/PicImageView" />
+
+                    <TextView
+                        android:id="@+id/first_info"
+                        style="@style/InfoTextView" />
+
+                    <TextView
+                        android:id="@+id/first_temp"
+                        style="@style/TempTextView"
+                        android:layout_below="@id/first_info" />
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/second_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/first_card"
+                android:layout_margin="@dimen/card_view_margin">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/box_height">
+
+                    <TextView
+                        android:id="@+id/second_date"
+                        style="@style/DateTextView" />
+
+                    <ImageView
+                        android:id="@+id/second_pic"
+                        style="@style/PicImageView" />
+
+                    <TextView
+                        android:id="@+id/second_info"
+                        style="@style/InfoTextView" />
+
+                    <TextView
+                        android:id="@+id/second_temp"
+                        style="@style/TempTextView"
+                        android:layout_below="@id/second_info" />
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/third_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/second_card"
+                android:layout_margin="@dimen/card_view_margin">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/box_height">
+
+                    <TextView
+                        android:id="@+id/third_date"
+                        style="@style/DateTextView" />
+
+                    <ImageView
+                        android:id="@+id/third_pic"
+                        style="@style/PicImageView" />
+
+                    <TextView
+                        android:id="@+id/third_info"
+                        style="@style/InfoTextView" />
+
+                    <TextView
+                        android:id="@+id/third_temp"
+                        style="@style/TempTextView"
+                        android:layout_below="@id/third_info" />
+                </RelativeLayout>
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/third_card"
+                android:layout_margin="@dimen/card_view_margin"
+                android:id="@+id/fourth_card">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/box_height">
+
+
+                    <TextView
+                        android:id="@+id/fourth_info"
+                        style="@style/InfoTextView" />
+
+                    <TextView
+                        android:id="@+id/fourth_temp"
+                        style="@style/TempTextView"
+                        android:layout_below="@id/fourth_info"/>
+
+                    <TextView
+                        android:id="@+id/fourth_date"
+                        style="@style/DateTextView" />
+
+                    <ImageView
+                        android:id="@+id/fourth_pic"
+                        style="@style/PicImageView" />
+                </RelativeLayout>
+            </android.support.v7.widget.CardView>
+        </RelativeLayout>
+    </android.support.v4.widget.NestedScrollView>
+
+
+</RelativeLayout>
+

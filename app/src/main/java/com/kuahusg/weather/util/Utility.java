@@ -1,6 +1,5 @@
 package com.kuahusg.weather.util;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -208,6 +207,7 @@ public class Utility {
                     }
                     LogUtil.v(this.getClass().toString(), "slove weather info finish");
                     if (!isFromService) {
+                        Looper.prepare();
                         WeatherActivity.handler.sendMessage(show_weather);
                     }
 
@@ -260,14 +260,14 @@ public class Utility {
                         JSONObject cityInfo = allCityList.getJSONObject(i);
                         String name = cityInfo.getString("name");
                         String parent1 = cityInfo.getString("parent1");
-                        /*String parent2 = cityInfo.getString("parent2");
-                        String parent3 = cityInfo.getString("parent3");*/
-/*                        if (!(parent3.equals("直辖市") || parent2.equals(parent3))) {
+                        String parent2 = cityInfo.getString("parent2");
+                        String parent3 = cityInfo.getString("parent3");
+                        if (!(parent3.equals("直辖市") || parent2.equals(parent3))) {
                             stringInfo.append(parent3).append(" " + parent2).append(" " + parent1).append(name);
 
                         } else {
-                        }*/
-                        stringInfo.append(parent1).append(name);
+                            stringInfo.append(parent1).append(name);
+                        }
                         list.add(stringInfo.toString());
                         stringInfo.setLength(0);
                     }
