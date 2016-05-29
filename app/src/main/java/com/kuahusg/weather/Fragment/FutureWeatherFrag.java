@@ -19,8 +19,13 @@ import java.util.List;
  */
 
 public class FutureWeatherFrag extends Fragment {
-    View view;
-    List<Forecast> forecastList;
+    private View view;
+    private List<Forecast> forecastList;
+    private ImageView img;
+    private TextView info;
+    private TextView temp;
+    private TextView date;
+
 
     @Nullable
     @Override
@@ -29,21 +34,26 @@ public class FutureWeatherFrag extends Fragment {
         view = inflater.inflate(R.layout.future_frag, container, false);
         Bundle date = getArguments();
         forecastList = date.getParcelableArrayList("forecastList");
+        initId();
+
+        return view;
+    }
+
+    private void initId() {
         initView(R.id.first_pic, R.id.first_info, R.id.first_temp, R.id.first_date);
         initView(R.id.second_pic, R.id.second_info, R.id.second_temp, R.id.second_date);
         initView(R.id.third_pic, R.id.third_info, R.id.third_temp, R.id.third_date);
-        initView(R.id.fourth_pic,R.id.fourth_info,R.id.fourth_temp,R.id.fourth_date);
-
-        return view;
+        initView(R.id.fourth_pic, R.id.fourth_info, R.id.fourth_temp, R.id.fourth_date);
     }
 
 
     private void initView(int imgId, int infoId, int tempId, int dateId) {
 
-        ImageView img = (ImageView) view.findViewById(imgId);
-        TextView info = (TextView) view.findViewById(infoId);
-        TextView temp = (TextView) view.findViewById(tempId);
-        TextView date = (TextView) view.findViewById(dateId);
+        img = (ImageView) view.findViewById(imgId);
+        info = (TextView) view.findViewById(infoId);
+        temp = (TextView) view.findViewById(tempId);
+        date = (TextView) view.findViewById(dateId);
+
 
         initCard(img, info, temp, date);
     }
@@ -83,6 +93,14 @@ public class FutureWeatherFrag extends Fragment {
         } else if (info.contains("Breezy")) {
             img.setImageResource(R.drawable.weather_wind);
         }
+
+    }
+
+    public void refreshWeather(List<Forecast> list) {
+        if (list != null) {
+            forecastList = list;
+        }
+        initId();
 
     }
 }

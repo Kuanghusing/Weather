@@ -20,6 +20,7 @@
     <string name="about">关于</string>
     <string name="more">More</string>
     <string name="no_network">网络出错了……</string>
+    <string name="error_network">载入失败</string>
     <string name="about_text">本人第一次写的App\n用于练习\n有Bug在所难免……</string>
     <string name="open_source">Open Source</string>
     <string name="open_source_text">https://github.com/Kuanghusing/Weather</string>

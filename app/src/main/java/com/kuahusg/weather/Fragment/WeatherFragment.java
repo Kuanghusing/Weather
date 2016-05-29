@@ -1,12 +1,10 @@
 package com.kuahusg.weather.Fragment;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Message;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +16,6 @@ import android.widget.TextView;
 
 import com.kuahusg.weather.R;
 import com.kuahusg.weather.activities.WeatherActivity;
-import com.kuahusg.weather.db.WeatherDB;
 import com.kuahusg.weather.model.City;
 import com.kuahusg.weather.model.Forecast;
 
@@ -30,7 +27,7 @@ import java.util.List;
 
 public class WeatherFragment extends Fragment implements View.OnClickListener {
     private View view;
-    private static List<Forecast> forecastList;
+    private List<Forecast> forecastList;
     private City selectCity;
     private String tempAndPushDate;
     private Context mContext;
@@ -50,17 +47,13 @@ public class WeatherFragment extends Fragment implements View.OnClickListener {
     private final String WHICH_DAY = "WHICH_DAY";
 
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-//        mContext = getActivity();
 
-    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.weather_frag, container, false);
+        mContext = getActivity();
 
         forecastList = getArguments().getParcelableArrayList("forecastList");
         selectCity = (City) getArguments().getSerializable("selectCity");
@@ -69,8 +62,8 @@ public class WeatherFragment extends Fragment implements View.OnClickListener {
         initView();
 
         if (forecastList != null && forecastList.size() > 0 && !TextUtils.isEmpty(tempAndPushDate)) {
-            showWeather();
-            showTempAndDate();
+            showWeather(forecastList);
+            showTempAndDate(tempAndPushDate);
         }
 
 
@@ -79,14 +72,11 @@ public class WeatherFragment extends Fragment implements View.OnClickListener {
 
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mContext = getContext();
-    }
 
-
-    public void showWeather() {
+    public void showWeather(List<Forecast> list) {
+        if (list != null) {
+            forecastList = list;
+        }
         if (!forecastList.isEmpty()) {
             Forecast forecastToday = forecastList.get(whichDay);
             String weatherText = forecastToday.getWeatherText();
@@ -102,6 +92,8 @@ public class WeatherFragment extends Fragment implements View.OnClickListener {
             public_layout.setVisibility(View.VISIBLE);
             showWeatherPic(weatherText);
         } else {
+            Snackbar.make(WeatherActivity.fab, mContext.getString(R.string.error_network), Snackbar.LENGTH_LONG).show();
+
 
         }
 
@@ -126,12 +118,14 @@ public class WeatherFragment extends Fragment implements View.OnClickListener {
 
     }
 
-    public void showTempAndDate() {
+    public void showTempAndDate(String tempStr) {
+        if (tempStr != null) {
+            tempAndPushDate = tempStr;
+        }
         if (!TextUtils.isEmpty(tempAndPushDate)) {
 
             String[] t = tempAndPushDate.split("\\|");
             temp_now.setText(t[0]);
-//            String date = t[1].replace(" CST", "").replaceAll(" \\d{4}", "");
             String d = t[1].substring(17, 25);
             date.setText(d);
         }
@@ -169,11 +163,11 @@ public class WeatherFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    public void getHandle(GetHandleCallBack callBack) {
+    /*public void getHandle(GetHandleCallBack callBack) {
         callBack.onResult(handler);
-    }
+    }*/
 
-    public Handler handler = new Handler() {
+/*    public Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -193,11 +187,11 @@ public class WeatherFragment extends Fragment implements View.OnClickListener {
 
             }
         }
-    };
+    }*/
 
-    public interface GetHandleCallBack {
+/*    public interface GetHandleCallBack {
         void onResult(Handler handler);
-    }
+    }*/
 
 
 }
