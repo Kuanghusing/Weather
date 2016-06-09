@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.ContentLoadingProgressBar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,13 +26,13 @@ import java.util.List;
  * Created by kuahusg on 16-5-25.
  */
 
-public class WeatherFragment extends Fragment implements View.OnClickListener {
+public class WeatherFragment extends Fragment {
+    private final String WHICH_DAY = "WHICH_DAY";
     private View view;
     private List<Forecast> forecastList;
     private City selectCity;
     private String tempAndPushDate;
     private Context mContext;
-
     private TextView date;
     private TextView temp_now;
     private TextView temp1;
@@ -42,17 +43,14 @@ public class WeatherFragment extends Fragment implements View.OnClickListener {
     private RelativeLayout weather_info;
     private LinearLayout public_layout;
     private RelativeLayout weather_more_info;
-
+    private ContentLoadingProgressBar progressBar;
     private int whichDay = 0;
-    private final String WHICH_DAY = "WHICH_DAY";
-
-
-
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.weather_frag, container, false);
+        progressBar = (ContentLoadingProgressBar) view.findViewById(R.id.progressbar);
         mContext = getActivity();
 
         forecastList = getArguments().getParcelableArrayList("forecastList");
@@ -147,13 +145,24 @@ public class WeatherFragment extends Fragment implements View.OnClickListener {
         weather_info.setVisibility(View.INVISIBLE);
         weather_more_info.setVisibility(View.INVISIBLE);
         public_layout.setVisibility(View.INVISIBLE);
-        weather_info.setOnClickListener(this);
 
 
     }
 
+    public void showProgressBar() {
+        if (progressBar != null) {
+            progressBar.show();
+        }
+    }
 
-    @Override
+    public void hideProgressBar() {
+        if (progressBar != null) {
+            progressBar.hide();
+        }
+    }
+
+
+/*    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.weather_info:
@@ -161,7 +170,7 @@ public class WeatherFragment extends Fragment implements View.OnClickListener {
                 WeatherActivity.toolbar.setSubtitle(R.string.loading);
                 break;
         }
-    }
+    }*/
 
     /*public void getHandle(GetHandleCallBack callBack) {
         callBack.onResult(handler);

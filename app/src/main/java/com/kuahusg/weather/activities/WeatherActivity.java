@@ -19,6 +19,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -45,38 +46,63 @@ import java.util.List;
 /**
  * Created by kuahusg on 16-4-28.
  */
-public class WeatherActivity extends AppCompatActivity implements View.OnClickListener {
+public class WeatherActivity extends AppCompatActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
-
-    private static City selectCity;
-    private static String tempAndPushDate;
-    private static List<Forecast> forecastList;
-
-    private DrawerLayout drawerLayout;
-    private NavigationView navigationView;
-    public static FloatingActionButton fab;
-    public static Toolbar toolbar;
-    private TabLayout tabLayout;
-    private ViewPager viewPager;
-
-    public static Context mcontext;
-//    private static int whichDay = 0;
 
     public static final int SHOW_WEATHER = 2;
     public static final int SHOW_TEMP_DATE = 3;
-
+    public static FloatingActionButton fab;
+    public static Toolbar toolbar;
+    public static Context mContext;
+    private static City selectCity;
+    private static String tempAndPushDate;
+    private static List<Forecast> forecastList;
     private static WeatherFragment todayFrag;
     private static FutureWeatherFrag futureWeatherFrag;
+//    private static int whichDay = 0;
+private static SwipeRefreshLayout refreshLayout;
+    public static Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case SHOW_WEATHER:
+                    forecastList = WeatherDB.loadForecast();
+                    todayFrag.showWeather(forecastList);
+                    futureWeatherFrag.refreshWeather(forecastList);
 
+                    todayFrag.hideProgressBar();
+                    if (refreshLayout.isRefreshing()) {
+                        refreshLayout.setRefreshing(false);
+                    }
+                    //WeatherActivity.setupDrawerContent();
+                    Snackbar.make(WeatherActivity.fab, mContext.getString(R.string.load_finish), Snackbar.LENGTH_LONG)
+                            .show();
+                    break;
+                case SHOW_TEMP_DATE:
+                    tempAndPushDate = WeatherDB.loadTempAndDate();
+                    todayFrag.showTempAndDate(tempAndPushDate);
+                    futureWeatherFrag.refreshWeather(forecastList);
+                    break;
+
+            }
+        }
+    };
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+
+    public static void queryWeatherFromServer(final City selectCity) {
+        Utility.queryWeather(selectCity.getWoeid(), mContext, false);
+
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.weather_layout);
-        mcontext = getApplicationContext();
-
-
-
+        mContext = getApplicationContext();
 
         /*
         * fab
@@ -96,22 +122,25 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         toolbar.setSubtitle("loading...");
 
 
-        /*
-        * tabLayout and viewPager
-         */
-
-
         drawerLayout = (DrawerLayout) findViewById(R.id.main_container);
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
 
 
         InitWeather();
-
+        setupDrawerContent();
+        /*
+        * tabLayout and viewPager
+         */
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         viewPager = (ViewPager) findViewById(R.id.view_paper);
         setupViewPager(viewPager, new WeatherFragment(), new FutureWeatherFrag());
         tabLayout.setupWithViewPager(viewPager);
 
+        refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_layout);
+        if (refreshLayout != null) {
+            refreshLayout.setOnRefreshListener(this);
+//            refreshLayout.setColorSchemeColors();
+        }
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -125,15 +154,9 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         futureWeatherFrag = (FutureWeatherFrag) adapter.getItem(1);
 
 
-        Intent intent = new Intent(mcontext, AutoUpdateService.class);
-        mcontext.startService(intent);
+        Intent intent = new Intent(mContext, AutoUpdateService.class);
+        mContext.startService(intent);
 
-
-    }
-
-
-    public static void queryWeatherFromServer(final City selectCity) {
-        Utility.queryWeather(selectCity.getWoeid(), mcontext, false);
 
     }
 
@@ -165,13 +188,12 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
 
         if (forecastList.size() <= 0 || TextUtils.isEmpty(tempAndPushDate)) {
             queryWeatherFromServer(selectCity);
-        } else {
+        } /*else {
 
             setupDrawerContent();
 
-        }
+        }*/
     }
-
 
     @Override
     public void onClick(View v) {
@@ -179,10 +201,25 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
             case R.id.fab:
                 queryWeatherFromServer(selectCity);
                 toolbar.setSubtitle(R.string.loading);
+                todayFrag.showProgressBar();
                 break;
         }
     }
 
+    @Override
+    public void onRefresh() {
+        refreshLayout.setRefreshing(true);
+        queryWeatherFromServer(selectCity);
+        toolbar.setSubtitle(R.string.loading);
+
+
+        /*new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                refreshLayout.setRefreshing(false);
+            }
+        }, 3000);*/
+    }
 
     private void alertDialog(String title, String message, String negativeString, String positiveString,
                              DialogInterface.OnClickListener listener) {
@@ -200,7 +237,6 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
 
 
     }
-
 
     public void setupDrawerContent() {
 
@@ -220,9 +256,9 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
                             @Override
                             public void run() {
 
-                                Intent i = new Intent(mcontext, About.class);
+                                Intent i = new Intent(mContext, About.class);
                                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                mcontext.startActivity(i);
+                                mContext.startActivity(i);
                             }
                         }, 250);
                         break;
@@ -263,13 +299,11 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return super.onCreateOptionsMenu(menu);
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -296,32 +330,6 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         }
         return super.onOptionsItemSelected(item);
     }
-
-
-    public static Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case SHOW_WEATHER:
-                    forecastList = WeatherDB.loadForecast();
-                    todayFrag.showWeather(forecastList);
-                    futureWeatherFrag.refreshWeather(forecastList);
-
-                    //WeatherActivity.setupDrawerContent();
-                    Snackbar.make(WeatherActivity.fab, mcontext.getString(R.string.load_finish), Snackbar.LENGTH_LONG)
-                            .show();
-                    break;
-                case SHOW_TEMP_DATE:
-                    tempAndPushDate = WeatherDB.loadTempAndDate();
-                    todayFrag.showTempAndDate(tempAndPushDate);
-                    futureWeatherFrag.refreshWeather(forecastList);
-                    break;
-
-            }
-        }
-    };
-
 
     class PagerAdapter extends FragmentPagerAdapter {
         List<android.support.v4.app.Fragment> list;

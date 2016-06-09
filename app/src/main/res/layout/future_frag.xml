@@ -105,11 +105,11 @@
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
+                android:id="@+id/fourth_card"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/third_card"
-                android:layout_margin="@dimen/card_view_margin"
-                android:id="@+id/fourth_card">
+                android:layout_margin="@dimen/card_view_margin">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -131,6 +131,42 @@
 
                     <ImageView
                         android:id="@+id/fourth_pic"
+                        style="@style/PicImageView" />
+                </RelativeLayout>
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/fifth_cared"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/fourth_card"
+                android:layout_margin="@dimen/card_view_margin">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/box_height">
+
+                    <TextView
+                        android:id="@+id/fifth_info"
+                        style="@style/InfoTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/fifth_temp"
+                        style="@style/TempTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/fifth_info" />
+
+                    <TextView
+                        android:id="@+id/fifth_date"
+                        style="@style/DateTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <ImageView
+                        android:id="@+id/fifth_pic"
                         style="@style/PicImageView" />
                 </RelativeLayout>
             </android.support.v7.widget.CardView>

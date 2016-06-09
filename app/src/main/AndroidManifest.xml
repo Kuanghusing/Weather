@@ -10,7 +10,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".activities.SelectArea">
+
             <intent-filter>
+
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -19,7 +21,9 @@
         <activity android:name=".activities.WeatherActivity">
 
         </activity>
-        <activity android:name=".activities.About"></activity>
+        <activity android:name=".activities.About">
+
+        </activity>
 
         <receiver android:name=".receiver.AutoUpdateReceiver">
 

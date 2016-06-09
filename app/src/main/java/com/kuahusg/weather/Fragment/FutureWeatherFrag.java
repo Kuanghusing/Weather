@@ -26,6 +26,9 @@ public class FutureWeatherFrag extends Fragment {
     private TextView temp;
     private TextView date;
 
+    private int i = 1;
+
+
 
     @Nullable
     @Override
@@ -40,10 +43,12 @@ public class FutureWeatherFrag extends Fragment {
     }
 
     private void initId() {
+        i = 1;
         initView(R.id.first_pic, R.id.first_info, R.id.first_temp, R.id.first_date);
         initView(R.id.second_pic, R.id.second_info, R.id.second_temp, R.id.second_date);
         initView(R.id.third_pic, R.id.third_info, R.id.third_temp, R.id.third_date);
         initView(R.id.fourth_pic, R.id.fourth_info, R.id.fourth_temp, R.id.fourth_date);
+        initView(R.id.fifth_pic, R.id.fifth_info, R.id.fifth_temp, R.id.fifth_date);
     }
 
 
@@ -58,7 +63,6 @@ public class FutureWeatherFrag extends Fragment {
         initCard(img, info, temp, date);
     }
 
-    int i = 1;
 
     private void initCard(ImageView img, TextView info, TextView temp, TextView date) {
 
@@ -69,7 +73,7 @@ public class FutureWeatherFrag extends Fragment {
                 forecast = forecastList.get(i);
                 temp.setText(forecast.getLow() + "~" + forecast.getHigh());
                 info.setText(forecast.getWeatherText());
-                date.setText(forecast.getDate());
+                date.setText(forecast.getDate().substring(0, 6));
                 initImg(img, info.getText().toString());
                 i++;
 
@@ -96,11 +100,12 @@ public class FutureWeatherFrag extends Fragment {
 
     }
 
-    public void refreshWeather(List<Forecast> list) {
+    public synchronized void refreshWeather(List<Forecast> list) {
         if (list != null) {
             forecastList = list;
         }
         initId();
+        i = 1;
 
     }
 }
