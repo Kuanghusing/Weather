@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/app_name">
+
+
+        <SwitchPreference
+            android:key="auto_update"
+            android:summary="@string/auto_update_summary"
+            android:title="@string/auto_update" />
+
+        <EditTextPreference
+            android:key="update_time"
+            android:summary="@string/update_time_summary"
+            android:title="@string/update_time" />
+
+    </PreferenceCategory>
+
+
+</PreferenceScreen>

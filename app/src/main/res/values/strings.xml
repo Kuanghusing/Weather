@@ -50,7 +50,12 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License."</string>
+
+
     <string name="C">℃</string>
 
-
+    <string name="auto_update">自动更新天气</string>
+    <string name="auto_update_summary">后台自动更新</string>
+    <string name="update_time">更新间隔</string>
+    <string name="update_time_summary">设置更新的频率（分钟）</string>
 </resources>

@@ -64,6 +64,7 @@ public class WeatherFragment extends Fragment {
             showTempAndDate(tempAndPushDate);
         }
 
+//        getFragmentManager().beginTransaction().replace()
 
         return view;
 

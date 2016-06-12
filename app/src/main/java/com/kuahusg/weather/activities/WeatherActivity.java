@@ -7,12 +7,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -28,9 +26,9 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.kuahusg.weather.Fragment.FutureWeatherFrag;
+import com.kuahusg.weather.Fragment.SettingFrag;
 import com.kuahusg.weather.Fragment.WeatherFragment;
 import com.kuahusg.weather.R;
 import com.kuahusg.weather.db.WeatherDB;
@@ -54,14 +52,15 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     public static FloatingActionButton fab;
     public static Toolbar toolbar;
     public static Context mContext;
+    public static WeatherFragment todayFrag;
+    public static FutureWeatherFrag futureWeatherFrag;
+    public static SharedPreferences preferences;
+    //    private static int whichDay = 0;
+    public static SwipeRefreshLayout refreshLayout;
     private static City selectCity;
     private static String tempAndPushDate;
     private static List<Forecast> forecastList;
-    private static WeatherFragment todayFrag;
-    private static FutureWeatherFrag futureWeatherFrag;
-//    private static int whichDay = 0;
-private static SwipeRefreshLayout refreshLayout;
-    public static Handler handler = new Handler() {
+    /*public static Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -82,12 +81,12 @@ private static SwipeRefreshLayout refreshLayout;
                 case SHOW_TEMP_DATE:
                     tempAndPushDate = WeatherDB.loadTempAndDate();
                     todayFrag.showTempAndDate(tempAndPushDate);
-                    futureWeatherFrag.refreshWeather(forecastList);
+//                    futureWeatherFrag.refreshWeather(forecastList);
                     break;
 
             }
         }
-    };
+    };*/
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private TabLayout tabLayout;
@@ -95,6 +94,12 @@ private static SwipeRefreshLayout refreshLayout;
 
     public static void queryWeatherFromServer(final City selectCity) {
         Utility.queryWeather(selectCity.getWoeid(), mContext, false);
+
+    }
+
+    public static void updateInfomation(String tempAndPushDate, List<Forecast> forecastList) {
+        WeatherActivity.tempAndPushDate = tempAndPushDate;
+        WeatherActivity.forecastList = forecastList;
 
     }
 
@@ -154,8 +159,13 @@ private static SwipeRefreshLayout refreshLayout;
         futureWeatherFrag = (FutureWeatherFrag) adapter.getItem(1);
 
 
-        Intent intent = new Intent(mContext, AutoUpdateService.class);
-        mContext.startService(intent);
+        if (preferences.getBoolean(SettingFrag.AUTO_UPDATE, false)) {
+
+            int time = preferences.getInt(SettingFrag.UPDATE_TIME, 2 * 60);
+            Intent intent = new Intent(mContext, AutoUpdateService.class);
+            intent.putExtra(SettingFrag.UPDATE_TIME, time);
+            mContext.startService(intent);
+        }
 
 
     }
@@ -172,7 +182,7 @@ private static SwipeRefreshLayout refreshLayout;
 
         } else {
             LogUtil.v(this.getClass().getName(), "selectCity is null!");
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            preferences = PreferenceManager.getDefaultSharedPreferences(this);
             String fullName = preferences.getString("selectCity", "");
             String woeid = preferences.getString("woeid", "");
             String city_name = preferences.getString("city_name", "");
@@ -252,7 +262,7 @@ private static SwipeRefreshLayout refreshLayout;
                         viewPager.setCurrentItem(1);
                         break;
                     case R.id.about:
-                        handler.postDelayed(new Runnable() {
+                        new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
 
@@ -312,7 +322,9 @@ private static SwipeRefreshLayout refreshLayout;
                 drawerLayout.openDrawer(GravityCompat.START);
                 break;
             case R.id.menu_setting:
-                Toast.makeText(this, "还没完成...", Toast.LENGTH_LONG).show();
+//                Toast.makeText(this, "还没完成...", Toast.LENGTH_LONG).show();
+                Intent i = new Intent(WeatherActivity.this, Setting.class);
+                startActivity(i);
                 break;
             case R.id.change_btn:
 

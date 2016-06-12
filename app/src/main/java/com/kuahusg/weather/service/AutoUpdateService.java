@@ -19,6 +19,7 @@ import com.kuahusg.weather.util.Utility;
  * Created by kuahusg on 16-5-10.
  */
 public class AutoUpdateService extends Service {
+    private int time;
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -34,7 +35,7 @@ public class AutoUpdateService extends Service {
             }
         }).start();
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        long hours = 2 * 60 * 60 * 1000 + SystemClock.elapsedRealtime();
+        long hours = time * 60 * 60 * 1000 + SystemClock.elapsedRealtime();
         Intent i = new Intent(this, AutoUpdateReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
         alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, hours, pi);

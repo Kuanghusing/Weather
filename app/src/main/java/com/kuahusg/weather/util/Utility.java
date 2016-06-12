@@ -1,6 +1,7 @@
 package com.kuahusg.weather.util;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -29,8 +30,12 @@ import java.util.List;
  */
 public class Utility {
 
+    private static Context mContext;
+    private static boolean isFromService;
+
 
     public static void quaryCity(String city_name, final Context context) {
+//        mContext = context;
         try {
             city_name = URLEncoder.encode(city_name, "UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -134,12 +139,14 @@ public class Utility {
         }
         WeatherDB.deleteTable("temp");
         WeatherDB.deleteTable("Forecast");
-        final Message show_weather = new Message();
+        Utility.mContext = context;
+        Utility.isFromService = isFromService;
+        /*final Message show_weather = new Message();
         show_weather.what = WeatherActivity.SHOW_WEATHER;
         final Message tempAndD = new Message();
-        tempAndD.what = WeatherActivity.SHOW_TEMP_DATE;
+        tempAndD.what = WeatherActivity.SHOW_TEMP_DATE;*/
 
-        HttpUtil.sendHttpRequest(tempAndPushdate.replaceAll(" ", "%20").replaceAll("\"", "%22"),
+        /*HttpUtil.sendHttpRequest(tempAndPushdate.replaceAll(" ", "%20").replaceAll("\"", "%22"),
                 "GET", new HttpCallBackListener() {
                     @Override
                     public void onFinish(String respon) {
@@ -184,9 +191,12 @@ public class Utility {
 
 
                     }
-                });
+                });*/
 
-        HttpUtil.sendHttpRequest(address.replaceAll(" ", "%20").replaceAll("\"", "%22"), "GET", new HttpCallBackListener() {
+        new UpdateTempAndDate().execute(tempAndPushdate.replaceAll(" ", "%20").replaceAll("\"", "%22"));
+        new UpdateForecastTask().execute(address.replaceAll(" ", "%20").replaceAll("\"", "%22"));
+
+        /*HttpUtil.sendHttpRequest(address.replaceAll(" ", "%20").replaceAll("\"", "%22"), "GET", new HttpCallBackListener() {
 
             @Override
             public void onFinish(String respon) {
@@ -237,7 +247,7 @@ public class Utility {
 
 
             }
-        });
+        });*/
         return true;
 
     }
@@ -307,5 +317,133 @@ public class Utility {
         return jsonObject;
     }
 
+
+    static class UpdateForecastTask extends AsyncTask<String, Void, List<Forecast>> {
+
+
+        @Override
+        protected List<Forecast> doInBackground(String... params) {
+            final List<Forecast> forecastList = new ArrayList<>();
+
+            HttpUtil.sendHttpRequest(params[0].replaceAll(" ", "%20").replaceAll("\"", "%22"), "GET", new HttpCallBackListener() {
+
+                @Override
+                public void onFinish(String respon) {
+                    try {
+                        Forecast f;
+                        JSONObject jsonObject = new JSONObject(respon);
+                        JSONObject results = getJsonObject(jsonObject, "query", "results");
+//                    JSONArray item = new JSONArray(channel.toString());
+                        JSONArray item = results.getJSONArray("channel");
+                        for (int i = 0; i < item.length(); i++) {
+                            JSONObject day = item.getJSONObject(i);
+                            JSONObject forecast = getJsonObject(day, "item", "forecast");
+                            f = new Forecast(forecast.getString("date"), forecast.getString("high"),
+                                    forecast.getString("low"), forecast.getString("text"));
+                            forecastList.add(f);
+
+
+                        }
+                        LogUtil.v(this.getClass().toString(), "slove weather info finish");
+
+
+                    } catch (JSONException e) {
+
+
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    e.printStackTrace();
+                    LogUtil.d("Utility", "onError3" + e);
+
+                    Snackbar.make(WeatherActivity.fab, mContext.getString(R.string.no_network), Snackbar.LENGTH_LONG).show();
+                }
+            });
+            return forecastList;
+        }
+
+
+        @Override
+        protected void onPostExecute(List<Forecast> forecastList) {
+            super.onPostExecute(forecastList);
+            for (Forecast f :
+                    forecastList) {
+                WeatherDB.saveForecast(f);
+            }
+//            WeatherActivity.updateInfomation(null, forecastList);
+            WeatherActivity.todayFrag.showWeather(forecastList);
+            WeatherActivity.futureWeatherFrag.refreshWeather(forecastList);
+            WeatherActivity.todayFrag.hideProgressBar();
+            if (WeatherActivity.refreshLayout.isRefreshing()) {
+                WeatherActivity.refreshLayout.setRefreshing(false);
+
+            }
+            Snackbar.make(WeatherActivity.fab, mContext.getString(R.string.load_finish), Snackbar.LENGTH_LONG).show();
+
+        }
+    }
+
+
+    static class UpdateTempAndDate extends AsyncTask<String, Void, String> {
+
+
+        @Override
+        protected String doInBackground(String... params) {
+            final StringBuffer tempAndDate = new StringBuffer();
+            HttpUtil.sendHttpRequest(params[0].replaceAll(" ", "%20").replaceAll("\"", "%22"),
+                    "GET", new HttpCallBackListener() {
+                        @Override
+                        public void onFinish(String respon) {
+                            try {
+                                JSONObject jsonObject = new JSONObject(respon);
+                                JSONObject condition = getJsonObject(jsonObject, "query", "results", "channel",
+                                        "item", "condition");
+                                tempAndDate.append(condition.getString("date")).append("|");
+                                tempAndDate.append(condition.getString("temp"));
+
+
+                            } catch (JSONException e) {
+                                if (mContext != null) {
+
+
+                                    Toast.makeText(mContext, mContext.getString(R.string.no_result), Toast.LENGTH_LONG).show();
+
+                                }
+                                e.printStackTrace();
+
+
+                            }
+
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            e.printStackTrace();
+                            LogUtil.d("Utility", "onError2" + e);
+
+
+                        }
+                    });
+            return tempAndDate.toString();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            String temp;
+            String pushDate;
+            String t[] = s.split("\\|");
+            temp = t[0];
+            pushDate = t[1];
+            WeatherDB.saveTempAndDate(Integer.valueOf(temp), pushDate);
+            if (!isFromService) {
+                WeatherActivity.todayFrag.showTempAndDate(s);
+            }
+
+        }
+    }
 
 }

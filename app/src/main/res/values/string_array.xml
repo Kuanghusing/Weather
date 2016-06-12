@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="strings">
+        <item>111</item>
+        <item>222</item>
+        <item>333</item>
+    </string-array>
+
+    <string-array name="strings_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+</resources>

@@ -24,6 +24,10 @@
         <activity android:name=".activities.About">
 
         </activity>
+        <activity android:name=".activities.Setting">
+
+
+        </activity>
 
         <receiver android:name=".receiver.AutoUpdateReceiver">
 
