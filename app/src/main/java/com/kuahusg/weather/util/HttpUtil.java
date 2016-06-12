@@ -53,5 +53,29 @@ public class HttpUtil {
     }
 
 
+    public static String sendHttpReauest(final String address, final String method) {
+
+        URL url;
+        HttpURLConnection connection;
+        StringBuffer response;
+        response = new StringBuffer();
+        try {
+            url = new URL(address);
+            connection = (HttpURLConnection) url.openConnection();
+
+            String tmp;
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+            while ((tmp = bufferedReader.readLine()) != null) {
+                response.append(tmp);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return response.toString();
+
+    }
+
 }
 

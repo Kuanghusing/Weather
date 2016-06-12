@@ -307,7 +307,7 @@ public class Utility {
         });
     }
 
-    public static JSONObject getJsonObject(JSONObject fromJsonObject, String... strings) throws JSONException {
+    private static JSONObject getJsonObject(JSONObject fromJsonObject, String... strings) throws JSONException {
         JSONObject jsonObject = fromJsonObject;
         for (String s :
                 strings) {
@@ -318,14 +318,14 @@ public class Utility {
     }
 
 
-    static class UpdateForecastTask extends AsyncTask<String, Void, List<Forecast>> {
+    private static class UpdateForecastTask extends AsyncTask<String, Void, List<Forecast>> {
 
 
         @Override
         protected List<Forecast> doInBackground(String... params) {
-            final List<Forecast> forecastList = new ArrayList<>();
+            List<Forecast> forecastList = new ArrayList<>();
 
-            HttpUtil.sendHttpRequest(params[0].replaceAll(" ", "%20").replaceAll("\"", "%22"), "GET", new HttpCallBackListener() {
+            /*HttpUtil.sendHttpRequest(params[0].replaceAll(" ", "%20").replaceAll("\"", "%22"), "GET", new HttpCallBackListener() {
 
                 @Override
                 public void onFinish(String respon) {
@@ -340,7 +340,8 @@ public class Utility {
                             JSONObject forecast = getJsonObject(day, "item", "forecast");
                             f = new Forecast(forecast.getString("date"), forecast.getString("high"),
                                     forecast.getString("low"), forecast.getString("text"));
-                            forecastList.add(f);
+//                            forecastList.add(f);
+                            getList(f);
 
 
                         }
@@ -361,7 +362,33 @@ public class Utility {
 
                     Snackbar.make(WeatherActivity.fab, mContext.getString(R.string.no_network), Snackbar.LENGTH_LONG).show();
                 }
-            });
+            });*/
+
+            String result = HttpUtil.sendHttpReauest(params[0], "GET");
+            try {
+                Forecast f;
+                JSONObject jsonObject = new JSONObject(result);
+                JSONObject results = getJsonObject(jsonObject, "query", "results");
+//                    JSONArray item = new JSONArray(channel.toString());
+                JSONArray item = results.getJSONArray("channel");
+                for (int i = 0; i < item.length(); i++) {
+                    JSONObject day = item.getJSONObject(i);
+                    JSONObject forecast = getJsonObject(day, "item", "forecast");
+                    f = new Forecast(forecast.getString("date"), forecast.getString("high"),
+                            forecast.getString("low"), forecast.getString("text"));
+//                            forecastList.add(f);
+                    forecastList.add(f);
+
+
+                }
+                LogUtil.v(this.getClass().toString(), "slove weather info finish");
+
+
+            } catch (JSONException e) {
+
+
+                e.printStackTrace();
+            }
             return forecastList;
         }
 
@@ -384,16 +411,19 @@ public class Utility {
             Snackbar.make(WeatherActivity.fab, mContext.getString(R.string.load_finish), Snackbar.LENGTH_LONG).show();
 
         }
+
+
     }
 
 
-    static class UpdateTempAndDate extends AsyncTask<String, Void, String> {
+    private static class UpdateTempAndDate extends AsyncTask<String, Void, String> {
 
 
         @Override
         protected String doInBackground(String... params) {
-            final StringBuffer tempAndDate = new StringBuffer();
-            HttpUtil.sendHttpRequest(params[0].replaceAll(" ", "%20").replaceAll("\"", "%22"),
+            StringBuffer tempAndDate = new StringBuffer();
+
+            /*HttpUtil.sendHttpRequest(params[0].replaceAll(" ", "%20").replaceAll("\"", "%22"),
                     "GET", new HttpCallBackListener() {
                         @Override
                         public void onFinish(String respon) {
@@ -401,8 +431,9 @@ public class Utility {
                                 JSONObject jsonObject = new JSONObject(respon);
                                 JSONObject condition = getJsonObject(jsonObject, "query", "results", "channel",
                                         "item", "condition");
-                                tempAndDate.append(condition.getString("date")).append("|");
-                                tempAndDate.append(condition.getString("temp"));
+//                                tempAndDate.append(condition.getString("date")).append("|");
+//                                tempAndDate.append(condition.getString("temp"));
+                                getTempAndDate(condition.getString("date"), condition.getString("temp"));
 
 
                             } catch (JSONException e) {
@@ -426,9 +457,34 @@ public class Utility {
 
 
                         }
-                    });
+                    });*/
+
+            String result = HttpUtil.sendHttpReauest(params[0], "GET");
+            try {
+                JSONObject jsonObject = new JSONObject(result);
+                JSONObject condition = getJsonObject(jsonObject, "query", "results", "channel",
+                        "item", "condition");
+//                                tempAndDate.append(condition.getString("date")).append("|");
+//                                tempAndDate.append(condition.getString("temp"));
+//                getTempAndDate(condition.getString("date"), condition.getString("temp"));
+
+                tempAndDate.append(condition.getString("temp")).append("|").append(condition.getString("date"));
+
+            } catch (JSONException e) {
+                if (mContext != null) {
+
+
+                    Toast.makeText(mContext, mContext.getString(R.string.no_result), Toast.LENGTH_LONG).show();
+
+                }
+                e.printStackTrace();
+
+
+            }
+
             return tempAndDate.toString();
         }
+
 
         @Override
         protected void onPostExecute(String s) {
@@ -444,6 +500,8 @@ public class Utility {
             }
 
         }
+
+
     }
 
 }

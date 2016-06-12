@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constraintLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/date_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="20dp"
+        android:paddingTop="20dp"
+        android:text="date"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp" />
+
+
+    <ImageView
+        android:id="@+id/weather_pic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="8dp"
+        android:src="@drawable/weather_sun_day"
+        app:layout_constraintBottom_toTopOf="@+id/weather_text"
+        app:layout_constraintLeft_toLeftOf="@+id/weather_text"
+        app:layout_constraintRight_toRightOf="@+id/weather_text" />
+
+
+    <TextView
+        android:id="@+id/temp_now"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/temp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:text="20"
+        android:textColor="@color/white"
+        android:textSize="80sp"
+        android:typeface="monospace"
+        app:layout_constraintBottom_toBottomOf="@+id/constraintLayout"
+        app:layout_constraintHorizontal_bias="0.03"
+        app:layout_constraintLeft_toLeftOf="@+id/constraintLayout"
+        app:layout_constraintRight_toRightOf="@+id/constraintLayout" />
+
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:src="@drawable/ic_down"
+        app:layout_constraintBottom_toTopOf="@+id/temp_now"
+        app:layout_constraintLeft_toRightOf="@+id/temp1" />
+
+    <TextView
+        android:id="@+id/temp1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:text="temp1"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toTopOf="@+id/temp_now"
+        app:layout_constraintLeft_toRightOf="@+id/imageView"
+        app:layout_constraintTop_toTopOf="@+id/imageView" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="16dp"
+        android:src="@drawable/ic_up"
+        app:layout_constraintBottom_toTopOf="@+id/temp_now"
+        app:layout_constraintLeft_toLeftOf="@+id/constraintLayout" />
+
+    <!--<TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="~"
+        android:textColor="@color/white" />-->
+
+    <TextView
+        android:id="@+id/temp2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="16dp"
+        android:text="temp2"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toTopOf="@+id/temp_now"
+        app:layout_constraintHorizontal_bias="0.01"
+        app:layout_constraintLeft_toRightOf="@+id/imageView2"
+        app:layout_constraintRight_toRightOf="@+id/constraintLayout" />
+
+
+    <TextView
+        android:id="@+id/weather_text"
+        android:layout_width="160dp"
+        android:layout_height="42dp"
+        android:layout_below="@id/weather_pic"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="weather_text"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toBottomOf="@+id/constraintLayout"
+        app:layout_constraintLeft_toLeftOf="@+id/constraintLayout"
+        app:layout_constraintRight_toRightOf="@+id/constraintLayout"
+        app:layout_constraintTop_toTopOf="@+id/constraintLayout" />
+
+
+    <TextView
+        android:id="@+id/degree"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/temp_now"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_toEndOf="@+id/temp_now"
+        android:paddingBottom="12dp"
+        android:text="℃"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="@+id/constraintLayout"
+        app:layout_constraintLeft_toRightOf="@+id/temp_now" />
+
+
+    <ImageView
+        android:id="@+id/clock_img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_clock"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp" />
+
+    <TextView
+        android:id="@+id/public_data"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:padding="7dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="6dp"
+        android:text="publish_date"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        app:layout_constraintRight_toRightOf="@+id/constraintLayout"
+        tools:layout_editor_absoluteY="0dp" />
+
+
+</android.support.constraint.ConstraintLayout>
