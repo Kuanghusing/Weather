@@ -15,5 +15,17 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/more">
+        <Preference
+            android:key="about"
+            android:title="@string/about"></Preference>
+
+        <Preference
+            android:key="open_source"
+            android:summary="@string/open_source_text"
+            android:title="@string/open_source" />
+
+    </PreferenceCategory>
+
 
 </PreferenceScreen>

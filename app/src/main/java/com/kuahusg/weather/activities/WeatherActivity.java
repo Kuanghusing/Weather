@@ -97,17 +97,18 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
-    public static void updateInfomation(String tempAndPushDate, List<Forecast> forecastList) {
+    /*public static void updateInfomation(String tempAndPushDate, List<Forecast> forecastList) {
         WeatherActivity.tempAndPushDate = tempAndPushDate;
         WeatherActivity.forecastList = forecastList;
 
-    }
+    }*/
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.weather_layout);
         mContext = getApplicationContext();
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         /*
         * fab
@@ -159,12 +160,12 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         futureWeatherFrag = (FutureWeatherFrag) adapter.getItem(1);
 
 
+        Intent intent = new Intent(mContext, AutoUpdateService.class);
         if (preferences.getBoolean(SettingFrag.AUTO_UPDATE, false)) {
 
-            int time = preferences.getInt(SettingFrag.UPDATE_TIME, 2 * 60);
-            Intent intent = new Intent(mContext, AutoUpdateService.class);
-            intent.putExtra(SettingFrag.UPDATE_TIME, time);
             mContext.startService(intent);
+        } else {
+            stopService(intent);
         }
 
 
@@ -182,7 +183,6 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
 
         } else {
             LogUtil.v(this.getClass().getName(), "selectCity is null!");
-            preferences = PreferenceManager.getDefaultSharedPreferences(this);
             String fullName = preferences.getString("selectCity", "");
             String woeid = preferences.getString("woeid", "");
             String city_name = preferences.getString("city_name", "");

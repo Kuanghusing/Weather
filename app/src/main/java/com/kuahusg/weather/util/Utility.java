@@ -325,51 +325,12 @@ public class Utility {
         protected List<Forecast> doInBackground(String... params) {
             List<Forecast> forecastList = new ArrayList<>();
 
-            /*HttpUtil.sendHttpRequest(params[0].replaceAll(" ", "%20").replaceAll("\"", "%22"), "GET", new HttpCallBackListener() {
-
-                @Override
-                public void onFinish(String respon) {
-                    try {
-                        Forecast f;
-                        JSONObject jsonObject = new JSONObject(respon);
-                        JSONObject results = getJsonObject(jsonObject, "query", "results");
-//                    JSONArray item = new JSONArray(channel.toString());
-                        JSONArray item = results.getJSONArray("channel");
-                        for (int i = 0; i < item.length(); i++) {
-                            JSONObject day = item.getJSONObject(i);
-                            JSONObject forecast = getJsonObject(day, "item", "forecast");
-                            f = new Forecast(forecast.getString("date"), forecast.getString("high"),
-                                    forecast.getString("low"), forecast.getString("text"));
-//                            forecastList.add(f);
-                            getList(f);
-
-
-                        }
-                        LogUtil.v(this.getClass().toString(), "slove weather info finish");
-
-
-                    } catch (JSONException e) {
-
-
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    e.printStackTrace();
-                    LogUtil.d("Utility", "onError3" + e);
-
-                    Snackbar.make(WeatherActivity.fab, mContext.getString(R.string.no_network), Snackbar.LENGTH_LONG).show();
-                }
-            });*/
 
             String result = HttpUtil.sendHttpReauest(params[0], "GET");
             try {
                 Forecast f;
                 JSONObject jsonObject = new JSONObject(result);
                 JSONObject results = getJsonObject(jsonObject, "query", "results");
-//                    JSONArray item = new JSONArray(channel.toString());
                 JSONArray item = results.getJSONArray("channel");
                 for (int i = 0; i < item.length(); i++) {
                     JSONObject day = item.getJSONObject(i);
@@ -401,14 +362,17 @@ public class Utility {
                 WeatherDB.saveForecast(f);
             }
 //            WeatherActivity.updateInfomation(null, forecastList);
-            WeatherActivity.todayFrag.showWeather(forecastList);
-            WeatherActivity.futureWeatherFrag.refreshWeather(forecastList);
-            WeatherActivity.todayFrag.hideProgressBar();
-            if (WeatherActivity.refreshLayout.isRefreshing()) {
-                WeatherActivity.refreshLayout.setRefreshing(false);
+            if (!isFromService) {
+                WeatherActivity.todayFrag.showWeather(forecastList);
+                WeatherActivity.futureWeatherFrag.refreshWeather(forecastList);
+                WeatherActivity.todayFrag.hideProgressBar();
+                if (WeatherActivity.refreshLayout.isRefreshing()) {
+                    WeatherActivity.refreshLayout.setRefreshing(false);
 
+                }
+
+                Snackbar.make(WeatherActivity.fab, mContext.getString(R.string.load_finish), Snackbar.LENGTH_LONG).show();
             }
-            Snackbar.make(WeatherActivity.fab, mContext.getString(R.string.load_finish), Snackbar.LENGTH_LONG).show();
 
         }
 
@@ -422,42 +386,6 @@ public class Utility {
         @Override
         protected String doInBackground(String... params) {
             StringBuffer tempAndDate = new StringBuffer();
-
-            /*HttpUtil.sendHttpRequest(params[0].replaceAll(" ", "%20").replaceAll("\"", "%22"),
-                    "GET", new HttpCallBackListener() {
-                        @Override
-                        public void onFinish(String respon) {
-                            try {
-                                JSONObject jsonObject = new JSONObject(respon);
-                                JSONObject condition = getJsonObject(jsonObject, "query", "results", "channel",
-                                        "item", "condition");
-//                                tempAndDate.append(condition.getString("date")).append("|");
-//                                tempAndDate.append(condition.getString("temp"));
-                                getTempAndDate(condition.getString("date"), condition.getString("temp"));
-
-
-                            } catch (JSONException e) {
-                                if (mContext != null) {
-
-
-                                    Toast.makeText(mContext, mContext.getString(R.string.no_result), Toast.LENGTH_LONG).show();
-
-                                }
-                                e.printStackTrace();
-
-
-                            }
-
-                        }
-
-                        @Override
-                        public void onError(Exception e) {
-                            e.printStackTrace();
-                            LogUtil.d("Utility", "onError2" + e);
-
-
-                        }
-                    });*/
 
             String result = HttpUtil.sendHttpReauest(params[0], "GET");
             try {

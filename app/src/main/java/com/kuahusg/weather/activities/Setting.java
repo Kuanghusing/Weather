@@ -14,6 +14,21 @@ public class Setting extends PreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        addPreferencesFromResource(R.xml.preference);
+//        setContentView(R.layout.setting);
+
+/*
+        ViewGroup viewRoot = (ViewGroup) findViewById(android.R.id.content);
+        View content = viewRoot.getChildAt(0);
+
+        LinearLayout toolbarLayout = (LinearLayout)LayoutInflater.from(this).inflate(R.layout.setting, null);
+        viewRoot.removeAllViews();
+        toolbarLayout.addView(content);
+        viewRoot.addView(toolbarLayout);*/
+
         getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingFrag()).commit();
+
+
     }
+
+
 }
