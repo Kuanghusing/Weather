@@ -3,7 +3,7 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="AppTheme.Base">
         <!-- Customize your theme here. -->
-        <item name="android:windowTranslucentStatus">true</item>
+        <!--<item name="android:windowTranslucentStatus">true</item>-->
         <!--<item name="android:windowTranslucentNavigation">true</item>-->
 
     </style>
@@ -27,16 +27,16 @@
     <style name="DateTextView">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_alignParentEnd">true</item>
+        <item name="android:layout_alignParentRight">true</item>
         <item name="android:layout_margin">10dp</item>
     </style>
     
     <style name="PicImageView">
         <item name="android:layout_width">80dp</item>
         <item name="android:layout_height">80dp</item>
-        <item name="android:layout_alignParentStart">true</item>
+        <item name="android:layout_alignParentLeft">true</item>
         <item name="android:layout_centerVertical">true</item>
-        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingLeft">10dp</item>
     </style>
     
     
@@ -44,7 +44,7 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_centerInParent">true</item>
-        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingLeft">20dp</item>
         <item name="android:textSize">14sp</item>
     </style>
     
@@ -54,7 +54,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_centerHorizontal">true</item>
         <item name="android:textSize">20sp</item>
-        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingLeft">20dp</item>
     </style>
 
 

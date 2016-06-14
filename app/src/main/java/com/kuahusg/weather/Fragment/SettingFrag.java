@@ -9,6 +9,8 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
+import android.text.TextUtils;
+import android.widget.Toast;
 
 import com.kuahusg.weather.R;
 import com.kuahusg.weather.activities.About;
@@ -24,6 +26,7 @@ public class SettingFrag extends PreferenceFragment implements Preference.OnPref
     public static final String UPDATE_TIME = "update_time";
     public static final String OPEN_SOURCE = "open_source";
     public static final String ABOUT = "about";
+    public static final String UPDATE_APP = "update_app";
     private SwitchPreference autoUpdatePreference;
     private EditTextPreference updateTimePreference;
     private Activity activity;
@@ -61,6 +64,11 @@ public class SettingFrag extends PreferenceFragment implements Preference.OnPref
                 intent1.setData(Uri.parse("https://github.com/Kuanghusing/Weather"));
                 activity.startActivity(intent1);
                 break;
+            case UPDATE_APP:
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse("http://fir.im/eync"));
+                startActivity(i);
+                break;
         }
         return super.onPreferenceTreeClick(preferenceScreen, preference);
     }
@@ -72,7 +80,10 @@ public class SettingFrag extends PreferenceFragment implements Preference.OnPref
         LogUtil.v(this.toString(), "onPreferenceChange()");
         if (preference.getKey().equals(SettingFrag.UPDATE_TIME)) {
             LogUtil.v(this.toString(), "onPreferenceChange() -> UPDATE");
-
+            if (TextUtils.isEmpty((String) newValue)) {
+                Toast.makeText(activity, activity.getString(R.string.no_value_error), Toast.LENGTH_LONG).show();
+                return false;
+            }
             activity.stopService(intent);
             activity.startService(intent);
         } else if (preference.getKey().equals(SettingFrag.AUTO_UPDATE)) {

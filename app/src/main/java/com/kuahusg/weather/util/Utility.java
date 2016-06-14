@@ -318,7 +318,7 @@ public class Utility {
     }
 
 
-    private static class UpdateForecastTask extends AsyncTask<String, Void, List<Forecast>> {
+    private static class UpdateForecastTask extends AsyncTask<String, String, List<Forecast>> {
 
 
         @Override
@@ -326,7 +326,14 @@ public class Utility {
             List<Forecast> forecastList = new ArrayList<>();
 
 
-            String result = HttpUtil.sendHttpReauest(params[0], "GET");
+            String result;
+            try {
+                result = HttpUtil.sendHttpReauest(params[0], "GET");
+            } catch (Exception e) {
+                e.printStackTrace();
+                publishProgress(mContext.getString(R.string.no_network));
+                return null;
+            }
             try {
                 Forecast f;
                 JSONObject jsonObject = new JSONObject(result);
@@ -346,32 +353,46 @@ public class Utility {
 
 
             } catch (JSONException e) {
+                publishProgress(mContext.getString(R.string.no_result));
 
 
+//                Toast.makeText(mContext,mContext.getString(R.string.no_result),Toast.LENGTH_LONG).show();
                 e.printStackTrace();
+                return null;
             }
             return forecastList;
         }
 
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            if (!isFromService) {
+                Toast.makeText(mContext, values[0], Toast.LENGTH_SHORT).show();
+                WeatherActivity.refreshLayout.setRefreshing(false);
+            }
+
+        }
 
         @Override
         protected void onPostExecute(List<Forecast> forecastList) {
             super.onPostExecute(forecastList);
-            for (Forecast f :
-                    forecastList) {
-                WeatherDB.saveForecast(f);
-            }
-//            WeatherActivity.updateInfomation(null, forecastList);
-            if (!isFromService) {
-                WeatherActivity.todayFrag.showWeather(forecastList);
-                WeatherActivity.futureWeatherFrag.refreshWeather(forecastList);
-                WeatherActivity.todayFrag.hideProgressBar();
-                if (WeatherActivity.refreshLayout.isRefreshing()) {
-                    WeatherActivity.refreshLayout.setRefreshing(false);
-
+            if (forecastList != null) {
+                for (Forecast f :
+                        forecastList) {
+                    WeatherDB.saveForecast(f);
                 }
+//            WeatherActivity.updateInfomation(null, forecastList);
+                if (!isFromService) {
+                    WeatherActivity.todayFrag.showWeather(forecastList);
+                    WeatherActivity.futureWeatherFrag.refreshWeather(forecastList);
+                    WeatherActivity.todayFrag.hideProgressBar();
+                    if (WeatherActivity.refreshLayout.isRefreshing()) {
+                        WeatherActivity.refreshLayout.setRefreshing(false);
 
-                Snackbar.make(WeatherActivity.fab, mContext.getString(R.string.load_finish), Snackbar.LENGTH_LONG).show();
+                    }
+
+                    Snackbar.make(WeatherActivity.fab, mContext.getString(R.string.load_finish), Snackbar.LENGTH_LONG).show();
+                }
             }
 
         }
@@ -380,14 +401,22 @@ public class Utility {
     }
 
 
-    private static class UpdateTempAndDate extends AsyncTask<String, Void, String> {
+    private static class UpdateTempAndDate extends AsyncTask<String, String, String> {
 
 
         @Override
         protected String doInBackground(String... params) {
             StringBuffer tempAndDate = new StringBuffer();
 
-            String result = HttpUtil.sendHttpReauest(params[0], "GET");
+            String result = null;
+            try {
+                result = HttpUtil.sendHttpReauest(params[0], "GET");
+            } catch (Exception e) {
+                e.printStackTrace();
+//                publishProgress(mContext.getString(R.string.no_network));
+                return null;
+
+            }
             try {
                 JSONObject jsonObject = new JSONObject(result);
                 JSONObject condition = getJsonObject(jsonObject, "query", "results", "channel",
@@ -402,8 +431,9 @@ public class Utility {
                 if (mContext != null) {
 
 
-                    Toast.makeText(mContext, mContext.getString(R.string.no_result), Toast.LENGTH_LONG).show();
-
+//                    Toast.makeText(mContext, mContext.getString(R.string.no_result), Toast.LENGTH_LONG).show();
+//                    publishProgress(mContext.getString(R.string.no_result));
+                    return null;
                 }
                 e.printStackTrace();
 
@@ -415,16 +445,28 @@ public class Utility {
 
 
         @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            if (!isFromService) {
+                Toast.makeText(mContext, values[0], Toast.LENGTH_SHORT).show();
+                WeatherActivity.refreshLayout.setRefreshing(false);
+            }
+
+        }
+
+        @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             String temp;
             String pushDate;
-            String t[] = s.split("\\|");
-            temp = t[0];
-            pushDate = t[1];
-            WeatherDB.saveTempAndDate(Integer.valueOf(temp), pushDate);
-            if (!isFromService) {
-                WeatherActivity.todayFrag.showTempAndDate(s);
+            if (s != null) {
+                String t[] = s.split("\\|");
+                temp = t[0];
+                pushDate = t[1];
+                WeatherDB.saveTempAndDate(Integer.valueOf(temp), pushDate);
+                if (!isFromService) {
+                    WeatherActivity.todayFrag.showTempAndDate(s);
+                }
             }
 
         }

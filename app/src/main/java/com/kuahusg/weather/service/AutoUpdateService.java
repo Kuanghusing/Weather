@@ -50,7 +50,7 @@ public class AutoUpdateService extends Service {
             sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         }
         time = Integer.valueOf(sharedPreferences.getString(SettingFrag.UPDATE_TIME, "0"));
-        if (time == 0) {
+        if (time <= 0) {
             time = 2;
         }
         LogUtil.v(this.toString(), "update time:" + time);

@@ -45,4 +45,6 @@
     <string name="auto_update_summary">后台自动更新</string>
     <string name="update_time">更新间隔</string>
     <string name="update_time_summary">设置更新的频率（小时）</string>
+    <string name="update_app">检查更新</string>
+    <string name="no_value_error">不能为空哦……</string>
 </resources>

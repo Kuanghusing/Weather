@@ -9,6 +9,7 @@
             android:title="@string/auto_update" />
 
         <EditTextPreference
+            android:defaultValue="2"
             android:key="update_time"
             android:summary="@string/update_time_summary"
             android:title="@string/update_time" />
@@ -18,13 +19,16 @@
     <PreferenceCategory android:title="@string/more">
         <Preference
             android:key="about"
-            android:title="@string/about"></Preference>
+            android:title="@string/about" />
 
         <Preference
             android:key="open_source"
             android:summary="@string/open_source_text"
             android:title="@string/open_source" />
 
+        <Preference
+            android:key="update_app"
+            android:title="@string/update_app" />
     </PreferenceCategory>
 
 
