@@ -4,15 +4,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/date_textview"
+    <LinearLayout
+        android:id="@+id/date_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingLeft="20dp"
-        android:paddingRight="0dp"
-        android:paddingTop="20dp"
-        android:textColor="@color/white"
-        android:textSize="15sp" />
+        android:paddingTop="20dp">
+
+        <ImageView
+            android:id="@+id/date_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_date_black" />
+
+        <TextView
+            android:id="@+id/date_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            android:textSize="15sp" />
+    </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/weather_info"
@@ -33,7 +43,6 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/weather_pic"
             android:layout_centerHorizontal="true"
-            android:textColor="@color/white"
             android:textSize="15sp" />
 
     </RelativeLayout>
@@ -55,7 +64,6 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/temp"
-            android:textColor="@color/white"
             android:textSize="80sp"
             android:typeface="monospace" />
 
@@ -67,7 +75,6 @@
             android:layout_toRightOf="@+id/temp_now"
             android:paddingBottom="12dp"
             android:text="@string/C"
-            android:textColor="@color/white"
             android:textSize="30sp" />
 
         <LinearLayout
@@ -79,19 +86,20 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_down" />
+                android:src="@drawable/ic_down"
+                android:tint="@android:color/primary_text_light" />
 
             <TextView
                 android:id="@+id/temp1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
                 android:textSize="15sp" />
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_up" />
+                android:src="@drawable/ic_up"
+                android:tint="@android:color/primary_text_light" />
 
             <!--<TextView
                 android:layout_width="wrap_content"
@@ -103,7 +111,6 @@
                 android:id="@+id/temp2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
                 android:textSize="15sp" />
         </LinearLayout>
 
@@ -123,7 +130,7 @@
             android:id="@+id/clock_img"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_clock" />
+            android:src="@drawable/ic_clock_black" />
 
         <TextView
             android:id="@+id/public_data"
@@ -132,7 +139,6 @@
             android:padding="7dp"
             android:paddingRight="10dp"
             android:paddingTop="6dp"
-            android:textColor="@color/white"
             android:textSize="15sp" />
 
     </LinearLayout>

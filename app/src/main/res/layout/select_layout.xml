@@ -1,68 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:focusable="true"
-    android:focusableInTouchMode="true">
+    android:fitsSystemWindows="true">
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/ic_launcher"
-        android:layout_above="@+id/relativeLayout"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="63dp"
-        android:id="@+id/logo" />
-
-
-    <RelativeLayout
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="180dp"
-        android:layout_centerInParent="true"
-        android:id="@+id/relativeLayout">
+        android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/first"
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:theme="@style/ThemeOverlay.AppCompat.Dark" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
+
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_above="@+id/relativeLayout"
             android:layout_centerHorizontal="true"
-            android:orientation="horizontal">
+            android:layout_marginBottom="33dp"
+            android:scaleType="centerCrop"
+            android:src="@mipmap/ic_launcher" />
 
 
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="250dp"
-                android:layout_height="wrap_content">
+        <RelativeLayout
+            android:id="@+id/relativeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:layout_centerInParent="true"
+            android:paddingTop="30dp">
 
-                <AutoCompleteTextView
-                    android:id="@+id/city_editText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/search_hint"
-                    android:completionThreshold="1"
-                    android:paddingRight="20dp"
-                    android:paddingLeft="20dp" />
-            </android.support.design.widget.TextInputLayout>
-
-            <ImageView
+            <LinearLayout
+                android:id="@+id/first"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_search"
-                android:id="@+id/query_button"
-                android:paddingTop="15dp" />
+                android:layout_centerHorizontal="true"
+                android:orientation="horizontal">
 
-            <!--            <Button
-                            android:id="@+id/query_button"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/query_bottom" />-->
-        </LinearLayout>
 
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/city_list"
-            android:layout_below="@+id/first">
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content">
 
-        </ListView>
+                    <AutoCompleteTextView
+                        android:id="@+id/city_editText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:completionThreshold="1"
+                        android:hint="@string/search_hint"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="20dp" />
+                </android.support.design.widget.TextInputLayout>
+
+                <ImageView
+                    android:id="@+id/query_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="15dp"
+                    android:src="@drawable/ic_search"
+                    android:tint="@color/colorAccent" />
+
+                <!--            <Button
+                                android:id="@+id/query_button"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/query_bottom" />-->
+            </LinearLayout>
+
+            <ListView
+                android:id="@+id/city_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/first">
+
+            </ListView>
+        </RelativeLayout>
     </RelativeLayout>
-</RelativeLayout>
+
+</android.support.design.widget.CoordinatorLayout>

@@ -14,13 +14,15 @@
 
         <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:elevation="4dp">
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="@color/colorPrimary"
+                app:elevation="4dp"
                 app:layout_scrollFlags="scroll|enterAlways"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 app:subtitleTextColor="@color/white"
@@ -34,8 +36,9 @@
                 android:id="@+id/tab_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:tabSelectedTextColor="@color/colorAccent"
-                app:tabTextColor="@color/white">
+                app:tabIndicatorColor="@color/colorAccent"
+                app:tabSelectedTextColor="@color/white"
+                app:tabTextColor="@color/light_blue">
 
             </android.support.design.widget.TabLayout>
         </android.support.design.widget.AppBarLayout>
@@ -70,10 +73,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="16dp"
-            android:backgroundTint="#00BFFF"
             android:src="@drawable/ic_refresh"
             app:borderWidth="0dp"
-            app:rippleColor="@color/colorPrimaryDark" />
+            app:elevation="6dp"
+            app:rippleColor="@color/colorPrimary" />
 
     </android.support.design.widget.CoordinatorLayout>
 
@@ -86,8 +89,7 @@
         android:layout_marginTop="@dimen/nav_margin_top"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header"
-        app:itemIconTint="@color/white"
-        app:itemTextColor="@color/white"
+        app:itemIconTint="@color/colorPrimary"
         app:menu="@menu/nav_menu" />
 
 

@@ -42,6 +42,7 @@ public class WeatherFragment extends Fragment {
     private ImageView weatherPic;
     private RelativeLayout weather_info;
     private LinearLayout public_layout;
+    private LinearLayout date_layout;
     private RelativeLayout weather_more_info;
     private ContentLoadingProgressBar progressBar;
     private int whichDay = 0;
@@ -89,6 +90,7 @@ public class WeatherFragment extends Fragment {
             weather_info.setVisibility(View.VISIBLE);
             weather_more_info.setVisibility(View.VISIBLE);
             public_layout.setVisibility(View.VISIBLE);
+            date_layout.setVisibility(View.VISIBLE);
             showWeatherPic(weatherText);
         } else {
             Snackbar.make(WeatherActivity.fab, mContext.getString(R.string.error_network), Snackbar.LENGTH_LONG).show();
@@ -140,12 +142,14 @@ public class WeatherFragment extends Fragment {
         weatherPic = (ImageView) view.findViewById(R.id.weather_pic);
         weather_info = (RelativeLayout) view.findViewById(R.id.weather_info);
         public_layout = (LinearLayout) view.findViewById(R.id.public_layout);
+        date_layout = (LinearLayout) view.findViewById(R.id.date_layout);
         weather_more_info = (RelativeLayout) view.findViewById(R.id.main_info);
 
         date.setVisibility(View.INVISIBLE);
         weather_info.setVisibility(View.INVISIBLE);
         weather_more_info.setVisibility(View.INVISIBLE);
         public_layout.setVisibility(View.INVISIBLE);
+        date_layout.setVisibility(View.INVISIBLE);
 
 
     }

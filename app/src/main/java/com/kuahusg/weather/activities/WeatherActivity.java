@@ -125,7 +125,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setSubtitle("loading...");
+        toolbar.setSubtitle(getString(R.string.loading));
 
 
         drawerLayout = (DrawerLayout) findViewById(R.id.main_container);

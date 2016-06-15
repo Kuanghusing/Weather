@@ -18,6 +18,7 @@
             android:layout_height="wrap_content"
             android:fitsSystemWindows="true"
             app:contentScrim="@color/colorPrimary"
+            app:elevation="4dp"
             app:expandedTitleMarginEnd="48dp"
             app:expandedTitleMarginStart="64dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
@@ -138,6 +139,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:src="@drawable/github_icon"
+        app:elevation="6dp"
         app:layout_anchor="@id/appbar"
         app:layout_anchorGravity="bottom|end" />
 </android.support.design.widget.CoordinatorLayout>
