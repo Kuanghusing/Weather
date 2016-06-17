@@ -106,6 +106,24 @@ public class SelectArea extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.select_layout);
 
+         /*
+        * from WeatherActivity? go to WeatherAcitvity directly
+         */
+
+        db = WeatherDB.getInstance(this);
+        isFromWeatherActivity = getIntent().getBooleanExtra("isFromWeatherActivity", false);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String selectCity = sharedPreferences.getString("selectCity", "");
+        String hasLoadCity = sharedPreferences.getString("hasLoadCity", "");
+        if (!isFromWeatherActivity && !TextUtils.isEmpty(selectCity)) {
+            Intent intent = new Intent(SelectArea.this, WeatherActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
+
+
         queryButton = (ImageView) findViewById(R.id.query_button);
         editText = (AutoCompleteTextView) findViewById(R.id.city_editText);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -122,22 +140,9 @@ public class SelectArea extends AppCompatActivity {
         arrayAdapter = new ArrayAdapter<>(SelectArea.this, android.R.layout.simple_list_item_1, cityListFromDataBase);
         editText.setAdapter(arrayAdapter);
 
-        db = WeatherDB.getInstance(this);
 
 
-        /*
-        * from WeatherActivity? go to WeatherAcitvity directly
-         */
 
-        isFromWeatherActivity = getIntent().getBooleanExtra("isFromWeatherActivity", false);
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String selectCity = sharedPreferences.getString("selectCity", "");
-        String hasLoadCity = sharedPreferences.getString("hasLoadCity", "");
-        if (!isFromWeatherActivity && !TextUtils.isEmpty(selectCity)) {
-            Intent intent = new Intent(SelectArea.this, WeatherActivity.class);
-            startActivity(intent);
-            finish();
-        }
 
         /*
         * load the all the cities list from server

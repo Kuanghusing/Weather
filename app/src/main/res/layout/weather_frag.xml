@@ -81,36 +81,39 @@
             android:id="@+id/temp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true">
+            android:layout_alignParentLeft="true"
+            android:paddingLeft="20dp">
 
-            <ImageView
+            <!--<ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_down"
-                android:tint="@android:color/primary_text_light" />
+                android:tint="@android:color/primary_text_light" />-->
 
             <TextView
                 android:id="@+id/temp1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_margin="5dp"
                 android:textSize="15sp" />
 
-            <ImageView
+            <!--<ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_up"
-                android:tint="@android:color/primary_text_light" />
+                android:tint="@android:color/primary_text_light" />-->
 
             <!--<TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="~"
-                android:textColor="@color/white" />-->
+                android:layout_margin="5dp"
+                android:text="|" />-->
 
             <TextView
                 android:id="@+id/temp2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_margin="5dp"
                 android:textSize="15sp" />
         </LinearLayout>
 

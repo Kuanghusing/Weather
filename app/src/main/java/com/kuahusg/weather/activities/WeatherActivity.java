@@ -60,6 +60,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     private static City selectCity;
     private static String tempAndPushDate;
     private static List<Forecast> forecastList;
+    private WeatherDB db;
     /*public static Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -107,6 +108,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.weather_layout);
+        db = WeatherDB.getInstance(this);
         mContext = getApplicationContext();
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -131,6 +133,11 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         drawerLayout = (DrawerLayout) findViewById(R.id.main_container);
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
 
+        refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_layout);
+        if (refreshLayout != null) {
+            refreshLayout.setOnRefreshListener(this);
+//            refreshLayout.setColorSchemeColors();
+        }
 
         InitWeather();
         setupDrawerContent();
@@ -142,11 +149,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         setupViewPager(viewPager, new WeatherFragment(), new FutureWeatherFrag());
         tabLayout.setupWithViewPager(viewPager);
 
-        refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_layout);
-        if (refreshLayout != null) {
-            refreshLayout.setOnRefreshListener(this);
-//            refreshLayout.setColorSchemeColors();
-        }
+
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -177,15 +180,16 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         if (selectCity != null) {
             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
             editor.putString("selectCity", selectCity.getFullNmae());
+            editor.putString("selectCitySimpleName", selectCity.getCity_name());
             editor.putString("woeid", selectCity.getWoeid());
             editor.putString("city_name", selectCity.getCity_name());
             editor.apply();
 
         } else {
             LogUtil.v(this.getClass().getName(), "selectCity is null!");
-            String fullName = preferences.getString("selectCity", "");
-            String woeid = preferences.getString("woeid", "");
-            String city_name = preferences.getString("city_name", "");
+            String fullName = preferences.getString("selectCity", "null");
+            String woeid = preferences.getString("woeid", "0");
+            String city_name = preferences.getString("city_name", "null");
             LogUtil.v(this.getClass().getName(), fullName + "\t" + woeid);
             selectCity = new City(city_name, woeid, fullName);
         }
@@ -198,6 +202,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
 
         if (forecastList.size() <= 0 || TextUtils.isEmpty(tempAndPushDate)) {
             queryWeatherFromServer(selectCity);
+            refreshLayout.setRefreshing(true);
         } /*else {
 
             setupDrawerContent();

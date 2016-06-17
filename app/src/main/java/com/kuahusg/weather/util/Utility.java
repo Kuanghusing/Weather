@@ -87,8 +87,6 @@ public class Utility {
 //                        Utility.cityList = cityList;
 
 
-                    } else {
-                        city = null;
                     }
 
 
@@ -193,7 +191,7 @@ public class Utility {
                     }
                 });*/
 
-        new UpdateTempAndDate().execute(tempAndPushdate.replaceAll(" ", "%20").replaceAll("\"", "%22"));
+        new UpdateTempAndDateTask().execute(tempAndPushdate.replaceAll(" ", "%20").replaceAll("\"", "%22"));
         new UpdateForecastTask().execute(address.replaceAll(" ", "%20").replaceAll("\"", "%22"));
 
         /*HttpUtil.sendHttpRequest(address.replaceAll(" ", "%20").replaceAll("\"", "%22"), "GET", new HttpCallBackListener() {
@@ -401,7 +399,7 @@ public class Utility {
     }
 
 
-    private static class UpdateTempAndDate extends AsyncTask<String, String, String> {
+    private static class UpdateTempAndDateTask extends AsyncTask<String, String, String> {
 
 
         @Override

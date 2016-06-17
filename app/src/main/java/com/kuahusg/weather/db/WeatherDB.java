@@ -18,8 +18,8 @@ import java.util.List;
  * Created by kuahusg on 16-4-25.
  */
 public class WeatherDB {
-    public static String DB_NAME = "myWeatherDataBase";
     public static final int VERSION = 1;
+    public static String DB_NAME = "myWeatherDataBase";
     private static SQLiteDatabase db;
     private static WeatherDB weatherDB;
 

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/main_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+
+        <RelativeLayout
+            android:id="@+id/left"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:orientation="vertical"
+            android:paddingTop="10dp">
+
+            <TextView
+                android:id="@+id/city_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:text="null"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/weather_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/city_name"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:text="null" />
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/weather_info"
+                android:layout_centerHorizontal="true"
+                android:text="10:00"
+                android:textSize="12sp" />
+
+
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/weather_pic"
+            android:layout_width="70dp"
+            android:layout_height="80dp"
+            android:layout_toRightOf="@id/left"
+            android:src="@drawable/weather_sun_day" />
+
+        <TextView
+            android:id="@+id/temp_now"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/weather_pic"
+            android:text="NaN"
+            android:textSize="36sp" />
+
+        <TextView
+            android:id="@+id/temp"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/temp_now"
+            android:layout_toRightOf="@id/weather_pic"
+            android:text="NaN"
+            android:textSize="16sp" />
+    </RelativeLayout>
+
+
+</RelativeLayout>
