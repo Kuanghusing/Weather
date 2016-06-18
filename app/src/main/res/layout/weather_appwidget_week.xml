@@ -4,6 +4,7 @@
     android:layout_height="match_parent">
 
     <RelativeLayout
+        android:id="@+id/main_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true">
@@ -89,7 +90,7 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
+                android:layout_margin="10dp"
                 android:orientation="vertical">
 
                 <TextView
@@ -103,6 +104,7 @@
                     android:id="@+id/first_pic"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
+                    android:layout_gravity="center"
                     android:src="@drawable/weather_wind" />
 
                 <TextView
@@ -116,7 +118,7 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
+                android:layout_margin="10dp"
                 android:orientation="vertical">
 
                 <TextView
@@ -130,6 +132,7 @@
                     android:id="@+id/second_pic"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
+                    android:layout_gravity="center"
                     android:src="@drawable/weather_wind" />
 
                 <TextView
@@ -143,7 +146,7 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
+                android:layout_margin="10dp"
                 android:orientation="vertical">
 
                 <TextView
@@ -157,6 +160,7 @@
                     android:id="@+id/third_pic"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
+                    android:layout_gravity="center"
                     android:src="@drawable/weather_wind" />
 
                 <TextView
@@ -170,7 +174,7 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
+                android:layout_margin="10dp"
                 android:orientation="vertical">
 
                 <TextView
@@ -184,6 +188,7 @@
                     android:id="@+id/fourth_pic"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
+                    android:layout_gravity="center"
                     android:src="@drawable/weather_wind" />
 
                 <TextView
