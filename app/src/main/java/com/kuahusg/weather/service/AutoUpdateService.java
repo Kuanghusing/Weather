@@ -20,7 +20,7 @@ import com.kuahusg.weather.util.Utility;
  * Created by kuahusg on 16-5-10.
  */
 public class AutoUpdateService extends Service {
-    private int time = 2;
+    private double time = 2;
     private SharedPreferences sharedPreferences;
 
     @Override
@@ -49,13 +49,13 @@ public class AutoUpdateService extends Service {
         if (sharedPreferences == null) {
             sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         }
-        time = Integer.valueOf(sharedPreferences.getString(SettingFrag.UPDATE_TIME, "0"));
+        time = Double.valueOf(sharedPreferences.getString(SettingFrag.UPDATE_TIME, "0"));
         if (time <= 0) {
             time = 2;
         }
         LogUtil.v(this.toString(), "update time:" + time);
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        long hours = time * 60 * 60 * 1000 + SystemClock.elapsedRealtime();
+        long hours = (long) (time * 60 * 60 * 1000 + SystemClock.elapsedRealtime());
         Intent i = new Intent(this, AutoUpdateReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
         alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, hours, pi);

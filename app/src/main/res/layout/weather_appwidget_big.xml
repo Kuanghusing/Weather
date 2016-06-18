@@ -11,10 +11,10 @@
 
         <RelativeLayout
             android:id="@+id/left"
-            android:layout_width="80dp"
+            android:layout_width="70dp"
             android:layout_height="80dp"
             android:orientation="vertical"
-            android:paddingTop="10dp">
+            android:paddingTop="20dp">
 
             <TextView
                 android:id="@+id/city_name"
@@ -24,20 +24,13 @@
                 android:text="null"
                 android:textSize="16sp" />
 
-            <TextView
-                android:id="@+id/weather_info"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/city_name"
-                android:layout_centerHorizontal="true"
-                android:gravity="center"
-                android:text="null" />
+
 
             <TextView
                 android:id="@+id/date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/weather_info"
+                android:layout_below="@id/city_name"
                 android:layout_centerHorizontal="true"
                 android:text="10:00"
                 android:textSize="12sp" />
@@ -54,20 +47,29 @@
 
         <TextView
             android:id="@+id/temp_now"
-            android:layout_width="50dp"
+            android:layout_width="45dp"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/weather_pic"
-            android:text="NaN"
+            android:text="N"
             android:textSize="36sp" />
 
         <TextView
             android:id="@+id/temp"
-            android:layout_width="50dp"
+            android:layout_width="45dp"
             android:layout_height="wrap_content"
             android:layout_below="@id/temp_now"
             android:layout_toRightOf="@id/weather_pic"
             android:text="NaN"
             android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/weather_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/weather_pic"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:text="null" />
     </RelativeLayout>
 
 

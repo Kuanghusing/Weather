@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+
+
+        <ImageView
+            android:id="@+id/weather_pic"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/weather_sun_day" />
+
+        <TextView
+            android:id="@+id/temp_now"
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_toRightOf="@id/weather_pic"
+            android:text="N"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/weather_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/weather_pic"
+            android:layout_centerHorizontal="true"
+            android:text="N" />
+    </RelativeLayout>
+
+</RelativeLayout>
+
