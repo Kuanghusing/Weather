@@ -47,8 +47,8 @@ import java.util.List;
 public class WeatherActivity extends AppCompatActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
 
-    public static final int SHOW_WEATHER = 2;
-    public static final int SHOW_TEMP_DATE = 3;
+    /*public static final int SHOW_WEATHER = 2;
+    public static final int SHOW_TEMP_DATE = 3;*/
     public static FloatingActionButton fab;
     public static Toolbar toolbar;
     public static Context mContext;
@@ -150,7 +150,6 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         tabLayout.setupWithViewPager(viewPager);
 
 
-
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -236,6 +235,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         }, 3000);*/
     }
 
+
     private void alertDialog(String title, String message, String negativeString, String positiveString,
                              DialogInterface.OnClickListener listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -312,6 +312,27 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         FragmentPagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(), fragmentList, list);
         viewPager.setAdapter(adapter);
 
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+                if (state == ViewPager.SCROLL_STATE_IDLE) {
+                    refreshLayout.setEnabled(true);
+                } else {
+                    refreshLayout.setEnabled(false);
+                }
+            }
+        });
     }
 
     @Override
@@ -348,6 +369,15 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawers();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
     class PagerAdapter extends FragmentPagerAdapter {
         List<android.support.v4.app.Fragment> list;
         List<String> titleList;
@@ -374,7 +404,5 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
             return list.size();
         }
     }
-
-
 }
 

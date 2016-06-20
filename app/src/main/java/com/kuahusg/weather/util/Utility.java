@@ -1,6 +1,8 @@
 package com.kuahusg.weather.util;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
@@ -313,6 +315,18 @@ public class Utility {
 
         }
         return jsonObject;
+    }
+
+    public static boolean hasNetwork() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = connectivityManager.getActiveNetworkInfo();
+        if (info != null) {
+            if (info.getState() == NetworkInfo.State.CONNECTED) {
+                return true;
+            } else
+                return false;
+        } else
+            return false;
     }
 
 

@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import com.kuahusg.weather.model.City;
 import com.kuahusg.weather.model.Forecast;
 import com.kuahusg.weather.util.LogUtil;
+import com.kuahusg.weather.util.Utility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +23,12 @@ public class WeatherDB {
     public static String DB_NAME = "myWeatherDataBase";
     private static SQLiteDatabase db;
     private static WeatherDB weatherDB;
+    private static Context mContext;
 
     private WeatherDB(Context context) {
         WeatherOpenHelper dbhelper = new WeatherOpenHelper(context, DB_NAME, null, VERSION);
         db = dbhelper.getWritableDatabase();
+
 
     }
 
@@ -33,6 +36,7 @@ public class WeatherDB {
         if (weatherDB == null) {
             weatherDB = new WeatherDB(context);
         }
+        mContext = context;
         return weatherDB;
     }
 
@@ -147,11 +151,23 @@ public class WeatherDB {
 
     public static boolean deleteTable(String table) {
         try {
+            db.beginTransaction();
             db.execSQL("delete from " + table);
         } catch (SQLException e) {
             e.printStackTrace();
+
+        } finally {
+            if (Utility.hasNetwork()) {
+                db.setTransactionSuccessful();
+                db.endTransaction();
+            } else {
+                LogUtil.v("WeatherDB", "No Network! transaction fail");
+                db.endTransaction();
+                return false;
+            }
         }
         return true;
     }
+
 
 }
