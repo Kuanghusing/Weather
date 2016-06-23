@@ -37,7 +37,7 @@ public class Utility {
 
 
     public static void quaryCity(String city_name, final Context context) {
-//        mContext = context;
+        mContext = context;
         try {
             city_name = URLEncoder.encode(city_name, "UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -317,14 +317,18 @@ public class Utility {
         return jsonObject;
     }
 
-    public static boolean hasNetwork() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+    public static boolean hasNetwork(Context mContext) {
+        if (Utility.mContext == null && Myapplication.getContext() != null) {
+            Utility.mContext = Myapplication.getContext();
+        } else if (mContext != null) {
+            Utility.mContext = mContext;
+        } else
+            return false;
+
+        ConnectivityManager connectivityManager = (ConnectivityManager) Utility.mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = connectivityManager.getActiveNetworkInfo();
         if (info != null) {
-            if (info.getState() == NetworkInfo.State.CONNECTED) {
-                return true;
-            } else
-                return false;
+            return info.getState() == NetworkInfo.State.CONNECTED;
         } else
             return false;
     }

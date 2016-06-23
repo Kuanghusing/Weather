@@ -157,13 +157,12 @@ public class WeatherDB {
             e.printStackTrace();
 
         } finally {
-            if (Utility.hasNetwork()) {
+            if (Utility.hasNetwork(mContext)) {
                 db.setTransactionSuccessful();
                 db.endTransaction();
             } else {
                 LogUtil.v("WeatherDB", "No Network! transaction fail");
                 db.endTransaction();
-                return false;
             }
         }
         return true;

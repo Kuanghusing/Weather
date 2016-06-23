@@ -1,37 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:layout_below="@id/fourth_card"
     android:layout_margin="@dimen/card_view_margin">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="200dp">
-            <ImageView
-                android:id="@+id/first_pic"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:scaleType="centerCrop" />
-            <TextView
-                android:id="@+id/first_temp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/first_pic"
-                android:layout_toRightOf="@id/first_pic"
-                android:paddingTop="50dp"
-                android:text="test"
-                android:textSize="50sp" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/first_temp"
-                android:layout_toEndOf="@id/first_pic"
-                android:layout_toRightOf="@id/first_pic"
-                android:text="test"
-                android:textSize="20sp" />
-        </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/box_height">
 
-    </android.support.v7.widget.CardView>
+        <TextView
+            android:id="@+id/weather_info"
+            style="@style/InfoTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/weather_temp"
+            style="@style/TempTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/weather_info" />
+
+        <TextView
+            android:id="@+id/weather_date"
+            style="@style/DateTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:id="@+id/weaher_pic"
+            style="@style/PicImageView" />
+    </RelativeLayout>
+</android.support.v7.widget.CardView>
 

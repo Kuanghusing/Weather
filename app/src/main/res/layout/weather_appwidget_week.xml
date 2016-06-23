@@ -94,7 +94,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@id/first_date"
+                    android:id="@+id/first_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -122,7 +122,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@id/second_date"
+                    android:id="@+id/second_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -150,7 +150,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@id/third_date"
+                    android:id="@+id/third_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -178,7 +178,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@id/fourth_date"
+                    android:id="@+id/fourth_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"

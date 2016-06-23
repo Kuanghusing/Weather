@@ -146,6 +146,7 @@
 
     </LinearLayout>
 
+
     <android.support.v4.widget.ContentLoadingProgressBar
         android:id="@+id/progressbar"
         style="?android:attr/progressBarStyleSmallInverse"
