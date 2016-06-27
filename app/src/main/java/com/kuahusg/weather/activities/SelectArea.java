@@ -16,8 +16,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.kuahusg.weather.R;
 import com.kuahusg.weather.db.WeatherDB;
@@ -61,8 +63,6 @@ public class SelectArea extends AppCompatActivity {
                             cityL) {
                         SelectArea.cityList.add(c.getFullNmae());
                     }
-/*                LogUtil.v(this.getClass().getName() + "\tcityList.size()", +cityList.size() + "\t");
-                LogUtil.v(this.getClass().getName() + "\tcityList(0)", cityList.get(0));*/
 
                     if (SelectArea.cityList.size() > 0) {
                         adapter.notifyDataSetChanged();
@@ -81,7 +81,8 @@ public class SelectArea extends AppCompatActivity {
             }
         }
     };
-    private ImageView queryButton;
+    //    private ImageView queryButton;
+    private Button queryButton;
     private Toolbar toolbar;
     private boolean isFromWeatherActivity;
     private WeatherDB db;
@@ -105,6 +106,8 @@ public class SelectArea extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.select_layout);
+        View view = getWindow().getDecorView();
+//        view.setBackgroundColor(R.color.colorPrimary);
 
          /*
         * from WeatherActivity? go to WeatherAcitvity directly
@@ -123,12 +126,14 @@ public class SelectArea extends AppCompatActivity {
         }
 
 
-
-        queryButton = (ImageView) findViewById(R.id.query_button);
+        queryButton = (Button) findViewById(R.id.query_button);
         editText = (AutoCompleteTextView) findViewById(R.id.city_editText);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setIcon(R.mipmap.ic_launcher);
+        }
 //        actionBar.setDisplayHomeAsUpEnabled(true);
         cityList = new ArrayList<>();
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, cityList);
@@ -169,8 +174,11 @@ public class SelectArea extends AppCompatActivity {
                 showProgress(true);
 
 //                cityList.clear();
-                String city = editText.getText().toString();
-                Utility.queryCity(city, mContext);
+                String city = null;
+                if (!TextUtils.isEmpty(editText.getText().toString())) {
+                    city = editText.getText().toString();
+                    Utility.queryCity(city, mContext);
+                }
 
 
             }

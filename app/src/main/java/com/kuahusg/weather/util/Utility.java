@@ -18,6 +18,7 @@ import com.kuahusg.weather.activities.SelectArea;
 import com.kuahusg.weather.activities.WeatherActivity;
 import com.kuahusg.weather.db.WeatherDB;
 import com.kuahusg.weather.model.City;
+import com.kuahusg.weather.model.CitySearchResult;
 import com.kuahusg.weather.model.Citys;
 import com.kuahusg.weather.model.Forecast;
 
@@ -57,10 +58,20 @@ public class Utility {
                 List<City> cityList = new ArrayList<>();
 
                 try {
-                    City city;
+/*                    City city;
                     JSONObject json = new JSONObject(respon);
-                    JSONObject results = getJsonObject(json, "query", "results");
+                    JSONObject results = getJsonObject(json, "query", "results");*/
+
+                    City city;
+
+
+                    Gson gson = new Gson();
+                    CitySearchResult citySearchResult = gson.fromJson(respon, CitySearchResult.class);
+                    StringBuilder fullName;
+
+
                     if (!TextUtils.isEmpty(respon)) {
+/*
                         JSONObject place = results.getJSONObject("place");
                         String woeid = place.getString("woeid");
                         String name = place.getString("name");
@@ -70,17 +81,28 @@ public class Utility {
                         String admin1 = place.getString("admin1");
                         String admin2 = place.getString("admin2");
                         String admin3 = place.getString("admin3");
+*/
 
-                        if (!"null".equals(country)) {
+
+                        String woeid = citySearchResult.getQuery().getResults().getPlace().getWoeid();
+                        String name = citySearchResult.getQuery().getResults().getPlace().getName();
+                        String country = citySearchResult.getQuery().getResults().getPlace().getCountry();
+                        String admin1 = citySearchResult.getQuery().getResults().getPlace().getAdmin1();
+                        String admin2 = citySearchResult.getQuery().getResults().getPlace().getAdmin2();
+                        String admin3 = citySearchResult.getQuery().getResults().getPlace().getAdmin3();
+                        fullName = new StringBuilder();
+
+
+                        if (country != null) {
                             fullName.append(country);
                         }
-                        if (!"null".equals(admin1)) {
+                        if (admin1 != null) {
                             fullName.append(admin1);
                         }
-                        if (!"null".equals(admin2)) {
+                        if (admin2 != null) {
                             fullName.append(admin2);
                         }
-                        if (!"null".equals(admin3)) {
+                        if (admin3 != null) {
                             fullName.append(admin3);
                         }
                         city = new City(name, woeid, fullName.toString());
@@ -88,14 +110,10 @@ public class Utility {
                                 city.getWoeid());
                         cityList.add(city);
                         LogUtil.v(this.getClass().getName() + "\tcityList.size()", cityList.size() + "\t");
-
-//                        Utility.cityList = cityList;
-
-
                     }
 
 
-                } catch (JSONException e) {
+                } catch (Exception e) {
                     if (context != null) {
                         Handler handler = new Handler(Looper.getMainLooper());
                         handler.post(new Runnable() {
@@ -188,25 +206,6 @@ public class Utility {
                     }
 
 
-
-
-                    /*JSONArray allCityList = new JSONArray(respon);
-
-                    for (int i = 0; i < allCityList.length(); i++) {
-                        JSONObject cityInfo = allCityList.getJSONObject(i);
-                        String name = cityInfo.getString("name");
-                        String parent1 = cityInfo.getString("parent1");
-                        String parent2 = cityInfo.getString("parent2");
-                        String parent3 = cityInfo.getString("parent3");
-                        if (!(parent3.equals("直辖市") || parent2.equals(parent3))) {
-                            stringInfo.append(parent3).append(" " + parent2).append(" " + parent1).append(name);
-
-                        } else {
-                            stringInfo.append(parent1).append(name);
-                        }
-                        list.add(stringInfo.toString());
-                        stringInfo.setLength(0);
-                    }*/
                     WeatherDB.saveCity(list);
 
 

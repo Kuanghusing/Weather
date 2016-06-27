@@ -2,8 +2,10 @@
 
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
     android:fitsSystemWindows="true">
 
     <android.support.design.widget.AppBarLayout
@@ -14,7 +16,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:theme="@style/ThemeOverlay.AppCompat.Dark" />
+            app:theme="@style/ThemeOverlay.AppCompat.Dark"/>
 
     </android.support.design.widget.AppBarLayout>
 
@@ -26,22 +28,24 @@
         android:focusableInTouchMode="true">
 
 
-        <ImageView
+        <!--<ImageView
             android:id="@+id/logo"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_above="@+id/relativeLayout"
-            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="60dp"
             android:scaleType="centerCrop"
-            android:src="@mipmap/ic_launcher" />
+            android:src="@mipmap/ic_launcher" />-->
 
 
         <RelativeLayout
             android:id="@+id/relativeLayout"
             android:layout_width="match_parent"
-            android:layout_height="180dp"
+            android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:paddingTop="30dp">
+            tools:layout_height="200dp">
 
             <LinearLayout
                 android:id="@+id/first"
@@ -65,13 +69,22 @@
                         android:paddingRight="20dp" />
                 </android.support.design.widget.TextInputLayout>
 
-                <ImageView
+                <!--<ImageView
                     android:id="@+id/query_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="15dp"
                     android:src="@drawable/ic_search"
-                    android:tint="@color/colorAccent" />
+                    android:tint="@color/colorAccent" />-->
+
+                <Button
+                    android:id="@+id/query_button"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:paddingTop="15dp"
+                    android:text="@string/query_bottom"
+                    android:textColor="@color/colorAccent" />
 
                 <!--            <Button
                                 android:id="@+id/query_button"
@@ -84,10 +97,25 @@
                 android:id="@+id/city_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/first">
+                android:layout_below="@+id/first"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:layout_marginTop="10dp">
 
             </ListView>
         </RelativeLayout>
+
+
+        <!--<ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="30dp"
+            android:src="@drawable/ic_play_circle_filled_black_24dp"
+            android:tint="@color/colorAccent" />-->
+
     </RelativeLayout>
+
 
 </android.support.design.widget.CoordinatorLayout>
