@@ -10,8 +10,8 @@ import android.widget.RemoteViews;
 
 import com.kuahusg.weather.R;
 import com.kuahusg.weather.activities.WeatherActivity;
-import com.kuahusg.weather.db.WeatherDB;
 import com.kuahusg.weather.model.Forecast;
+import com.kuahusg.weather.util.Utility;
 
 import java.util.List;
 
@@ -22,13 +22,14 @@ import java.util.List;
 public class WeatherAppWidgetSmallProvider extends AppWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        String tempAndDate = WeatherDB.loadTempAndDate();
+        String tempAndDate;
+        tempAndDate = Utility.loadTempAndDateFromDatabase();
         String temp_now = "NaN";
         if (!TextUtils.isEmpty(tempAndDate)) {
             String[] t = tempAndDate.split("\\|");
             temp_now = t[0];
         }
-        List<Forecast> forecastList = WeatherDB.loadForecast();
+        List<Forecast> forecastList = Utility.loadForecastFromDatabase();
         Forecast forecast_to_show = null;
         if (forecastList != null && forecastList.size() > 0) {
             forecast_to_show = forecastList.get(0);

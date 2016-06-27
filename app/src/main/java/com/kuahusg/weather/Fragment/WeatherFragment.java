@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.kuahusg.weather.R;
 import com.kuahusg.weather.activities.WeatherActivity;
 import com.kuahusg.weather.model.City;
@@ -27,7 +28,7 @@ import java.util.List;
  */
 
 public class WeatherFragment extends Fragment {
-    private final String WHICH_DAY = "WHICH_DAY";
+    //    private final String WHICH_DAY = "WHICH_DAY";
     private View view;
     private List<Forecast> forecastList;
     private City selectCity;
@@ -103,17 +104,22 @@ public class WeatherFragment extends Fragment {
 
     private void showWeatherPic(String weatherText) {
         if (weatherText.contains("Thunderstorms")) {
-            weatherPic.setImageResource(R.drawable.weather_thunderstorm);
+//            weatherPic.setImageResource(R.drawable.weather_thunderstorm);
+            Glide.with(this).load(R.drawable.weather_thunderstorm).into(weatherPic);
 
         } else if (weatherText.contains("Cloudy")) {
-            weatherPic.setImageResource(R.drawable.weather_cloudy);
+//            weatherPic.setImageResource(R.drawable.weather_cloudy);
+            Glide.with(this).load(R.drawable.weather_cloudy).into(weatherPic);
         } else if (weatherText.contains("Sunny")) {
-            weatherPic.setImageResource(R.drawable.weather_sun_day);
+//            weatherPic.setImageResource(R.drawable.weather_sun_day);
+            Glide.with(this).load(R.drawable.weather_sun_day);
 
         } else if (weatherText.contains("Showers") || weatherText.contains("Rain")) {
-            weatherPic.setImageResource(R.drawable.weather_rain);
+//            weatherPic.setImageResource(R.drawable.weather_rain);
+            Glide.with(this).load(R.drawable.weather_rain).into(weatherPic);
         } else if (weatherText.contains("Breezy")) {
-            weatherPic.setImageResource(R.drawable.weather_wind);
+//            weatherPic.setImageResource(R.drawable.weather_wind);
+            Glide.with(this).load(R.drawable.weather_wind).into(weatherPic);
         }
 
 

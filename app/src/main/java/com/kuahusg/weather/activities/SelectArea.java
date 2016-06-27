@@ -170,7 +170,7 @@ public class SelectArea extends AppCompatActivity {
 
 //                cityList.clear();
                 String city = editText.getText().toString();
-                Utility.quaryCity(city, mContext);
+                Utility.queryCity(city, mContext);
 
 
             }
@@ -187,7 +187,7 @@ public class SelectArea extends AppCompatActivity {
                     if (isFromWeatherActivity)
                         intent.putExtra("anotherCity", true);
                     startActivity(intent);
-//                    finish();
+                    finish();
 
                 }
 

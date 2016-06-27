@@ -44,7 +44,7 @@ import java.util.List;
 /**
  * Created by kuahusg on 16-4-28.
  */
-public class WeatherActivity extends AppCompatActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
+public class WeatherActivity extends AppCompatActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener, ViewPager.OnPageChangeListener {
 
 
     /*public static final int SHOW_WEATHER = 2;
@@ -61,7 +61,9 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     private static String tempAndPushDate;
     private static List<Forecast> forecastList;
     private WeatherDB db;
+    //    private float oldOffset = 1;
     /*public static Handler handler = new Handler() {
+
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -112,9 +114,30 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         mContext = getApplicationContext();
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        /*
-        * fab
-         */
+
+        InitView();
+
+
+        PagerAdapter adapter = (PagerAdapter) viewPager.getAdapter();
+        todayFrag = (WeatherFragment) adapter.getItem(0);
+        futureWeatherFrag = (FutureWeatherFrag) adapter.getItem(1);
+
+
+        Intent intent = new Intent(mContext, AutoUpdateService.class);
+        if (preferences.getBoolean(SettingFrag.AUTO_UPDATE, false)) {
+
+            mContext.startService(intent);
+        } else {
+            stopService(intent);
+        }
+
+
+    }
+
+    private void InitView() {
+    /*
+    * fab
+     */
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         if (fab != null) {
@@ -155,28 +178,12 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
         }
-
-
-        PagerAdapter adapter = (PagerAdapter) viewPager.getAdapter();
-        todayFrag = (WeatherFragment) adapter.getItem(0);
-        futureWeatherFrag = (FutureWeatherFrag) adapter.getItem(1);
-
-
-        Intent intent = new Intent(mContext, AutoUpdateService.class);
-        if (preferences.getBoolean(SettingFrag.AUTO_UPDATE, false)) {
-
-            mContext.startService(intent);
-        } else {
-            stopService(intent);
-        }
-
-
     }
 
     private void InitWeather() {
         selectCity = (City) getIntent().getSerializableExtra("selectCity");
         boolean anotherCity = getIntent().getBooleanExtra("anotherCity", false);
-        if (selectCity != null) {
+        if (selectCity != null) {   //form the select activity
             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
             editor.putString("selectCity", selectCity.getFullNmae());
             editor.putString("selectCitySimpleName", selectCity.getCity_name());
@@ -184,7 +191,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
             editor.putString("city_name", selectCity.getCity_name());
             editor.apply();
 
-        } else {
+        } else {    //enter WeatherActivity directly
             LogUtil.v(this.getClass().getName(), "selectCity is null!");
             String fullName = preferences.getString("selectCity", "null");
             String woeid = preferences.getString("woeid", "0");
@@ -195,18 +202,16 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         if (anotherCity) {
             queryWeatherFromServer(selectCity);
         }
-        tempAndPushDate = WeatherDB.loadTempAndDate();
-        forecastList = WeatherDB.loadForecast();
+//        tempAndPushDate = WeatherDB.loadTempAndDate();
+        tempAndPushDate = Utility.loadTempAndDateFromDatabase();
+//        forecastList = WeatherDB.loadForecast();
+        forecastList = Utility.loadForecastFromDatabase();
 
 
         if (forecastList.size() <= 0 || TextUtils.isEmpty(tempAndPushDate)) {
             queryWeatherFromServer(selectCity);
             refreshLayout.setRefreshing(true);
-        } /*else {
-
-            setupDrawerContent();
-
-        }*/
+        }
     }
 
     @Override
@@ -226,15 +231,30 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         queryWeatherFromServer(selectCity);
         toolbar.setSubtitle(R.string.loading);
 
-
-        /*new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                refreshLayout.setRefreshing(false);
-            }
-        }, 3000);*/
     }
 
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+        if (state == ViewPager.SCROLL_STATE_IDLE) {
+            refreshLayout.setEnabled(true);
+
+        } else {
+            refreshLayout.setEnabled(false);
+        }
+
+    }
 
     private void alertDialog(String title, String message, String negativeString, String positiveString,
                              DialogInterface.OnClickListener listener) {
@@ -255,11 +275,17 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
 
     public void setupDrawerContent() {
 
+
+/*        View header = navigationView.getHeaderView(0);
+        ImageView background = (ImageView) header.findViewById(R.id.back_in_nav_header);*/
+
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
                 item.setChecked(true);
                 switch (item.getItemId()) {
+
+
                     case R.id.today:
                         viewPager.setCurrentItem(0);
                         break;
@@ -291,7 +317,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         });
     }
 
-    private void setupViewPager(ViewPager viewPager, WeatherFragment todayFrag, FutureWeatherFrag futureWeatherFrag) {
+    private void setupViewPager(final ViewPager viewPager, WeatherFragment todayFrag, FutureWeatherFrag futureWeatherFrag) {
 
 
         Bundle data = new Bundle();
@@ -312,27 +338,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         FragmentPagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(), fragmentList, list);
         viewPager.setAdapter(adapter);
 
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-                if (state == ViewPager.SCROLL_STATE_IDLE) {
-                    refreshLayout.setEnabled(true);
-                } else {
-                    refreshLayout.setEnabled(false);
-                }
-            }
-        });
+        viewPager.addOnPageChangeListener(this);
     }
 
     @Override

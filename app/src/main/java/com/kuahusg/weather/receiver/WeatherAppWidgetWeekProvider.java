@@ -12,8 +12,8 @@ import android.widget.RemoteViews;
 
 import com.kuahusg.weather.R;
 import com.kuahusg.weather.activities.WeatherActivity;
-import com.kuahusg.weather.db.WeatherDB;
 import com.kuahusg.weather.model.Forecast;
+import com.kuahusg.weather.util.Utility;
 
 import java.util.List;
 
@@ -30,8 +30,9 @@ public class WeatherAppWidgetWeekProvider extends AppWidgetProvider {
         /*
          get the data from database
          */
-        List<Forecast> forecastList = WeatherDB.loadForecast();
-        String tempAndDate = WeatherDB.loadTempAndDate();
+        List<Forecast> forecastList = Utility.loadForecastFromDatabase();
+        String tempAndDate;
+        tempAndDate = Utility.loadTempAndDateFromDatabase();
         String temp_now = "N";
         String date = "N";
         Forecast forecast = null;

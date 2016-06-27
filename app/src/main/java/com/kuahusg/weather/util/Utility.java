@@ -11,11 +11,14 @@ import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.kuahusg.weather.R;
 import com.kuahusg.weather.activities.SelectArea;
 import com.kuahusg.weather.activities.WeatherActivity;
 import com.kuahusg.weather.db.WeatherDB;
 import com.kuahusg.weather.model.City;
+import com.kuahusg.weather.model.Citys;
 import com.kuahusg.weather.model.Forecast;
 
 import org.json.JSONArray;
@@ -36,7 +39,7 @@ public class Utility {
     private static boolean isFromService;
 
 
-    public static void quaryCity(String city_name, final Context context) {
+    public static void queryCity(String city_name, final Context context) {
         mContext = context;
         try {
             city_name = URLEncoder.encode(city_name, "UTF-8");
@@ -128,7 +131,7 @@ public class Utility {
     }
 
     public static boolean queryWeather(String woeid, final Context context, final boolean isFromService) {
-        String tempAndPushdate = "https://query.yahooapis.com/v1/public/yql?q="
+        String tempAndPushDate = "https://query.yahooapis.com/v1/public/yql?q="
                 + "select item.condition.temp,item.condition.date from weather.forecast where woeid = " +
                 woeid + " and u=\"c\"&format=json";
         String address = "https://query.yahooapis.com/v1/public/yql?q="
@@ -141,113 +144,11 @@ public class Utility {
         WeatherDB.deleteTable("Forecast");
         Utility.mContext = context;
         Utility.isFromService = isFromService;
-        /*final Message show_weather = new Message();
-        show_weather.what = WeatherActivity.SHOW_WEATHER;
-        final Message tempAndD = new Message();
-        tempAndD.what = WeatherActivity.SHOW_TEMP_DATE;*/
-
-        /*HttpUtil.sendHttpRequest(tempAndPushdate.replaceAll(" ", "%20").replaceAll("\"", "%22"),
-                "GET", new HttpCallBackListener() {
-                    @Override
-                    public void onFinish(String respon) {
-                        try {
-                            JSONObject jsonObject = new JSONObject(respon);
-                            JSONObject condition = getJsonObject(jsonObject, "query", "results", "channel",
-                                    "item", "condition");
-                            String pushDate = condition.getString("date");
-                            String temp = condition.getString("temp");
 
 
-                            WeatherDB.saveTempAndDate(Integer.valueOf(temp), pushDate);
-
-
-                            if (!isFromService) {
-                                WeatherActivity.handler.sendMessage(tempAndD);
-                            }
-
-                        } catch (JSONException e) {
-                            if (context != null) {
-
-                                Handler handler = new Handler(Looper.getMainLooper());
-                                handler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(context, context.getString(R.string.no_result), Toast.LENGTH_LONG).show();
-                                    }
-                                });
-                            }
-                            e.printStackTrace();
-
-
-                        }
-
-
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        e.printStackTrace();
-                        LogUtil.d("Utility", "onError2" + e);
-
-
-                    }
-                });*/
-
-        new UpdateTempAndDateTask().execute(tempAndPushdate.replaceAll(" ", "%20").replaceAll("\"", "%22"));
+        new UpdateTempAndDateTask().execute(tempAndPushDate.replaceAll(" ", "%20").replaceAll("\"", "%22"));
         new UpdateForecastTask().execute(address.replaceAll(" ", "%20").replaceAll("\"", "%22"));
 
-        /*HttpUtil.sendHttpRequest(address.replaceAll(" ", "%20").replaceAll("\"", "%22"), "GET", new HttpCallBackListener() {
-
-            @Override
-            public void onFinish(String respon) {
-                try {
-                    Forecast f;
-                    JSONObject jsonObject = new JSONObject(respon);
-                    JSONObject results = getJsonObject(jsonObject, "query", "results");
-//                    JSONArray item = new JSONArray(channel.toString());
-                    JSONArray item = results.getJSONArray("channel");
-                    for (int i = 0; i < item.length(); i++) {
-                        JSONObject day = item.getJSONObject(i);
-                        JSONObject forecast = getJsonObject(day, "item", "forecast");
-                        f = new Forecast(forecast.getString("date"), forecast.getString("high"),
-                                forecast.getString("low"), forecast.getString("text"));
-                        boolean result = WeatherDB.saveForecast(f);
-
-
-                    }
-                    LogUtil.v(this.getClass().toString(), "slove weather info finish");
-                    if (!isFromService) {
-                        Looper.prepare();
-                        WeatherActivity.handler.sendMessage(show_weather);
-                    }
-
-
-                } catch (JSONException e) {
-
-
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onError(Exception e) {
-                e.printStackTrace();
-                LogUtil.d("Utility", "onError3" + e);
-                Looper.prepare();
-                if (WeatherActivity.fab != null) {
-                    Handler handler = new Handler(Looper.getMainLooper());
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Snackbar.make(WeatherActivity.fab, context.getString(R.string.no_network), Snackbar.LENGTH_LONG).show();
-
-                        }
-                    });
-                }
-
-
-            }
-        });*/
         return true;
 
     }
@@ -263,8 +164,33 @@ public class Utility {
             public void onFinish(String respon) {
                 List<String> list = new ArrayList<>();
                 try {
-                    JSONArray allCityList = new JSONArray(respon);
-                    StringBuilder stringInfo = new StringBuilder();
+
+                    Gson gson = new Gson();
+                    List<Citys> cities = gson.fromJson(respon, new TypeToken<List<Citys>>() {
+                    }.getType());
+
+                    for (int i = 0; i < cities.size(); i++) {
+                        Citys citys = cities.get(i);
+                        String name = citys.getName();
+                        String parent1 = citys.getParent1();
+                        String parent2 = citys.getParent2();
+                        String parent3 = citys.getParent3();
+                        StringBuilder stringInfo = new StringBuilder();
+
+                        if (!(parent3.equals("直辖市") || parent2.equals(parent3))) {
+                            stringInfo.append(parent3).append(" " + parent2).append(" " + parent1).append(name);
+
+                        } else {
+                            stringInfo.append(parent1).append(name);
+                        }
+                        list.add(stringInfo.toString());
+                        stringInfo.setLength(0);
+                    }
+
+
+
+
+                    /*JSONArray allCityList = new JSONArray(respon);
 
                     for (int i = 0; i < allCityList.length(); i++) {
                         JSONObject cityInfo = allCityList.getJSONObject(i);
@@ -280,7 +206,7 @@ public class Utility {
                         }
                         list.add(stringInfo.toString());
                         stringInfo.setLength(0);
-                    }
+                    }*/
                     WeatherDB.saveCity(list);
 
 
@@ -293,7 +219,7 @@ public class Utility {
                     SelectArea.handler.sendMessage(message);
 
 
-                } catch (JSONException e) {
+                } catch (Exception e) {
 
                     e.printStackTrace();
                 }
@@ -331,6 +257,16 @@ public class Utility {
             return info.getState() == NetworkInfo.State.CONNECTED;
         } else
             return false;
+    }
+
+
+    public static String loadTempAndDateFromDatabase() {
+        return WeatherDB.loadTempAndDate();
+    }
+
+
+    public static List<Forecast> loadForecastFromDatabase() {
+        return WeatherDB.loadForecast();
     }
 
 

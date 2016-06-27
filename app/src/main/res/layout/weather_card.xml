@@ -1,36 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_below="@id/fourth_card"
-    android:layout_margin="@dimen/card_view_margin">
+    android:layout_margin="@dimen/card_view_margin"
+    app:elevation="2dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/box_height">
 
-        <TextView
-            android:id="@+id/weather_info"
-            style="@style/InfoTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
 
-        <TextView
-            android:id="@+id/weather_temp"
-            style="@style/TempTextView"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/weather_info" />
+            android:layout_alignParentBottom="true"
+            android:layout_margin="8dp">
 
-        <TextView
-            android:id="@+id/weather_date"
-            style="@style/DateTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
 
-        <ImageView
-            android:id="@+id/weaher_pic"
-            style="@style/PicImageView" />
+            <ImageView
+                android:id="@+id/weaher_pic"
+                style="@style/PicImageView"
+                tools:src="@drawable/weather_sun_day" />
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/weather_info"
+                    style="@style/InfoTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    tools:text="Sunny" />
+
+                <TextView
+                    android:id="@+id/weather_temp"
+                    style="@style/TempTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    tools:text="12 - 22" />
+            </LinearLayout>
+
+
+        </RelativeLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="180dp">
+
+
+            <ImageView
+                android:id="@+id/card_background"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/back" />
+
+            <TextView
+                android:id="@+id/weather_date"
+                style="@style/DateTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                tools:text="12/22" />
+
+        </FrameLayout>
     </RelativeLayout>
 </android.support.v7.widget.CardView>
 

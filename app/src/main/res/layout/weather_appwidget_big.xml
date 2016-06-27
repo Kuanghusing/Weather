@@ -70,6 +70,14 @@
             android:layout_centerHorizontal="true"
             android:gravity="center"
             android:text="null" />
+
+        <!--<TextClock
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:format12Hour="hh:mm"
+            tools:targetApi="jelly_bean_mr1" />-->
+
+
     </RelativeLayout>
 
 
