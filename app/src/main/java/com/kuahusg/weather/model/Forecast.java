@@ -7,16 +7,11 @@ import android.os.Parcelable;
  * Created by kuahusg on 16-5-1.
  */
 public class Forecast implements Parcelable{
-    private String date;
-    private String high;
-    private String low;
-    private String weatherText;
-
     public static final Parcelable.Creator<Forecast> CREATOR = new Creator<Forecast>() {
         @Override
         public Forecast createFromParcel(Parcel source) {
-            Forecast forecast = new Forecast(source.readString(),source.readString(),source.readString(),
-                    source.readString());
+            Forecast forecast = new Forecast(source.readString(), source.readString(), source.readString(),
+                    source.readString(), source.readString());
 
             return null;
         }
@@ -26,12 +21,18 @@ public class Forecast implements Parcelable{
             return new Forecast[size];
         }
     };
+    private String date;
+    private String high;
+    private String low;
+    private String text;
+    private String woeid;
 
-    public Forecast(String date, String high, String low, String weatherText) {
+    public Forecast(String date, String high, String low, String text, String woeid) {
         this.date = date;
         this.high = high;
         this.low = low;
-        this.weatherText = weatherText;
+        this.text = text;
+        this.woeid = woeid;
     }
 
 
@@ -48,11 +49,13 @@ public class Forecast implements Parcelable{
         return low;
     }
 
-    public String getWeatherText() {
-        return weatherText;
+    public String getText() {
+        return text;
     }
 
-
+    public String getWoeid() {
+        return woeid;
+    }
 
     @Override
     public int describeContents() {
@@ -65,6 +68,7 @@ public class Forecast implements Parcelable{
         dest.writeString(date);
         dest.writeString(high);
         dest.writeString(low);
-        dest.writeString(weatherText);
+        dest.writeString(text);
+        dest.writeString(woeid);
     }
 }

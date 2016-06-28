@@ -32,7 +32,7 @@ public class WeatherAppWidgetWeekProvider extends AppWidgetProvider {
          */
         List<Forecast> forecastList = Utility.loadForecastFromDatabase();
         String tempAndDate;
-        tempAndDate = Utility.loadTempAndDateFromDatabase();
+        tempAndDate = Utility.loadForecastInfoFromDatabase();
         String temp_now = "N";
         String date = "N";
         Forecast forecast = null;
@@ -48,30 +48,30 @@ public class WeatherAppWidgetWeekProvider extends AppWidgetProvider {
         for (int appwidgetId : appWidgetIds) {
             RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.weather_appwidget_week);
             forecast = forecastList.get(0);
-            rv.setImageViewResource(R.id.weather_pic, getWeatherPicId(forecast.getWeatherText()));
+            rv.setImageViewResource(R.id.weather_pic, getWeatherPicId(forecast.getText()));
             rv.setTextViewText(R.id.city_name, cityName);
             rv.setTextViewText(R.id.date, date.substring(0, 6));
             rv.setTextViewText(R.id.temp_now, temp_now);
             rv.setTextViewText(R.id.temp, forecast.getLow() + "|" + forecast.getHigh());
-            rv.setTextViewText(R.id.weather_info, forecastList.get(0).getWeatherText());
+            rv.setTextViewText(R.id.weather_info, forecastList.get(0).getText());
 
             forecast = forecastList.get(1);
-            rv.setImageViewResource(R.id.first_pic, getWeatherPicId(forecast.getWeatherText()));
+            rv.setImageViewResource(R.id.first_pic, getWeatherPicId(forecast.getText()));
             rv.setTextViewText(R.id.first_date, forecast.getDate().substring(0, 6));
             rv.setTextViewText(R.id.first_temp, forecast.getLow() + "|" + forecast.getHigh());
 
             forecast = forecastList.get(2);
-            rv.setImageViewResource(R.id.second_pic, getWeatherPicId(forecast.getWeatherText()));
+            rv.setImageViewResource(R.id.second_pic, getWeatherPicId(forecast.getText()));
             rv.setTextViewText(R.id.second_date, forecast.getDate().substring(0, 6));
             rv.setTextViewText(R.id.second_temp, forecast.getLow() + "|" + forecast.getHigh());
 
             forecast = forecastList.get(3);
-            rv.setImageViewResource(R.id.third_pic, getWeatherPicId(forecast.getWeatherText()));
+            rv.setImageViewResource(R.id.third_pic, getWeatherPicId(forecast.getText()));
             rv.setTextViewText(R.id.third_date, forecast.getDate().substring(0, 6));
             rv.setTextViewText(R.id.third_temp, forecast.getLow() + "|" + forecast.getHigh());
 
             forecast = forecastList.get(4);
-            rv.setImageViewResource(R.id.fourth_pic, getWeatherPicId(forecast.getWeatherText()));
+            rv.setImageViewResource(R.id.fourth_pic, getWeatherPicId(forecast.getText()));
             rv.setTextViewText(R.id.fourth_date, forecast.getDate().substring(0, 6));
             rv.setTextViewText(R.id.fourth_temp, forecast.getLow() + "|" + forecast.getHigh());
 

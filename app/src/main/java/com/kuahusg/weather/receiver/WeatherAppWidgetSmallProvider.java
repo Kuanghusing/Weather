@@ -23,7 +23,7 @@ public class WeatherAppWidgetSmallProvider extends AppWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         String tempAndDate;
-        tempAndDate = Utility.loadTempAndDateFromDatabase();
+        tempAndDate = Utility.loadForecastInfoFromDatabase();
         String temp_now = "NaN";
         if (!TextUtils.isEmpty(tempAndDate)) {
             String[] t = tempAndDate.split("\\|");
@@ -45,8 +45,8 @@ public class WeatherAppWidgetSmallProvider extends AppWidgetProvider {
         for (int appwidgetId :
                 appWidgetIds) {
             RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.weather_appwidget_small);
-            rv.setImageViewResource(R.id.weather_pic, getWeatherPicId(forecast_to_show.getWeatherText()));
-            rv.setTextViewText(R.id.weather_info, forecast_to_show.getWeatherText());
+            rv.setImageViewResource(R.id.weather_pic, getWeatherPicId(forecast_to_show.getText()));
+            rv.setTextViewText(R.id.weather_info, forecast_to_show.getText());
             rv.setTextViewText(R.id.temp_now, temp_now);
 
             Intent intent = new Intent(context, WeatherActivity.class);

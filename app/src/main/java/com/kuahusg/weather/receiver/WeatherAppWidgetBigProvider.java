@@ -40,7 +40,7 @@ public class WeatherAppWidgetBigProvider extends AppWidgetProvider {
             return;
         }
         String tempAndDate;
-        tempAndDate = Utility.loadTempAndDateFromDatabase();
+        tempAndDate = Utility.loadForecastInfoFromDatabase();
         String temp_now = "NaN";
         String date = "NaN";
 
@@ -58,9 +58,9 @@ public class WeatherAppWidgetBigProvider extends AppWidgetProvider {
         for (int appwidgetId :
                 appWidgetIds) {
             RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.weather_appwidget_big);
-            rv.setImageViewResource(R.id.weather_pic, getWeatherPicId(forecast_to_show.getWeatherText()));
+            rv.setImageViewResource(R.id.weather_pic, getWeatherPicId(forecast_to_show.getText()));
             rv.setTextViewText(R.id.city_name, selectedCity);
-            rv.setTextViewText(R.id.weather_info, forecast_to_show.getWeatherText());
+            rv.setTextViewText(R.id.weather_info, forecast_to_show.getText());
             rv.setTextViewText(R.id.date, date);
             rv.setTextViewText(R.id.temp_now, temp_now);
             rv.setTextViewText(R.id.temp, forecast_to_show.getLow() + "|" + forecast_to_show.getHigh());

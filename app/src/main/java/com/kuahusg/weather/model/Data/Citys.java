@@ -1,4 +1,4 @@
-package com.kuahusg.weather.model;
+package com.kuahusg.weather.model.Data;
 
 /**
  * Created by kuahusg on 16-6-27.

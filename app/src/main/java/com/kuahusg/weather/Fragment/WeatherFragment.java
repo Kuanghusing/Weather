@@ -20,6 +20,7 @@ import com.kuahusg.weather.R;
 import com.kuahusg.weather.activities.WeatherActivity;
 import com.kuahusg.weather.model.City;
 import com.kuahusg.weather.model.Forecast;
+import com.kuahusg.weather.model.ForecastInfo;
 
 import java.util.List;
 
@@ -47,6 +48,7 @@ public class WeatherFragment extends Fragment {
     private RelativeLayout weather_more_info;
     private ContentLoadingProgressBar progressBar;
     private int whichDay = 0;
+    private ForecastInfo info;
 
     @Nullable
     @Override
@@ -56,14 +58,15 @@ public class WeatherFragment extends Fragment {
         mContext = getActivity();
 
         forecastList = getArguments().getParcelableArrayList("forecastList");
-        selectCity = (City) getArguments().getSerializable("selectCity");
+//        selectCity = (City) getArguments().getSerializable("selectCity");
+        info = (ForecastInfo) getArguments().getSerializable("ForecastInfo");
         tempAndPushDate = getArguments().getString("tempAndPushDate");
 
         initView();
 
         if (forecastList != null && forecastList.size() > 0 && !TextUtils.isEmpty(tempAndPushDate)) {
             showWeather(forecastList);
-            showTempAndDate(tempAndPushDate);
+            showForecastInfo(tempAndPushDate);
         }
 
 //        getFragmentManager().beginTransaction().replace()
@@ -80,7 +83,7 @@ public class WeatherFragment extends Fragment {
         }
         if (!forecastList.isEmpty()) {
             Forecast forecastToday = forecastList.get(whichDay);
-            String weatherText = forecastToday.getWeatherText();
+            String weatherText = forecastToday.getText();
             temp1.setText(forecastToday.getLow());
             temp2.setText(forecastToday.getHigh());
             weather_text.setText(weatherText);
@@ -125,8 +128,9 @@ public class WeatherFragment extends Fragment {
 
     }
 
-    public void showTempAndDate(String tempStr) {
-        if (tempStr != null) {
+    public void showForecastInfo(ForecastInfo info) {
+
+        /*if (tempStr != null) {
             tempAndPushDate = tempStr;
         }
         if (!TextUtils.isEmpty(tempAndPushDate)) {
@@ -135,7 +139,7 @@ public class WeatherFragment extends Fragment {
             temp_now.setText(t[0]);
             String d = t[1].substring(17, 25);
             date.setText(d);
-        }
+        }*/
     }
 
     private void initView() {
@@ -201,8 +205,8 @@ public class WeatherFragment extends Fragment {
                             .show();
                     break;
                 case WeatherActivity.SHOW_TEMP_DATE:
-                    tempAndPushDate = WeatherDB.loadTempAndDate();
-                    showTempAndDate();
+                    tempAndPushDate = WeatherDB.loadForecastInfo();
+                    showForecastInfo();
                     break;
 
             }

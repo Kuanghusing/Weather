@@ -22,7 +22,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,6 +33,7 @@ import com.kuahusg.weather.R;
 import com.kuahusg.weather.db.WeatherDB;
 import com.kuahusg.weather.model.City;
 import com.kuahusg.weather.model.Forecast;
+import com.kuahusg.weather.model.ForecastInfo;
 import com.kuahusg.weather.service.AutoUpdateService;
 import com.kuahusg.weather.util.LogUtil;
 import com.kuahusg.weather.util.Utility;
@@ -61,6 +61,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     private static String tempAndPushDate;
     private static List<Forecast> forecastList;
     private WeatherDB db;
+    private ForecastInfo info;
     //    private float oldOffset = 1;
     /*public static Handler handler = new Handler() {
 
@@ -82,8 +83,8 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
                             .show();
                     break;
                 case SHOW_TEMP_DATE:
-                    tempAndPushDate = WeatherDB.loadTempAndDate();
-                    todayFrag.showTempAndDate(tempAndPushDate);
+                    tempAndPushDate = WeatherDB.loadForecastInfo();
+                    todayFrag.showForecastInfo(tempAndPushDate);
 //                    futureWeatherFrag.refreshWeather(forecastList);
                     break;
 
@@ -202,13 +203,13 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         if (anotherCity) {
             queryWeatherFromServer(selectCity);
         }
-//        tempAndPushDate = WeatherDB.loadTempAndDate();
-        tempAndPushDate = Utility.loadTempAndDateFromDatabase();
+//        tempAndPushDate = WeatherDB.loadForecastInfo();
+        info = Utility.loadForecastInfoFromDatabase(selectCity.getWoeid());
 //        forecastList = WeatherDB.loadForecast();
-        forecastList = Utility.loadForecastFromDatabase();
+        forecastList = Utility.loadForecastFromDatabase(selectCity.getWoeid());
 
 
-        if (forecastList.size() <= 0 || TextUtils.isEmpty(tempAndPushDate)) {
+        if (forecastList.size() <= 0 || info != null) {
             queryWeatherFromServer(selectCity);
             refreshLayout.setRefreshing(true);
         }
@@ -322,7 +323,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
 
         Bundle data = new Bundle();
         data.putParcelableArrayList("forecastList", (ArrayList<Forecast>) forecastList);
-        data.putString("tempAndPushDate", tempAndPushDate);
+        data.putSerializable("ForecastInfo", info);
         data.putSerializable("selectCity", selectCity);
         todayFrag.setArguments(data);
         futureWeatherFrag.setArguments(data);

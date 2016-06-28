@@ -52,9 +52,6 @@ public class FutureWeatherFrag extends Fragment {
 
     private void initId() {
         i = 1;
-
-
-
         cardView = (CardView) view.findViewById(R.id.first_card);
         initView(cardView);
 
@@ -74,15 +71,12 @@ public class FutureWeatherFrag extends Fragment {
 
 
     private void initView(CardView cardView) {
-
-
         pic = (ImageView) cardView.findViewById(R.id.weaher_pic);
         info = (TextView) cardView.findViewById(R.id.weather_info);
         temp = (TextView) cardView.findViewById(R.id.weather_temp);
         date = (TextView) cardView.findViewById(R.id.weather_date);
         background_img = (ImageView) cardView.findViewById(R.id.card_background);
 //        Glide.with(this).load("http://s.tu.ihuan.me/bgc/.png").into(background_img);
-
         initCard(pic, info, temp, date, background_img);
     }
 
@@ -97,13 +91,12 @@ public class FutureWeatherFrag extends Fragment {
             if (i < forecastList.size()) {
                 forecast = forecastList.get(i);
                 temp.setText(forecast.getLow() + "~" + forecast.getHigh());
-                info.setText(forecast.getWeatherText());
+                info.setText(forecast.getText());
                 date.setText(forecast.getDate().substring(0, 6));
                 initImg(img, info.getText().toString());
                 Glide.with(getActivity()).load("http://s.tu.ihuan.me/bgc/" + date_string + ".png").placeholder(R.drawable.back).into(background);
 
                 i++;
-
             }
         }
 
