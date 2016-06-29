@@ -11,7 +11,7 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
-import com.kuahusg.weather.Fragment.SettingFrag;
+import com.kuahusg.weather.UI.Fragment.SettingFrag;
 import com.kuahusg.weather.receiver.AutoUpdateReceiver;
 import com.kuahusg.weather.util.LogUtil;
 import com.kuahusg.weather.util.Utility;

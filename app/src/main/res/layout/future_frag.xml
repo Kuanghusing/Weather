@@ -33,7 +33,13 @@
                 layout="@layout/weather_card"
                 android:id="@+id/fifth_card" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="70dp">
+
+            </LinearLayout>
         </LinearLayout>
+
     </android.support.v4.widget.NestedScrollView>
 
 

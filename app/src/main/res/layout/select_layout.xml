@@ -66,7 +66,10 @@
                         android:completionThreshold="1"
                         android:hint="@string/search_hint"
                         android:paddingLeft="20dp"
-                        android:paddingRight="20dp" />
+                        android:paddingRight="20dp"
+                        android:textColorHint="@color/white"
+                        android:textColor="@color/white"
+                        android:textColorHighlight="@color/white"/>
                 </android.support.design.widget.TextInputLayout>
 
                 <!--<ImageView

@@ -17,6 +17,36 @@
             android:orientation="vertical">
 
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
+                android:paddingTop="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/today_weather"
+                    android:textColor="@color/colorAccent" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/refresh_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:text="@string/refersh_time"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="10sp" />
+                </LinearLayout>
+            </RelativeLayout>
+
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -33,11 +63,11 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
 
-                        <ImageView
+                        <com.kuahusg.weather.UI.Widget.BackgroundPicture
+                            android:id="@+id/today_background"
                             android:layout_width="match_parent"
-                            android:layout_height="250dp"
-                            android:scaleType="centerCrop"
-                            tools:src="@drawable/back" />
+                            android:layout_height="250dp" />
+
 
                         <RelativeLayout
                             android:id="@+id/date_layout"
@@ -72,6 +102,7 @@
                     </FrameLayout>
 
                     <RelativeLayout
+                        android:id="@+id/weather_now_container"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom"
@@ -123,7 +154,7 @@
                                 android:layout_height="50dp"
                                 android:layout_centerHorizontal="true"
                                 android:layout_margin="8dp"
-                                tools:src="@drawable/weather_sun_day" />
+                                tools:src="@drawable/sunny" />
 
                             <TextView
                                 android:id="@+id/weather_text"
@@ -145,12 +176,26 @@
             </android.support.v7.widget.CardView>
 
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="12dp"
+                android:paddingRight="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/more"
+                    android:textColor="@color/colorAccent" />
+            </RelativeLayout>
+
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/card_view_margin">
 
                 <LinearLayout
+                    android:id="@+id/weather_info_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
@@ -159,52 +204,68 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
-                        android:textColor="@color/colorAccent"
-                        tools:text="@string/more" />
+                        android:text="@string/wind"
+                        android:textColor="@color/colorAccent" />
 
                     <RelativeLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center"
                         android:padding="8dp">
 
-                        <TextView
-                            android:id="@+id/ws"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                        <ImageView
+                            android:id="@+id/windmill"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
                             android:layout_margin="5dp"
-                            android:text="@string/wind_speed" />
+                            android:src="@drawable/windmill" />
 
-                        <TextView
-                            android:id="@+id/wind_speed"
+                        <RelativeLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_margin="5dp"
-                            android:layout_toRightOf="@id/ws"
-                            tools:text="123" />
+                            android:layout_margin="8dp"
+                            android:layout_toRightOf="@id/windmill">
 
-                        <TextView
-                            android:id="@+id/wd"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@id/ws"
-                            android:layout_margin="5dp"
-                            android:text="@string/wind_direction" />
+                            <TextView
+                                android:id="@+id/ws"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:text="@string/wind_speed" />
 
-                        <TextView
-                            android:id="@+id/wind_direction"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@id/ws"
-                            android:layout_margin="5dp"
-                            android:layout_toRightOf="@id/wd"
-                            tools:text="122" />
+                            <TextView
+                                android:id="@+id/wind_speed"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:layout_toRightOf="@id/ws"
+                                tools:text="123" />
+
+                            <TextView
+                                android:id="@+id/wd"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/ws"
+                                android:layout_margin="5dp"
+                                android:text="@string/wind_direction" />
+
+                            <TextView
+                                android:id="@+id/wind_direction"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/ws"
+                                android:layout_margin="5dp"
+                                android:layout_toRightOf="@id/wd"
+                                tools:text="122" />
+                        </RelativeLayout>
+
                     </RelativeLayout>
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <!--<LinearLayout
+                        android:layout_width="100dp"
                         android:layout_height="1dp"
-                        android:layout_margin="8dp"
-                        android:background="@color/div" />
+                        android:layout_gravity="center"
+                        android:background="@color/div" />-->
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -212,6 +273,51 @@
                         android:layout_margin="5dp">
 
                         <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/sunrise_and_sunset"
+                            android:textColor="@color/colorAccent" />
+
+                        <RelativeLayout
+                            android:layout_width="150dp"
+                            android:layout_height="wrap_content"
+                            android:layout_centerHorizontal="true"
+                            android:layout_margin="30dp">
+
+                            <ImageView
+                                android:id="@+id/sunrise_pic"
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:layout_margin="5dp"
+                                android:src="@drawable/sunrise" />
+
+                            <TextView
+                                android:id="@+id/sunrise"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/sunrise_pic"
+                                android:layout_margin="5dp"
+                                tools:text="@string/sunrise" />
+
+                            <ImageView
+                                android:id="@+id/sunset_pic"
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:layout_alignParentRight="true"
+                                android:layout_margin="5dp"
+                                android:src="@drawable/sunset" />
+
+                            <TextView
+                                android:id="@+id/sunset"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentRight="true"
+                                android:layout_below="@id/sunset_pic"
+                                android:layout_margin="5dp"
+                                tools:text="@string/sunset" />
+
+                        </RelativeLayout>
+                        <!--<TextView
                             android:id="@+id/sr"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -241,7 +347,7 @@
                             android:layout_below="@id/sr"
                             android:layout_margin="5dp"
                             android:layout_toRightOf="@id/st"
-                            tools:text="7:00 am" />
+                            tools:text="7:00 am" />-->
                     </RelativeLayout>
 
                 </LinearLayout>
@@ -252,9 +358,10 @@
                 android:id="@+id/check_source"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_margin="5dp"
+                android:layout_gravity="left"
+                android:layout_margin="2dp"
                 android:background="@android:color/transparent"
+                android:paddingLeft="5dp"
                 android:text="@string/check_source"
                 android:textColor="@color/colorAccent" />
         </LinearLayout>

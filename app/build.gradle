@@ -8,8 +8,8 @@ android {
         applicationId "com.kuahusg.weather"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 11
-        versionName "2.0.2"
+        versionCode 15
+        versionName "2.1"
     }
     buildTypes {
         release {

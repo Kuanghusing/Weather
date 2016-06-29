@@ -49,7 +49,7 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_toRightOf="@id/left"
-                android:src="@drawable/weather_sun_day" />
+                android:src="@drawable/sunny" />
 
             <TextView
                 android:id="@+id/temp_now"
@@ -105,7 +105,7 @@
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/weather_wind" />
+                    android:src="@drawable/rain" />
 
                 <TextView
                     android:id="@+id/first_temp"
@@ -133,7 +133,7 @@
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/weather_wind" />
+                    android:src="@drawable/snow" />
 
                 <TextView
                     android:id="@+id/second_temp"
@@ -161,7 +161,7 @@
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/weather_wind" />
+                    android:src="@drawable/cloud_sun" />
 
                 <TextView
                     android:id="@+id/third_temp"
@@ -189,7 +189,7 @@
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/weather_wind" />
+                    android:src="@drawable/thunderstorm" />
 
                 <TextView
                     android:id="@+id/fourth_temp"

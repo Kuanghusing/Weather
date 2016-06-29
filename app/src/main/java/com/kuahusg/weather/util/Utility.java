@@ -14,9 +14,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.kuahusg.weather.R;
-import com.kuahusg.weather.activities.SelectArea;
-import com.kuahusg.weather.activities.WeatherActivity;
-import com.kuahusg.weather.db.WeatherDB;
+import com.kuahusg.weather.UI.activities.SelectArea;
+import com.kuahusg.weather.UI.activities.WeatherActivity;
+import com.kuahusg.weather.model.db.WeatherDB;
 import com.kuahusg.weather.model.City;
 import com.kuahusg.weather.model.Data.CitySearchResult;
 import com.kuahusg.weather.model.Data.Citys;
@@ -39,10 +39,12 @@ public class Utility {
 
     private static Context mContext;
     private static boolean isFromService;
+    private static WeatherDB db;
 
 
     public static void queryCity(String city_name, final Context context) {
         mContext = context;
+        db = WeatherDB.getInstance(context);
         try {
             city_name = URLEncoder.encode(city_name, "UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -58,9 +60,10 @@ public class Utility {
     }
 
     public static boolean queryWeather(String woeid, final Context context, final boolean isFromService) {
-        String infoAddress = "https://query.yahooapis.com/v1/public/yql?q="
+        db = WeatherDB.getInstance(context);
+        /*String infoAddress = "https://query.yahooapis.com/v1/public/yql?q="
                 + "select item.condition.temp,item.condition.date from weather.forecast where woeid = " +
-                woeid + " and u=\"c\"&format=json";
+                woeid + " and u=\"c\"&format=json";*/
 /*        String address = "https://query.yahooapis.com/v1/public/yql?q="
                 + "select item.forecast.date,item.forecast.low,item.forecast.high,item.forecast.text"
                 + " from weather.forecast where woeid = " + woeid + " and u=\"c\"&format=json";*/
@@ -73,13 +76,13 @@ public class Utility {
         if (isFromService) {
             WeatherDB.getInstance(context);
         }
-        WeatherDB.deleteTable("temp");
+        WeatherDB.deleteTable("info");
         WeatherDB.deleteTable("Forecast");
         Utility.mContext = context;
         Utility.isFromService = isFromService;
 
 
-        new UpdateForecastInfoTask(woeid).execute(infoAddress.replaceAll(" ", "%20").replaceAll("\"", "%22"));
+//        new UpdateForecastInfoTask(woeid).execute(address.replaceAll(" ", "%20").replaceAll("\"", "%22"));
         new UpdateForecastTask(woeid).execute(address.replaceAll(" ", "%20").replaceAll("\"", "%22"));
 
         return true;
@@ -87,6 +90,9 @@ public class Utility {
     }
 
     public static void handleCityList() {
+        if (db == null && mContext != null) {
+            db = WeatherDB.getInstance(mContext);
+        }
 
         WeatherDB.deleteTable("city");
         String address = "https://raw.githubusercontent.com/Kuanghusing/City_list/master/city-list";
@@ -125,6 +131,7 @@ public class Utility {
 
 
     public static ForecastInfo loadForecastInfoFromDatabase(String woeid) {
+
         return WeatherDB.loadForecastInfo(woeid);
     }
 
@@ -166,26 +173,14 @@ public class Utility {
             ForecastInfo forecastInfo;
 
 
-            /*JSONObject jsonObject = new JSONObject(result);
-                JSONObject results = getJsonObject(jsonObject, "query", "results");
-                JSONArray item = results.getJSONArray("channel");
-                for (int i = 0; i < item.length(); i++) {
-                    JSONObject day = item.getJSONObject(i);
-                    JSONObject forecast = getJsonObject(day, "item", "forecast");
-                    f = new Forecast(forecast.getString("date"), forecast.getString("high"),
-                            forecast.getString("low"), forecast.getString("text"));
-                    forecastList.add(f);
-                }*/
-
-
             Gson gson = new Gson();
-            WeatherResult weatherResult;
+            WeatherResult weatherResult = null;
             try {
                 weatherResult = gson.fromJson(result, WeatherResult.class);
             } catch (JsonSyntaxException e) {
                 e.printStackTrace();
                 publishProgress(mContext.getString(R.string.no_result));
-                return null;
+                cancel(true);
             }
 
 
@@ -207,65 +202,70 @@ public class Utility {
         @Override
         protected void onPostExecute(WeatherResult weatherResult) {
             super.onPostExecute(weatherResult);
-/*            if (we != null) {
-                for (Forecast f :
-                        forecastList) {
-                    WeatherDB.saveForecast(f);
-                }
-                if (!isFromService) {
-                    WeatherActivity.todayFrag.showWeather(forecastList);
-                    WeatherActivity.futureWeatherFrag.refreshWeather(forecastList);
-                    WeatherActivity.todayFrag.hideProgressBar();
-                    if (WeatherActivity.refreshLayout.isRefreshing()) {
-                        WeatherActivity.refreshLayout.setRefreshing(false);
 
-                    }
-
-                    Snackbar.make(WeatherActivity.fab, mContext.getString(R.string.load_finish), Snackbar.LENGTH_LONG).show();
-                }
-            }*/
             List<Forecast> forecastList = new ArrayList<>();
-            ForecastInfo forecastInfo;
-
-
-            Forecast[] forecasts = weatherResult.getQuery().getResults().getChannel().getItem().getForecast();
-            for (Forecast f :
-                    forecasts) {
-                forecastList.add(f);
+            ForecastInfo forecastInfo = null;
+            if (weatherResult == null) {
+                return;
             }
-            /*forecastInfo = new ForecastInfo(link, lastBuildDate, wind_direction, wind_speed, date,
-                    temp, text, woeid, sunrise, sunset);*/
 
 
-            /*
-            * show the main weather info
-             */
+            Forecast[] forecasts = new Forecast[0];
+            try {
+                forecasts = weatherResult.getQuery().getResults().getChannel().getItem().getForecast();
+                forecasts = weatherResult.getQuery().getResults().getChannel().getItem().getForecast();
+                String link = weatherResult.getQuery().getResults().getChannel().getLink();
+                String lastBuildDate = weatherResult.getQuery().getResults().getChannel()
+                        .getLastBuildDate();
+                String wind_direction = weatherResult.getQuery().getResults().getChannel()
+                        .getWind().getDirection();
+                String wind_speed = weatherResult.getQuery().getResults().getChannel().getWind()
+                        .getSpeed();
+                String date = weatherResult.getQuery().getResults().getChannel().getItem()
+                        .getCondition().getDate();
+                String temp = weatherResult.getQuery().getResults().getChannel().getItem()
+                        .getCondition().getTemp();
+                String text = weatherResult.getQuery().getResults().getChannel().getItem()
+                        .getCondition().getText();
+                String sunrise = weatherResult.getQuery().getResults().getChannel().getAstronomy()
+                        .getSunrise();
+                String sunset = weatherResult.getQuery().getResults().getChannel().getAstronomy()
+                        .getSunset();
+
+                forecastInfo = new ForecastInfo(link, lastBuildDate, wind_direction, wind_speed, date,
+                        temp, text, woeid, sunrise, sunset);
 
 
-            if (forecastList.size() > 0) {
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (!isFromService) {
+                    Snackbar.make(WeatherActivity.fab, mContext.getString(R.string.no_result), Snackbar.LENGTH_SHORT).show();
+                }
+            }
+
+            LogUtil.v(this.toString(), "length:\t" + forecasts.length + "");
+            if (forecasts.length > 0) {
                 for (Forecast f :
-                        forecastList) {
+                        forecasts) {
+                    f.setWoeid(woeid);
+                    forecastList.add(f);
                     WeatherDB.saveForecast(f);
+
                 }
             }
 
             if (!isFromService) {
                 WeatherActivity.todayFrag.showWeather(forecastList);
                 WeatherActivity.futureWeatherFrag.refreshWeather(forecastList);
-                WeatherActivity.todayFrag.hideProgressBar();
                 WeatherActivity.refreshLayout.setRefreshing(false);
 
+
+                WeatherDB.saveForecastInfo(forecastInfo);
+
+                WeatherActivity.todayFrag.showForecastInfo(forecastInfo);
+
+                Snackbar.make(WeatherActivity.fab, mContext.getString(R.string.load_finish), Snackbar.LENGTH_LONG).show();
             }
-            Snackbar.make(WeatherActivity.fab, mContext.getString(R.string.load_finish), Snackbar.LENGTH_LONG).show();
-
-            /*
-            * show other info
-             */
-
-
-
-
-
 
 
         }
@@ -274,7 +274,7 @@ public class Utility {
     }
 
 
-    private static class UpdateForecastInfoTask extends AsyncTask<String, String, WeatherResult> {
+/*    private static class UpdateForecastInfoTask extends AsyncTask<String, String, WeatherResult> {
         String woeid;
 
         public UpdateForecastInfoTask(String woeid) {
@@ -287,17 +287,18 @@ public class Utility {
             String result = null;
             try {
                 result = HttpUtil.sendHttpReauest(params[0], "GET");
+                LogUtil.v(this.toString(), result);
             } catch (Exception e) {
                 e.printStackTrace();
-                publishProgress(mContext.getString(R.string.error_network));
-                return null;
+//                publishProgress(mContext.getString(R.string.error_network));
+                cancel(true);
 
             }
 
             Gson gson = new Gson();
 
             return gson.fromJson(result, WeatherResult.class);
-            /*StringBuffer tempAndDate = new StringBuffer();
+            *//*StringBuffer tempAndDate = new StringBuffer();
 
             String result = null;
             try {
@@ -323,7 +324,7 @@ public class Utility {
 
             }
 
-            return tempAndDate.toString();*/
+            return tempAndDate.toString();*//*
         }
 
 
@@ -343,40 +344,47 @@ public class Utility {
 
             ForecastInfo forecastInfo = null;
             List<Forecast> forecastList = new ArrayList<>();
-            Forecast[] forecasts = weatherResult.getQuery().getResults().getChannel().getItem().getForecast();
-
-
-            String link = weatherResult.getQuery().getResults().getChannel().getLink();
-            String lastBuildDate = weatherResult.getQuery().getResults().getChannel()
-                    .getLastBuildDate();
-            String wind_direction = weatherResult.getQuery().getResults().getChannel()
-                    .getWind().getDirection();
-            String wind_speed = weatherResult.getQuery().getResults().getChannel().getWind()
-                    .getSpeed();
-            String date = weatherResult.getQuery().getResults().getChannel().getItem()
-                    .getCondition().getDate();
-            String temp = weatherResult.getQuery().getResults().getChannel().getItem()
-                    .getCondition().getTemp();
-            String text = weatherResult.getQuery().getResults().getChannel().getItem()
-                    .getCondition().getText();
-            String sunrise = weatherResult.getQuery().getResults().getChannel().getAstronomy()
-                    .getSunrise();
-            String sunset = weatherResult.getQuery().getResults().getChannel().getAstronomy()
-                    .getSunset();
-
-
-            for (Forecast f :
-                    forecasts) {
-                forecastList.add(f);
+            Forecast[] forecasts = new Forecast[0];
+            if (weatherResult == null) {
+                return;
             }
-            forecastInfo = new ForecastInfo(link, lastBuildDate, wind_direction, wind_speed, date,
-                    temp, text, woeid, sunrise, sunset);
+            try {
+                forecasts = weatherResult.getQuery().getResults().getChannel().getItem().getForecast();
+                String link = weatherResult.getQuery().getResults().getChannel().getLink();
+                String lastBuildDate = weatherResult.getQuery().getResults().getChannel()
+                        .getLastBuildDate();
+                String wind_direction = weatherResult.getQuery().getResults().getChannel()
+                        .getWind().getDirection();
+                String wind_speed = weatherResult.getQuery().getResults().getChannel().getWind()
+                        .getSpeed();
+                String date = weatherResult.getQuery().getResults().getChannel().getItem()
+                        .getCondition().getDate();
+                String temp = weatherResult.getQuery().getResults().getChannel().getItem()
+                        .getCondition().getTemp();
+                String text = weatherResult.getQuery().getResults().getChannel().getItem()
+                        .getCondition().getText();
+                String sunrise = weatherResult.getQuery().getResults().getChannel().getAstronomy()
+                        .getSunrise();
+                String sunset = weatherResult.getQuery().getResults().getChannel().getAstronomy()
+                        .getSunset();
+                for (Forecast f :
+                        forecasts) {
+                    forecastList.add(f);
+                }
+                forecastInfo = new ForecastInfo(link, lastBuildDate, wind_direction, wind_speed, date,
+                        temp, text, woeid, sunrise, sunset);
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (!isFromService) {
+                    Snackbar.make(WeatherActivity.fab, mContext.getString(R.string.no_result), Snackbar.LENGTH_SHORT).show();
+                }
 
+            }
             WeatherDB.saveForecastInfo(forecastInfo);
             if (!isFromService) {
                 WeatherActivity.todayFrag.showForecastInfo(forecastInfo);
             }
-            /*String temp;
+            *//*String temp;
             String pushDate;
             if (s != null) {
                 String t[] = s.split("\\|");
@@ -386,12 +394,12 @@ public class Utility {
                 if (!isFromService) {
                     WeatherActivity.todayFrag.showForecastInfo(s);
                 }
-            }*/
+            }*//*
 
         }
 
 
-    }
+    }*/
 
 
     private static class QueryCityTask extends AsyncTask<String, String, List<City>> {
@@ -418,12 +426,23 @@ public class Utility {
 
             if (!TextUtils.isEmpty(result)) {
 
-                String woeid = citySearchResult.getQuery().getResults().getPlace().getWoeid();
-                String name = citySearchResult.getQuery().getResults().getPlace().getName();
-                String country = citySearchResult.getQuery().getResults().getPlace().getCountry();
-                String admin1 = citySearchResult.getQuery().getResults().getPlace().getAdmin1();
-                String admin2 = citySearchResult.getQuery().getResults().getPlace().getAdmin2();
-                String admin3 = citySearchResult.getQuery().getResults().getPlace().getAdmin3();
+                String woeid = null;
+                String name = null;
+                String country = null;
+                String admin1 = null;
+                String admin2 = null;
+                String admin3 = null;
+                try {
+                    woeid = citySearchResult.getQuery().getResults().getPlace().getWoeid();
+                    name = citySearchResult.getQuery().getResults().getPlace().getName();
+                    country = citySearchResult.getQuery().getResults().getPlace().getCountry();
+                    admin1 = citySearchResult.getQuery().getResults().getPlace().getAdmin1();
+                    admin2 = citySearchResult.getQuery().getResults().getPlace().getAdmin2();
+                    admin3 = citySearchResult.getQuery().getResults().getPlace().getAdmin3();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    publishProgress(mContext.getString(R.string.no_result));
+                }
                 fullName = new StringBuilder();
 
 

@@ -61,7 +61,7 @@
 
         <!--<fragment
             android:id="@+id/weather_frag"
-            android:name="com.kuahusg.weather.Fragment.WeatherFragment"
+            android:name="com.kuahusg.weather.UI.Fragment.WeatherFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:layout="@layout/weather_frag" />-->

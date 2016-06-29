@@ -23,7 +23,7 @@
             <ImageView
                 android:id="@+id/weaher_pic"
                 style="@style/PicImageView"
-                tools:src="@drawable/weather_sun_day" />
+                tools:src="@drawable/sun" />
 
 
             <LinearLayout

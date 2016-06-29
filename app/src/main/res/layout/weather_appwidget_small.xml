@@ -27,7 +27,7 @@
             android:id="@+id/weather_pic"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/weather_sun_day" />
+            android:src="@drawable/sunny" />
 
         <TextView
             android:id="@+id/temp_now"

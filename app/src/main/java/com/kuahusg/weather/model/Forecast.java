@@ -57,6 +57,10 @@ public class Forecast implements Parcelable{
         return woeid;
     }
 
+    public void setWoeid(String woeid) {
+        this.woeid = woeid;
+    }
+
     @Override
     public int describeContents() {
         return 0;
