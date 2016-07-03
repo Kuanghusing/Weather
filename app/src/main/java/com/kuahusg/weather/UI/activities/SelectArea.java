@@ -24,7 +24,6 @@ import com.kuahusg.weather.R;
 import com.kuahusg.weather.model.City;
 import com.kuahusg.weather.model.db.WeatherDB;
 import com.kuahusg.weather.util.CityUtil;
-import com.kuahusg.weather.util.LogUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,10 +33,10 @@ import java.util.List;
  */
 public class SelectArea extends AppCompatActivity implements CityUtil.SolveCityCallback, CityUtil.QueryCityCallback {
     private AutoCompleteTextView editText;
-    private static ArrayAdapter<String> arrayAdapter;
+    private static ArrayAdapter<String> autoCompleteTextAdapter;
     private ListView cityListView;
-    private List<String> cityList;
-    private List<City> cityL;
+    private List<String> cityNameList;
+    private List<City> searchResultCityList;
     private ArrayAdapter<String> adapter;
     private static ProgressDialog progressDialog;
     private static List<String> cityListFromDataBase = new ArrayList<>();
@@ -47,6 +46,8 @@ public class SelectArea extends AppCompatActivity implements CityUtil.SolveCityC
     private Toolbar toolbar;
     private boolean isFromWeatherActivity;
     private WeatherDB db;
+    private String selectCity;
+    private boolean hasLoadAllCity;
 
 
     @Override
@@ -60,14 +61,11 @@ public class SelectArea extends AppCompatActivity implements CityUtil.SolveCityC
     public void solveCity(List<String> list) {
 
         dismissProgress();
-        hasLoadCityList(list);
+        allCityLoadFinish(list);
 
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(SelectArea.this).edit();
-        editor.putString("hasLoadCity", "OK");
+        editor.putBoolean("hasLoadAllCity", true);
         editor.apply();
-
-
-
     }
 
     @Override
@@ -82,58 +80,65 @@ public class SelectArea extends AppCompatActivity implements CityUtil.SolveCityC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.select_layout);
 
-
-
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        db = WeatherDB.getInstance(this);
         isFromWeatherActivity = getIntent().getBooleanExtra("isFromWeatherActivity", false);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String selectCity = sharedPreferences.getString("selectCity", "");
-        String hasLoadCity = sharedPreferences.getString("hasLoadCity", "");
+        selectCity = sharedPreferences.getString("selectCity", "");
+        hasLoadAllCity = sharedPreferences.getBoolean("hasLoadAllCity", false);
+
+
         if (!isFromWeatherActivity && !TextUtils.isEmpty(selectCity)) {
             Intent intent = new Intent(SelectArea.this, WeatherActivity.class);
             startActivity(intent);
             finish();
             return;
-        } else {
-            assert actionBar != null;
-            actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+        initView();
+    }
 
-        queryButton = (Button) findViewById(R.id.query_button);
-        editText = (AutoCompleteTextView) findViewById(R.id.city_editText);
-        if (!isFromWeatherActivity) {
-            actionBar.setDisplayHomeAsUpEnabled(false);
-            actionBar.setIcon(R.mipmap.ic_launcher);
-        }
-        cityList = new ArrayList<>();
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, cityList);
-        cityListView = (ListView) findViewById(R.id.city_list);
-        cityListView.setAdapter(adapter);
+
+    private void initView() {
+        db = WeatherDB.getInstance(this);
         mContext = getApplicationContext();
 
 
-        arrayAdapter = new ArrayAdapter<>(SelectArea.this, android.R.layout.simple_list_item_1, cityListFromDataBase);
-        editText.setAdapter(arrayAdapter);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+
+        queryButton = (Button) findViewById(R.id.query_button);
+        editText = (AutoCompleteTextView) findViewById(R.id.city_editText);
+        cityListView = (ListView) findViewById(R.id.city_list);
+
+        if (!isFromWeatherActivity && actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(false);
+            actionBar.setIcon(R.mipmap.ic_launcher);
+        }
+
+
+        cityNameList = new ArrayList<>();
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, cityNameList);
+        if (cityListView != null) {
+            cityListView.setAdapter(adapter);
+        }
+
+
+        autoCompleteTextAdapter = new ArrayAdapter<>(SelectArea.this, android.R.layout.simple_list_item_1, cityListFromDataBase);
+        editText.setAdapter(autoCompleteTextAdapter);
 
 
         /**
-        * load the all the cities list from server
+         * load the all the cities list from server
          */
 
 
         List<String> loadCity = WeatherDB.loadCity();
 
-        if (TextUtils.isEmpty(hasLoadCity) || loadCity.size() <= 0) {
+        if (!hasLoadAllCity || loadCity.size() <= 0) {
             showProgress(false);
             CityUtil.handleCityList(this, this);
-
         } else {
-            hasLoadCityList(loadCity);
+            allCityLoadFinish(loadCity);
 
         }
 
@@ -141,11 +146,11 @@ public class SelectArea extends AppCompatActivity implements CityUtil.SolveCityC
         queryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String city = null;
+                String cityName;
                 if (!TextUtils.isEmpty(editText.getText().toString())) {
                     showProgress(true);
-                    city = editText.getText().toString();
-                    CityUtil.queryCity(city, mContext, SelectArea.this);
+                    cityName = editText.getText().toString();
+                    CityUtil.queryCity(cityName, mContext, SelectArea.this);
                 }
             }
         });
@@ -155,7 +160,7 @@ public class SelectArea extends AppCompatActivity implements CityUtil.SolveCityC
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(SelectArea.this, WeatherActivity.class);
-                City city = cityL.get(position);
+                City city = searchResultCityList.get(position);
                 if (city != null) {
                     intent.putExtra("selectCity", city);
                     if (isFromWeatherActivity)
@@ -167,32 +172,26 @@ public class SelectArea extends AppCompatActivity implements CityUtil.SolveCityC
 
             }
         });
-
-
     }
 
-
-    public static void hasLoadCityList(List<String> loadCity) {
+    public static void allCityLoadFinish(List<String> loadCity) {
 
         cityListFromDataBase.clear();
         cityListFromDataBase.addAll(loadCity);
-
-
-        arrayAdapter.notifyDataSetChanged();
-        LogUtil.v(mContext.getClass().toString(), "cityListFrom..size()" + cityListFromDataBase.size());
+        autoCompleteTextAdapter.notifyDataSetChanged();
     }
 
 
     @Override
     public void queryCityFinish(List<City> cityList) {
         dismissProgress();
-        this.cityList.clear();
-        this.cityL = cityList;
+        this.cityNameList.clear();
+        this.searchResultCityList = cityList;
         for (City city :
                 cityList) {
-            this.cityList.add(city.getFullNmae());
+            this.cityNameList.add(city.getFullNmae());
         }
-        if (this.cityList.size() > 0) {
+        if (this.cityNameList.size() > 0) {
             adapter.notifyDataSetChanged();
             cityListView.setSelection(0);
         }

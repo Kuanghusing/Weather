@@ -79,10 +79,9 @@ public class WeatherUtil {
                 result = HttpUtil.sendHttpReauest(params[0], "GET");
             } catch (Exception e) {
                 e.printStackTrace();
-//                updateWeatherCallback.error(mContext.getString(R.string.no_network));
-
                 message = new Message();
                 message.what = ERROR;
+                message.obj = mContext.getString(R.string.error_network);
                 handler.sendMessage(message);
 
                 return null;
@@ -95,7 +94,10 @@ public class WeatherUtil {
                 weatherResult = gson.fromJson(result, WeatherResult.class);
             } catch (JsonSyntaxException e) {
                 e.printStackTrace();
-                updateWeatherCallback.error(mContext.getString(R.string.no_result));
+                message = new Message();
+                message.what = ERROR;
+                message.obj = mContext.getString(R.string.no_result);
+                handler.sendMessage(message);
                 cancel(true);
             }
 
@@ -186,9 +188,7 @@ public class WeatherUtil {
         void error(String message);
     }
 
-    /*public interface ShowResultCallback{
-        void showResult(String message);
-    }*/
+
 
     public interface GetWeatherCallback {
         void getWeather(List<Forecast> forecastList);
@@ -202,7 +202,7 @@ public class WeatherUtil {
             super.handleMessage(msg);
             switch (msg.what) {
                 case ERROR:
-                    updateWeatherCallback.error(mContext.getString(R.string.no_network));
+                    updateWeatherCallback.error((String) msg.obj);
                     break;
             }
         }

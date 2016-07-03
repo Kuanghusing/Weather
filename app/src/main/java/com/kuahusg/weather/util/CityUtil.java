@@ -157,7 +157,6 @@ public class CityUtil {
                 result = HttpUtil.sendHttpReauest(params[0], "GET");
 
             } catch (Exception e) {
-//                publishProgress();
                 Message message = new Message();
                 message.what = ERROR_SOLVE_CITY;
                 message.obj = mContext.getString(R.string.no_network);
@@ -173,9 +172,7 @@ public class CityUtil {
                 list = gson.fromJson(result, new TypeToken<List<Citys>>() {
                 }.getType());
             } catch (Exception e) {
-//                publishProgress();
                 e.printStackTrace();
-//                solveCityCallback.solveCityError(null);
                 Message message = new Message();
                 message.what = ERROR_QUERY_CITY;
                 message.obj = mContext.getString(R.string.no_result);
@@ -201,7 +198,8 @@ public class CityUtil {
                     StringBuilder stringInfo = new StringBuilder();
 
                     if (!(parent3.equals("直辖市") || parent2.equals(parent3))) {
-                        stringInfo.append(parent3).append(" " + parent2).append(" " + parent1).append(name);
+                        stringInfo.append(parent3).append(" ").append(parent2).
+                                append(" ").append(parent1).append(name);
 
                     } else {
                         stringInfo.append(parent1).append(name);

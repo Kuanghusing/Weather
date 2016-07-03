@@ -103,6 +103,7 @@ public class WeatherFragment extends Fragment implements View.OnClickListener, W
     @Override
     public void getWeatherInfo(ForecastInfo info) {
         showForecastInfo(info);
+
     }
 
     public void showWeather(List<Forecast> list) {

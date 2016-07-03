@@ -108,7 +108,6 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setSubtitle(getString(R.string.loading));
 
 
         drawerLayout = (DrawerLayout) findViewById(R.id.main_container);
@@ -117,7 +116,6 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_layout);
         if (refreshLayout != null) {
             refreshLayout.setOnRefreshListener(this);
-//            refreshLayout.setColorSchemeColors();
         }
 
         setupDrawerContent();
@@ -172,11 +170,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         if (forecastList.size() == 0 || info == null) {
             queryWeatherFromServer(selectCity);
             refreshLayout.setRefreshing(true);
-        } /*else {
-            todayFrag.showWeather(forecastList);
-            todayFrag.showForecastInfo(info);
-            futureWeatherFrag.initView(forecastList);
-        }*/
+        }
     }
 
 
@@ -186,8 +180,20 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public void getWeatherFromActivity(WeatherUtil.GetWeatherCallback getWeatherCallback) {
-        getWeatherCallback.getWeather(forecastList);
-        getWeatherCallback.getWeatherInfo(info);
+        if (forecastList != null || info != null) {
+            getWeatherCallback.getWeather(forecastList);
+            getWeatherCallback.getWeatherInfo(info);
+            resumeUI();
+        } else {
+            queryWeatherFromServer(selectCity);
+        }
+    }
+
+
+    private void resumeUI() {
+        refreshLayout.setRefreshing(false);
+        toolbar.setSubtitle(selectCity.getCity_name());
+
     }
 
     @Override
@@ -196,7 +202,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         todayFrag.showWeather(forecastList);
         futureWeatherFrag.initView(forecastList);
         Snackbar.make(fab, getString(R.string.load_finish), Snackbar.LENGTH_LONG).show();
-        refreshLayout.setRefreshing(false);
+        resumeUI();
     }
 
     @Override
@@ -208,17 +214,15 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void error(String message) {
         Snackbar.make(fab, message, Snackbar.LENGTH_LONG).show();
-        refreshLayout.setRefreshing(false);
+        resumeUI();
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fab:
-//                queryWeatherFromServer(selectCity);
                 toolbar.setSubtitle(R.string.loading);
                 queryWeatherFromServer(selectCity);
-//                todayFrag.showProgressBar();
                 break;
         }
     }
@@ -226,7 +230,6 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onRefresh() {
         refreshLayout.setRefreshing(true);
-//        queryWeatherFromServer(selectCity);
         toolbar.setSubtitle(R.string.loading);
         queryWeatherFromServer(selectCity);
 
