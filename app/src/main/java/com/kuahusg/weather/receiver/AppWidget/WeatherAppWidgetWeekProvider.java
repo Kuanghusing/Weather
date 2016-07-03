@@ -13,7 +13,7 @@ import com.kuahusg.weather.R;
 import com.kuahusg.weather.UI.activities.WeatherActivity;
 import com.kuahusg.weather.model.Forecast;
 import com.kuahusg.weather.model.ForecastInfo;
-import com.kuahusg.weather.util.Utility;
+import com.kuahusg.weather.util.WeatherUtil;
 
 import java.util.List;
 
@@ -32,9 +32,9 @@ public class WeatherAppWidgetWeekProvider extends AppWidgetProvider {
         /*
          get the data from database
          */
-        List<Forecast> forecastList = Utility.loadForecastFromDatabase(woeid);
+        List<Forecast> forecastList = WeatherUtil.loadForecastFromDatabase(woeid);
         String tempAndDate;
-        ForecastInfo info = Utility.loadForecastInfoFromDatabase(woeid);
+        ForecastInfo info = WeatherUtil.loadForecastInfoFromDatabase(woeid);
         String temp_now = "N";
         String date = "N";
         Forecast forecast = null;

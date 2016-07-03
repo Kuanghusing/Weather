@@ -10,7 +10,7 @@ import com.kuahusg.weather.model.City;
 import com.kuahusg.weather.model.Forecast;
 import com.kuahusg.weather.model.ForecastInfo;
 import com.kuahusg.weather.util.LogUtil;
-import com.kuahusg.weather.util.Utility;
+import com.kuahusg.weather.util.NetwordUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -205,7 +205,7 @@ public class WeatherDB {
             e.printStackTrace();
 
         } finally {
-            if (Utility.hasNetwork(mContext)) {
+            if (NetwordUtil.hasNetwork(mContext)) {
                 db.setTransactionSuccessful();
                 db.endTransaction();
             } else {

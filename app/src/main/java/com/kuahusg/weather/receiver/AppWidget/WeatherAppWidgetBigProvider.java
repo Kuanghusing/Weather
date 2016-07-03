@@ -14,7 +14,7 @@ import com.kuahusg.weather.UI.activities.WeatherActivity;
 import com.kuahusg.weather.model.Forecast;
 import com.kuahusg.weather.model.ForecastInfo;
 import com.kuahusg.weather.util.LogUtil;
-import com.kuahusg.weather.util.Utility;
+import com.kuahusg.weather.util.WeatherUtil;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class WeatherAppWidgetBigProvider extends AppWidgetProvider {
         /*
          weather information
          */
-        List<Forecast> forecastList = Utility.loadForecastFromDatabase(woeid);
+        List<Forecast> forecastList = WeatherUtil.loadForecastFromDatabase(woeid);
         Forecast forecast_to_show = null;
         if (forecastList != null && forecastList.size() > 0) {
             forecast_to_show = forecastList.get(0);
@@ -41,7 +41,7 @@ public class WeatherAppWidgetBigProvider extends AppWidgetProvider {
             return;
         }
         String tempAndDate;
-        ForecastInfo info = Utility.loadForecastInfoFromDatabase(woeid);
+        ForecastInfo info = WeatherUtil.loadForecastInfoFromDatabase(woeid);
         String temp_now = "NaN";
         String date = "NaN";
 

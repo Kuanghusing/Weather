@@ -14,7 +14,7 @@ import android.support.annotation.Nullable;
 import com.kuahusg.weather.UI.Fragment.SettingFrag;
 import com.kuahusg.weather.receiver.AutoUpdateReceiver;
 import com.kuahusg.weather.util.LogUtil;
-import com.kuahusg.weather.util.Utility;
+import com.kuahusg.weather.util.WeatherUtil;
 
 /**
  * Created by kuahusg on 16-5-10.
@@ -71,7 +71,7 @@ public class AutoUpdateService extends Service {
     private void updateWeather() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String woeid = sharedPreferences.getString("woeid", "");
-        Utility.queryWeather(woeid, AutoUpdateService.this, true);
+        WeatherUtil.queryWeather(woeid, AutoUpdateService.this, null);
     }
 
 

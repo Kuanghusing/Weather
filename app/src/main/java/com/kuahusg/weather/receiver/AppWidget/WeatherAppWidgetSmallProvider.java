@@ -13,7 +13,7 @@ import com.kuahusg.weather.R;
 import com.kuahusg.weather.UI.activities.WeatherActivity;
 import com.kuahusg.weather.model.Forecast;
 import com.kuahusg.weather.model.ForecastInfo;
-import com.kuahusg.weather.util.Utility;
+import com.kuahusg.weather.util.WeatherUtil;
 
 import java.util.List;
 
@@ -29,14 +29,14 @@ public class WeatherAppWidgetSmallProvider extends AppWidgetProvider {
         String woeid = sharedPreferences.getString("woeid", "");
 
         String tempAndDate;
-        ForecastInfo info = Utility.loadForecastInfoFromDatabase(woeid);
+        ForecastInfo info = WeatherUtil.loadForecastInfoFromDatabase(woeid);
         String temp_now = "NaN";
         if (info != null) {
             /*String[] t = tempAndDate.split("\\|");
             temp_now = t[0];*/
             temp_now = info.getTemp();
         }
-        List<Forecast> forecastList = Utility.loadForecastFromDatabase(woeid);
+        List<Forecast> forecastList = WeatherUtil.loadForecastFromDatabase(woeid);
         Forecast forecast_to_show = null;
         if (forecastList != null && forecastList.size() > 0) {
             forecast_to_show = forecastList.get(0);

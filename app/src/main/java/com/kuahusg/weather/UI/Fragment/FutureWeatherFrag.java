@@ -1,5 +1,6 @@
 package com.kuahusg.weather.UI.Fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -12,10 +13,10 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.kuahusg.weather.R;
-import com.kuahusg.weather.UI.Widget.BackgroundPicture;
+import com.kuahusg.weather.UI.activities.WeatherActivity;
 import com.kuahusg.weather.model.Forecast;
-import com.kuahusg.weather.util.DateUtil;
-import com.kuahusg.weather.util.LogUtil;
+import com.kuahusg.weather.model.ForecastInfo;
+import com.kuahusg.weather.util.WeatherUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -26,7 +27,7 @@ import java.util.Random;
  * Created by kuahusg on 16-5-26.
  */
 
-public class FutureWeatherFrag extends Fragment {
+public class FutureWeatherFrag extends Fragment implements WeatherUtil.GetWeatherCallback {
     CardView cardView;
     private View view;
     private List<Forecast> forecastList;
@@ -37,7 +38,7 @@ public class FutureWeatherFrag extends Fragment {
     private ImageView background_img;
     private ImageView imageView;
     private int i = 1;
-
+    private Context mContext;
 
 
     @Nullable
@@ -46,14 +47,17 @@ public class FutureWeatherFrag extends Fragment {
 
 
         view = inflater.inflate(R.layout.future_frag, container, false);
-        Bundle date = getArguments();
-        forecastList = date.getParcelableArrayList("forecastList");
-        initId();
+
+
+        ((WeatherActivity) getActivity()).getWeatherFromActivity(this);
 
         return view;
     }
 
-    private void initId() {
+    public void initView(List<Forecast> forecastList) {
+        if (forecastList != null) {
+            this.forecastList = forecastList;
+        }
         i = 1;
         cardView = (CardView) view.findViewById(R.id.first_card);
         initView(cardView);
@@ -79,7 +83,6 @@ public class FutureWeatherFrag extends Fragment {
         temp = (TextView) cardView.findViewById(R.id.weather_temp);
         date = (TextView) cardView.findViewById(R.id.weather_date);
         background_img = (ImageView) cardView.findViewById(R.id.card_background);
-//        Glide.with(this).load("http://s.tu.ihuan.me/bgc/.png").into(background_img);
         initCard(pic, info, temp, date, background_img);
     }
 
@@ -127,40 +130,27 @@ public class FutureWeatherFrag extends Fragment {
     private void initImg(ImageView img, String info) {
         if (info.contains("Thunderstorms")) {
             img.setImageResource(R.drawable.thunderstorm);
-//            Glide.with(getActivity()).load(R.drawable.thunderstorm).into(img);
 
 
         } else if (info.contains("Cloudy")) {
             img.setImageResource(R.drawable.cloud_sun);
-//            Glide.with(getActivity()).load(R.drawable.cloud_sun).into(img);
         } else if (info.contains("Sunny")) {
             img.setImageResource(R.drawable.sunny);
-//            Glide.with(getActivity()).load(R.drawable.sunny).into(img);
 
         } else if (info.contains("Showers") || info.contains("Rain")) {
             img.setImageResource(R.drawable.rain3);
-//            Glide.with(getActivity()).load(R.drawable.rain3).into(img);
         } else if (info.contains("Breezy")) {
             img.setImageResource(R.drawable.wind);
-//            Glide.with(getActivity()).load(R.drawable.wind).into(img);
         } else if (info.contains("snow")) {
-//            Glide.with(getActivity()).load(R.drawable.snow2).into(img);
             img.setImageResource(R.drawable.snow2);
         } else {
-//            Glide.with(getActivity()).load(R.drawable.sun).into(img);
             img.setImageResource(R.drawable.sun);
         }
 
     }
 
-    public synchronized void refreshWeather(List<Forecast> list) {
-        if (list != null) {
-            forecastList = list;
-        }
-        initId();
-        i = 1;
 
-    }
+
 
 
     private int getRandomNum(int from, int to) {
@@ -172,5 +162,15 @@ public class FutureWeatherFrag extends Fragment {
         Glide.with(this).load("http://s.tu.ihuan.me/bgc/" + s + ".png")
                 .placeholder(R.drawable.back)
                 .into(imageView);
+    }
+
+    @Override
+    public void getWeather(List<Forecast> forecastList) {
+        initView(forecastList);
+    }
+
+    @Override
+    public void getWeatherInfo(ForecastInfo info) {
+
     }
 }

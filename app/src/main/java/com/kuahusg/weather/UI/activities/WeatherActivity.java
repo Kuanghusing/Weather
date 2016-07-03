@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -26,17 +27,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.kuahusg.weather.R;
 import com.kuahusg.weather.UI.Fragment.FutureWeatherFrag;
 import com.kuahusg.weather.UI.Fragment.SettingFrag;
 import com.kuahusg.weather.UI.Fragment.WeatherFragment;
-import com.kuahusg.weather.R;
-import com.kuahusg.weather.model.db.WeatherDB;
 import com.kuahusg.weather.model.City;
 import com.kuahusg.weather.model.Forecast;
 import com.kuahusg.weather.model.ForecastInfo;
+import com.kuahusg.weather.model.db.WeatherDB;
 import com.kuahusg.weather.service.AutoUpdateService;
 import com.kuahusg.weather.util.LogUtil;
-import com.kuahusg.weather.util.Utility;
+import com.kuahusg.weather.util.WeatherUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,60 +45,26 @@ import java.util.List;
 /**
  * Created by kuahusg on 16-4-28.
  */
-public class WeatherActivity extends AppCompatActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener, ViewPager.OnPageChangeListener {
+public class WeatherActivity extends AppCompatActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener, ViewPager.OnPageChangeListener, WeatherUtil.UpdateWeatherCallback {
 
 
-    /*public static final int SHOW_WEATHER = 2;
-    public static final int SHOW_TEMP_DATE = 3;*/
     public static FloatingActionButton fab;
     public static Toolbar toolbar;
     public static Context mContext;
     public static WeatherFragment todayFrag;
     public static FutureWeatherFrag futureWeatherFrag;
     public static SharedPreferences preferences;
-    //    private static int whichDay = 0;
     public static SwipeRefreshLayout refreshLayout;
     private static City selectCity;
-    private static List<Forecast> forecastList;
+    private List<Forecast> forecastList;
     private WeatherDB db;
     private ForecastInfo info;
     private PagerAdapter adapter;
-    //    private float oldOffset = 1;
-    /*public static Handler handler = new Handler() {
 
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case SHOW_WEATHER:
-                    forecastList = WeatherDB.loadForecast();
-                    todayFrag.showWeather(forecastList);
-                    futureWeatherFrag.refreshWeather(forecastList);
-
-                    todayFrag.hideProgressBar();
-                    if (refreshLayout.isRefreshing()) {
-                        refreshLayout.setRefreshing(false);
-                    }
-                    //WeatherActivity.setupDrawerContent();
-                    Snackbar.make(WeatherActivity.fab, mContext.getString(R.string.load_finish), Snackbar.LENGTH_LONG)
-                            .show();
-                    break;
-                case SHOW_TEMP_DATE:
-                    tempAndPushDate = WeatherDB.loadForecastInfo();
-                    todayFrag.showForecastInfo(tempAndPushDate);
-//                    futureWeatherFrag.refreshWeather(forecastList);
-                    break;
-
-            }
-        }
-    };*/
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private TabLayout tabLayout;
     private ViewPager viewPager;
-
-
-
 
 
     @Override
@@ -105,18 +72,13 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.weather_layout);
         db = WeatherDB.getInstance(this);
-        mContext = getApplicationContext();
+        mContext = WeatherActivity.this;
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 
         InitView();
-        InitWeather();
         setupViewPager(viewPager);
-
-
-
-
-
+        InitWeather();
 
 
         Intent intent = new Intent(mContext, AutoUpdateService.class);
@@ -131,17 +93,17 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void InitView() {
-    /*
-    * fab
-     */
+        /**
+         * fab
+         */
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         if (fab != null) {
             fab.setOnClickListener(this);
         }
 
-        /*
-        * toolbar
+        /**
+         * toolbar
          */
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -159,14 +121,11 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         }
 
         setupDrawerContent();
-        /*
-        * tabLayout and viewPager
+        /**
+         * tabLayout and viewPager
          */
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         viewPager = (ViewPager) findViewById(R.id.view_paper);
-//        setupViewPager(viewPager, new WeatherFragment(), new FutureWeatherFrag());
-//        tabLayout.setupWithViewPager(viewPager);
-
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -178,7 +137,10 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     private void InitWeather() {
         selectCity = (City) getIntent().getSerializableExtra("selectCity");
         boolean anotherCity = getIntent().getBooleanExtra("anotherCity", false);
-        if (selectCity != null) {   //form the select activity
+        /**
+         * form the select activity
+         */
+        if (selectCity != null) {
             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
             editor.putString("selectCity", selectCity.getFullNmae());
             editor.putString("selectCitySimpleName", selectCity.getCity_name());
@@ -186,7 +148,10 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
             editor.putString("city_name", selectCity.getCity_name());
             editor.apply();
 
-        } else {    //enter WeatherActivity directly
+            /**
+             * enter Activity directly
+             */
+        } else {
             LogUtil.v(this.getClass().getName(), "selectCity is null!");
             String fullName = preferences.getString("selectCity", "null");
             String woeid = preferences.getString("woeid", "0");
@@ -194,33 +159,65 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
             LogUtil.v(this.getClass().getName(), fullName + "\t" + woeid);
             selectCity = new City(city_name, woeid, fullName);
         }
+
         if (anotherCity) {
             refreshLayout.setRefreshing(true);
             queryWeatherFromServer(selectCity);
             return;
         }
-        info = Utility.loadForecastInfoFromDatabase(selectCity.getWoeid());
-        forecastList = Utility.loadForecastFromDatabase(selectCity.getWoeid());
+        info = WeatherUtil.loadForecastInfoFromDatabase(selectCity.getWoeid());
+        forecastList = WeatherUtil.loadForecastFromDatabase(selectCity.getWoeid());
 
 
         if (forecastList.size() == 0 || info == null) {
             queryWeatherFromServer(selectCity);
             refreshLayout.setRefreshing(true);
-        }
+        } /*else {
+            todayFrag.showWeather(forecastList);
+            todayFrag.showForecastInfo(info);
+            futureWeatherFrag.initView(forecastList);
+        }*/
     }
 
 
     public static void queryWeatherFromServer(final City selectCity) {
-        Utility.queryWeather(selectCity.getWoeid(), mContext, false);
+        WeatherUtil.queryWeather(selectCity.getWoeid(), mContext, (WeatherActivity) mContext);
 
+    }
+
+    public void getWeatherFromActivity(WeatherUtil.GetWeatherCallback getWeatherCallback) {
+        getWeatherCallback.getWeather(forecastList);
+        getWeatherCallback.getWeatherInfo(info);
+    }
+
+    @Override
+    public void updateWeather(List<Forecast> forecastList) {
+        this.forecastList = forecastList;
+        todayFrag.showWeather(forecastList);
+        futureWeatherFrag.initView(forecastList);
+        Snackbar.make(fab, getString(R.string.load_finish), Snackbar.LENGTH_LONG).show();
+        refreshLayout.setRefreshing(false);
+    }
+
+    @Override
+    public void updateWeatherInfo(ForecastInfo forecastInfo) {
+        this.info = forecastInfo;
+        todayFrag.showForecastInfo(forecastInfo);
+    }
+
+    @Override
+    public void error(String message) {
+        Snackbar.make(fab, message, Snackbar.LENGTH_LONG).show();
+        refreshLayout.setRefreshing(false);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fab:
-                queryWeatherFromServer(selectCity);
+//                queryWeatherFromServer(selectCity);
                 toolbar.setSubtitle(R.string.loading);
+                queryWeatherFromServer(selectCity);
 //                todayFrag.showProgressBar();
                 break;
         }
@@ -229,8 +226,10 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onRefresh() {
         refreshLayout.setRefreshing(true);
-        queryWeatherFromServer(selectCity);
+//        queryWeatherFromServer(selectCity);
         toolbar.setSubtitle(R.string.loading);
+        queryWeatherFromServer(selectCity);
+
 
     }
 
@@ -276,10 +275,6 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
 
     public void setupDrawerContent() {
 
-
-/*        View header = navigationView.getHeaderView(0);
-        ImageView background = (ImageView) header.findViewById(R.id.back_in_nav_header);*/
-
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
@@ -321,17 +316,8 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     private void setupViewPager(final ViewPager viewPager) {
 
 
-
-        Bundle data = new Bundle();
-        data.putParcelableArrayList("forecastList", (ArrayList<Forecast>) forecastList);
-        data.putSerializable("ForecastInfo", info);
-        data.putSerializable("selectCity", selectCity);
         todayFrag = new WeatherFragment();
         futureWeatherFrag = new FutureWeatherFrag();
-        todayFrag.setArguments(data);
-        futureWeatherFrag.setArguments(data);
-
-
         List<String> list = new ArrayList<>();
         List<android.support.v4.app.Fragment> fragmentList = new ArrayList<>();
         list.add(getString(R.string.today));

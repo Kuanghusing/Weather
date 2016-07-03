@@ -74,5 +74,12 @@ public class HttpUtil {
 
     }
 
+
+    public interface HttpCallBackListener {
+        void onFinish(String respon);
+
+        void onError(Exception e);
+    }
+
 }
 

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -21,13 +20,12 @@ import com.bumptech.glide.Glide;
 import com.kuahusg.weather.R;
 import com.kuahusg.weather.UI.Widget.BackgroundPicture;
 import com.kuahusg.weather.UI.activities.WeatherActivity;
-import com.kuahusg.weather.model.City;
 import com.kuahusg.weather.model.Forecast;
 import com.kuahusg.weather.model.ForecastInfo;
 import com.kuahusg.weather.util.DateUtil;
 import com.kuahusg.weather.util.LogUtil;
+import com.kuahusg.weather.util.WeatherUtil;
 
-import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 
@@ -35,10 +33,9 @@ import java.util.Random;
  * Created by kuahusg on 16-5-25.
  */
 
-public class WeatherFragment extends Fragment implements View.OnClickListener {
+public class WeatherFragment extends Fragment implements View.OnClickListener, WeatherUtil.GetWeatherCallback {
     private View view;
     private List<Forecast> forecastList;
-    private City selectCity;
     private Context mContext;
     private TextView date;
     private TextView temp_now;
@@ -51,7 +48,6 @@ public class WeatherFragment extends Fragment implements View.OnClickListener {
     private TextView wind_direction;
     private TextView sunrise;
     private TextView sunset;
-    private ImageView today_background;
     private Button check;
     private String link;
     private TextView refresh_time;
@@ -78,20 +74,35 @@ public class WeatherFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        forecastList = getArguments().getParcelableArrayList("forecastList");
-        selectCity = (City) getArguments().getSerializable("selectCity");
-        info = (ForecastInfo) getArguments().getSerializable("ForecastInfo");
+        /*forecastList = getArguments().getParcelableArrayList("forecastList");
+        info = (ForecastInfo) getArguments().getSerializable("ForecastInfo");*/
         if (info != null) {
             link = info.getLink();
         }
 
-        if (forecastList != null && forecastList.size() > 0 && info != null) {
+
+        ((WeatherActivity) mContext).getWeatherFromActivity(this);
+
+        /*forecastList = WeatherUtil.loadForecastFromDatabase(selectCity.getWoeid());
+        info = WeatherUtil.loadForecastInfoFromDatabase(selectCity.getWoeid());*/
+
+        /*if (forecastList != null && forecastList.size() > 0 && info != null) {
 
             showWeather(forecastList);
-            showForecastInfo(info);
-        }
+            showForecastInfo(info);*/
 
 
+    }
+
+
+    @Override
+    public void getWeather(List<Forecast> forecastList) {
+        showWeather(forecastList);
+    }
+
+    @Override
+    public void getWeatherInfo(ForecastInfo info) {
+        showForecastInfo(info);
     }
 
     public void showWeather(List<Forecast> list) {
@@ -106,7 +117,7 @@ public class WeatherFragment extends Fragment implements View.OnClickListener {
             weather_text.setText(weatherText);
             cal_date.setText(forecastToday.getDate().substring(0, 6));
 
-            WeatherActivity.toolbar.setSubtitle(selectCity.getCity_name());
+//            WeatherActivity.toolbar.setSubtitle(selectCity.getCity_name());
 
 
             forecast_info_container.setVisibility(View.VISIBLE);
@@ -155,8 +166,8 @@ public class WeatherFragment extends Fragment implements View.OnClickListener {
             wind_direction.setText(getWindDirection(Integer.valueOf(info.getWindDirection())));
             wind_speed.setText(info.getWindSpeed() + " km/h");
             temp_now.setText(info.getTemp());
-            date.setText(info.getDate().substring(17, 22));
-            refresh_time.setText(getString(R.string.refersh_time) + "\n" + info.getLastBuildDate().substring(18, 22));
+            date.setText(info.getDate().substring(16, 22));
+            refresh_time.setText(getString(R.string.refersh_time) + "\n" + info.getLastBuildDate().substring(17, 22));
         }
 
 
