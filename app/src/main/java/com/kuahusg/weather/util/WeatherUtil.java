@@ -2,7 +2,6 @@ package com.kuahusg.weather.util;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.os.Message;
 
 import com.google.gson.Gson;
@@ -44,7 +43,14 @@ public class WeatherUtil {
         WeatherUtil.mContext = context;
 
 
-        new UpdateForecastTask(woeid).execute(address.replaceAll(" ", "%20").replaceAll("\"", "%22"));
+        if (NetwordUtil.hasNetwork(context)) {
+            new UpdateForecastTask(woeid).execute(address.replaceAll(" ", "%20").replaceAll("\"", "%22"));
+        } else {
+            if (updateWeatherCallback != null) {
+                updateWeatherCallback.error(context.getString(R.string.no_network));
+                return false;
+            }
+        }
 
         return true;
 
@@ -65,6 +71,7 @@ public class WeatherUtil {
     private static class UpdateForecastTask extends AsyncTask<String, String, WeatherResult> {
 
         String woeid;
+        Exception exceptionInBackground;
 
         public UpdateForecastTask(String woeid) {
             this.woeid = woeid;
@@ -79,10 +86,13 @@ public class WeatherUtil {
                 result = HttpUtil.sendHttpReauest(params[0], "GET");
             } catch (Exception e) {
                 e.printStackTrace();
-                message = new Message();
+                /*message = new Message();
                 message.what = ERROR;
                 message.obj = mContext.getString(R.string.error_network);
-                handler.sendMessage(message);
+                handler.sendMessage(message);*/
+                exceptionInBackground = new Exception(mContext.getString(R.string.error_network));
+
+
 
                 return null;
             }
@@ -94,11 +104,15 @@ public class WeatherUtil {
                 weatherResult = gson.fromJson(result, WeatherResult.class);
             } catch (JsonSyntaxException e) {
                 e.printStackTrace();
+                /*Looper.prepare();
                 message = new Message();
                 message.what = ERROR;
                 message.obj = mContext.getString(R.string.no_result);
-                handler.sendMessage(message);
-                cancel(true);
+                handler.sendMessage(message);*/
+                exceptionInBackground = new Exception(mContext.getString(R.string.no_result));
+
+
+                return null;
             }
 
 
@@ -111,6 +125,11 @@ public class WeatherUtil {
         @Override
         protected void onPostExecute(WeatherResult weatherResult) {
             super.onPostExecute(weatherResult);
+
+            if (exceptionInBackground != null && updateWeatherCallback != null) {
+                updateWeatherCallback.error(exceptionInBackground.getMessage());
+                return;
+            }
 
             List<Forecast> forecastList = new ArrayList<>();
             ForecastInfo forecastInfo = null;
@@ -170,8 +189,11 @@ public class WeatherUtil {
             /**
              * callback
              */
-            updateWeatherCallback.updateWeather(forecastList);
-            updateWeatherCallback.updateWeatherInfo(forecastInfo);
+            if (updateWeatherCallback != null) {
+
+                updateWeatherCallback.updateWeather(forecastList);
+                updateWeatherCallback.updateWeatherInfo(forecastInfo);
+            }
 
         }
 
@@ -189,14 +211,13 @@ public class WeatherUtil {
     }
 
 
-
     public interface GetWeatherCallback {
         void getWeather(List<Forecast> forecastList);
 
         void getWeatherInfo(ForecastInfo info);
     }
 
-    public static Handler handler = new Handler() {
+    /*private static Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -206,6 +227,7 @@ public class WeatherUtil {
                     break;
             }
         }
-    };
+    };*/
+
 
 }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +28,7 @@ import java.util.Random;
  * Created by kuahusg on 16-5-26.
  */
 
-public class FutureWeatherFrag extends Fragment implements WeatherUtil.GetWeatherCallback {
+public class FutureWeatherFrag extends Fragment implements WeatherUtil.GetWeatherCallback, NestedScrollView.OnScrollChangeListener {
     CardView cardView;
     private View view;
     private List<Forecast> forecastList;
@@ -39,6 +40,7 @@ public class FutureWeatherFrag extends Fragment implements WeatherUtil.GetWeathe
     private ImageView imageView;
     private int i = 1;
     private Context mContext;
+    private NestedScrollView nestedScrollView;
 
 
     @Nullable
@@ -49,6 +51,8 @@ public class FutureWeatherFrag extends Fragment implements WeatherUtil.GetWeathe
         view = inflater.inflate(R.layout.future_frag, container, false);
 
 
+        nestedScrollView = (NestedScrollView) view.findViewById(R.id.nestedScrollView);
+        nestedScrollView.setOnScrollChangeListener(this);
         ((WeatherActivity) getActivity()).getWeatherFromActivity(this);
 
         return view;
@@ -172,5 +176,15 @@ public class FutureWeatherFrag extends Fragment implements WeatherUtil.GetWeathe
     @Override
     public void getWeatherInfo(ForecastInfo info) {
 
+    }
+
+    @Override
+    public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+        if (oldScrollY < scrollY) {
+            WeatherActivity.fab.hide();
+
+        } else {
+            WeatherActivity.fab.show();
+        }
     }
 }

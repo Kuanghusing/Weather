@@ -2,8 +2,6 @@ package com.kuahusg.weather.util;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Message;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
@@ -67,6 +65,7 @@ public class CityUtil {
 
 
     private static class QueryCityTask extends AsyncTask<String, String, List<City>> {
+        Exception exceptionInBackground;
         @Override
         protected List<City> doInBackground(String... params) {
             String result = "";
@@ -76,12 +75,14 @@ public class CityUtil {
 
             } catch (Exception e) {
                 if (mContext != null) {
-                    Message message = new Message();
+                    /*Message message = new Message();
                     message.what = ERROR_QUERY_CITY;
                     message.obj = mContext.getString(R.string.no_network);
                     handler.sendMessage(message);
                     e.printStackTrace();
-                    cancel(true);
+                    cancel(true);*/
+                    exceptionInBackground = new Exception(mContext.getString(R.string.no_network));
+                    return null;
                 }
             }
             List<City> cityList = new ArrayList<>();
@@ -108,10 +109,12 @@ public class CityUtil {
                     admin3 = citySearchResult.getQuery().getResults().getPlace().getAdmin3();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Message message = new Message();
+                    /*Message message = new Message();
                     message.what = ERROR_QUERY_CITY;
                     message.obj = mContext.getString(R.string.no_result);
-                    handler.sendMessage(message);
+                    handler.sendMessage(message);*/
+                    exceptionInBackground = new Exception(mContext.getString(R.string.no_result));
+                    return null;
                 }
                 fullName = new StringBuilder();
 
@@ -143,13 +146,21 @@ public class CityUtil {
         @Override
         protected void onPostExecute(List<City> cityList) {
             super.onPostExecute(cityList);
-            queryCityCallback.queryCityFinish(cityList);
+            if (queryCityCallback != null) {
+                if (exceptionInBackground != null) {
+                    queryCityCallback.queryCityError(exceptionInBackground.getMessage());
+                    return;
+                }
+                queryCityCallback.queryCityFinish(cityList);
+            }
 
         }
 
     }
 
     private static class HandleCityListTask extends AsyncTask<String, String, List<Citys>> {
+        Exception exceptionInBackground;
+
         @Override
         protected List<Citys> doInBackground(String... params) {
             String result = null;
@@ -157,11 +168,14 @@ public class CityUtil {
                 result = HttpUtil.sendHttpReauest(params[0], "GET");
 
             } catch (Exception e) {
-                Message message = new Message();
+                /*Message message = new Message();
                 message.what = ERROR_SOLVE_CITY;
                 message.obj = mContext.getString(R.string.no_network);
                 handler.sendMessage(message);
-                cancel(true);
+                cancel(true);*/
+                exceptionInBackground = new Exception(mContext.getString(R.string.no_network));
+                return null;
+
             }
 
             List<Citys> list = new ArrayList<>();
@@ -173,11 +187,13 @@ public class CityUtil {
                 }.getType());
             } catch (Exception e) {
                 e.printStackTrace();
-                Message message = new Message();
+                /*Message message = new Message();
                 message.what = ERROR_QUERY_CITY;
                 message.obj = mContext.getString(R.string.no_result);
                 handler.sendMessage(message);
-                cancel(true);
+                cancel(true);*/
+                exceptionInBackground = new Exception(mContext.getString(R.string.no_result));
+                return null;
             }
 
             return list;
@@ -187,6 +203,10 @@ public class CityUtil {
         @Override
         protected void onPostExecute(List<Citys> cityList) {
             super.onPostExecute(cityList);
+            if (exceptionInBackground != null && solveCityCallback != null) {
+                solveCityCallback.solveCityError(exceptionInBackground.getMessage());
+                return;
+            }
             List<String> list = new ArrayList<>();
             if (cityList != null) {
                 for (int i = 0; i < cityList.size(); i++) {
@@ -233,7 +253,7 @@ public class CityUtil {
         void queryCityError(String message);
     }
 
-    public static Handler handler = new Handler() {
+    /*public static Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -247,5 +267,5 @@ public class CityUtil {
 
             }
         }
-    };
+    };*/
 }

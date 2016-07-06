@@ -23,7 +23,7 @@
                 android:layout_height="?attr/actionBarSize"
                 android:background="@color/colorPrimary"
                 app:elevation="4dp"
-                app:layout_scrollFlags="scroll|enterAlways"
+                app:layout_scrollFlags="scroll"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 app:subtitleTextColor="@color/white"
                 app:theme="@style/ThemeOverlay.AppCompat.Dark"
@@ -53,7 +53,8 @@
             <android.support.v4.view.ViewPager
                 android:id="@+id/view_paper"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:fitsSystemWindows="true">
 
             </android.support.v4.view.ViewPager>
 
