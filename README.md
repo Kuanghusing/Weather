@@ -1,11 +1,6 @@
-# Weather
-* 自己的第一个Android项目
-* 用yahoo weather的public api（解释json)
+# 晴 天气
 
-> ![image](https://github.com/Kuanghusing/Weather/raw/master/screenshots.png)
-> ［酷安下载](http://coolapk.com/apk/com.kuahusg.weather)
+> 仅用于学习
 
-
-
-
-
+> ![image](https://github.com/Kuanghusing/Weather/raw/master/Screenshot.png)
+> [酷安下载](http://coolapk.com/apk/com.kuahusg.weather)
