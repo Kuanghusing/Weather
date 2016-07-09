@@ -97,6 +97,10 @@ public class WeatherFragment extends Fragment implements View.OnClickListener, W
 
     @Override
     public void getWeather(List<Forecast> forecastList) {
+        if (forecastList == null) {
+            ((WeatherActivity) getActivity()).queryWeatherFromServer(null);
+            return;
+        }
         showWeather(forecastList);
     }
 

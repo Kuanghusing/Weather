@@ -170,6 +170,9 @@ public class FutureWeatherFrag extends Fragment implements WeatherUtil.GetWeathe
 
     @Override
     public void getWeather(List<Forecast> forecastList) {
+        if (forecastList == null) {
+            return;
+        }
         initView(forecastList);
     }
 

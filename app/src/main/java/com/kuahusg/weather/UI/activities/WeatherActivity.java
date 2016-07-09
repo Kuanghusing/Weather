@@ -174,8 +174,12 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     }
 
 
-    public static void queryWeatherFromServer(final City selectCity) {
-        WeatherUtil.queryWeather(selectCity.getWoeid(), mContext, (WeatherActivity) mContext);
+    public void queryWeatherFromServer(final City selectCity) {
+        refreshLayout.setRefreshing(true);
+        if (selectCity == null) {
+            WeatherUtil.queryWeather(WeatherActivity.selectCity.getWoeid(), mContext, (WeatherActivity) mContext);
+        } else
+            WeatherUtil.queryWeather(selectCity.getWoeid(), mContext, (WeatherActivity) mContext);
 
     }
 

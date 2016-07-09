@@ -15,6 +15,9 @@ import com.kuahusg.weather.model.db.WeatherDB;
 import java.util.ArrayList;
 import java.util.List;
 
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+
 /**
  * Created by kuahusg on 16-4-27.
  */
@@ -33,6 +36,7 @@ public class WeatherUtil {
                 + "select * from weather.forecast "
                 + "where woeid = " + woeid + " and u=\"c\"&format=json";
 
+        String yql = "select * from weather.forecast where woeid = " + woeid + " and u=\"c\"";
         WeatherUtil.updateWeatherCallback = updateWeatherCallback;
 
 
@@ -44,7 +48,8 @@ public class WeatherUtil {
 
 
         if (NetwordUtil.hasNetwork(context)) {
-            new UpdateForecastTask(woeid).execute(address.replaceAll(" ", "%20").replaceAll("\"", "%22"));
+//            new UpdateForecastTask(woeid).execute(address.replaceAll(" ", "%20").replaceAll("\"", "%22"));
+            updateForecastWithRxjava(woeid,yql, "json" );
         } else {
             if (updateWeatherCallback != null) {
                 updateWeatherCallback.error(context.getString(R.string.no_network));
@@ -65,7 +70,106 @@ public class WeatherUtil {
 
     public static List<Forecast> loadForecastFromDatabase(String woeid) {
         return WeatherDB.loadForecast(woeid);
+
+
+
+
+
     }
+
+    public static void updateForecastWithRxjava(final String woeid, String select, String format) {
+
+        RetrofitManager.newInstanst().getForecast(select, format)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<WeatherResult>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        if (updateWeatherCallback != null) {
+                            updateWeatherCallback.error(mContext.getString(R.string.error_network));
+                            e.printStackTrace();
+                        }
+
+                    }
+
+                    @Override
+                    public void onNext(WeatherResult weatherResult) {
+
+                        List<Forecast> forecastList = new ArrayList<>();
+                        ForecastInfo forecastInfo = null;
+                        if (weatherResult == null) {
+                            return;
+                        }
+
+
+                        Forecast[] forecasts = new Forecast[0];
+                        try {
+                            forecasts = weatherResult.getQuery().getResults().getChannel().getItem().getForecast();
+                            forecasts = weatherResult.getQuery().getResults().getChannel().getItem().getForecast();
+                            String link = weatherResult.getQuery().getResults().getChannel().getLink();
+                            String lastBuildDate = weatherResult.getQuery().getResults().getChannel()
+                                    .getLastBuildDate();
+                            String wind_direction = weatherResult.getQuery().getResults().getChannel()
+                                    .getWind().getDirection();
+                            String wind_speed = weatherResult.getQuery().getResults().getChannel().getWind()
+                                    .getSpeed();
+                            String date = weatherResult.getQuery().getResults().getChannel().getItem()
+                                    .getCondition().getDate();
+                            String temp = weatherResult.getQuery().getResults().getChannel().getItem()
+                                    .getCondition().getTemp();
+                            String text = weatherResult.getQuery().getResults().getChannel().getItem()
+                                    .getCondition().getText();
+                            String sunrise = weatherResult.getQuery().getResults().getChannel().getAstronomy()
+                                    .getSunrise();
+                            String sunset = weatherResult.getQuery().getResults().getChannel().getAstronomy()
+                                    .getSunset();
+
+                            forecastInfo = new ForecastInfo(link, lastBuildDate, wind_direction, wind_speed, date,
+                                    temp, text, woeid, sunrise, sunset);
+
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            updateWeatherCallback.error(mContext.getString(R.string.no_result));
+                            return;
+                        }
+
+                        LogUtil.v(this.toString(), "length:\t" + forecasts.length + "");
+
+                        /**
+                         * save to database
+                         */
+                        if (forecasts.length > 0) {
+                            for (Forecast f :
+                                    forecasts) {
+                                f.setWoeid(woeid);
+                                forecastList.add(f);
+                                WeatherDB.saveForecast(f);
+
+                            }
+                        }
+                        WeatherDB.saveForecastInfo(forecastInfo);
+
+
+                        /**
+                         * callback
+                         */
+                        if (updateWeatherCallback != null) {
+
+                            updateWeatherCallback.updateWeather(forecastList);
+                            updateWeatherCallback.updateWeatherInfo(forecastInfo);
+                        }
+
+                    }
+                });
+    }
+
+
+
 
 
     private static class UpdateForecastTask extends AsyncTask<String, String, WeatherResult> {
