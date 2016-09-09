@@ -31,16 +31,16 @@ import java.util.List;
 /**
  * Created by kuahusg on 16-4-30.
  */
-public class SelectArea extends AppCompatActivity implements CityUtil.SolveCityCallback, CityUtil.QueryCityCallback {
+public class SelectLocationActivity extends AppCompatActivity implements CityUtil.SolveCityCallback, CityUtil.QueryCityCallback {
     private AutoCompleteTextView editText;
-    private static ArrayAdapter<String> autoCompleteTextAdapter;
+    private ArrayAdapter<String> autoCompleteTextAdapter;
     private ListView cityListView;
     private List<String> cityNameList;
     private List<City> searchResultCityList;
     private ArrayAdapter<String> adapter;
     private static ProgressDialog progressDialog;
     private static List<String> cityListFromDataBase = new ArrayList<>();
-    private static Context mContext;
+    private Context mContext;
 
     private Button queryButton;
     private Toolbar toolbar;
@@ -53,7 +53,7 @@ public class SelectArea extends AppCompatActivity implements CityUtil.SolveCityC
     @Override
     public void queryCityError(String message) {
 
-        Toast.makeText(SelectArea.this, message, Toast.LENGTH_SHORT).show();
+        Toast.makeText(SelectLocationActivity.this, message, Toast.LENGTH_SHORT).show();
         dismissProgress();
     }
 
@@ -63,7 +63,7 @@ public class SelectArea extends AppCompatActivity implements CityUtil.SolveCityC
         dismissProgress();
         allCityLoadFinish(list);
 
-        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(SelectArea.this).edit();
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(SelectLocationActivity.this).edit();
         editor.putBoolean("hasLoadAllCity", true);
         editor.apply();
     }
@@ -78,7 +78,7 @@ public class SelectArea extends AppCompatActivity implements CityUtil.SolveCityC
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.select_layout);
+        setContentView(R.layout.activity_select_location);
 
         isFromWeatherActivity = getIntent().getBooleanExtra("isFromWeatherActivity", false);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -87,7 +87,7 @@ public class SelectArea extends AppCompatActivity implements CityUtil.SolveCityC
 
 
         if (!isFromWeatherActivity && !TextUtils.isEmpty(selectCity)) {
-            Intent intent = new Intent(SelectArea.this, WeatherActivity.class);
+            Intent intent = new Intent(SelectLocationActivity.this, WeatherActivity.class);
             startActivity(intent);
             finish();
             return;
@@ -123,7 +123,7 @@ public class SelectArea extends AppCompatActivity implements CityUtil.SolveCityC
         }
 
 
-        autoCompleteTextAdapter = new ArrayAdapter<>(SelectArea.this, android.R.layout.simple_list_item_1, cityListFromDataBase);
+        autoCompleteTextAdapter = new ArrayAdapter<>(SelectLocationActivity.this, android.R.layout.simple_list_item_1, cityListFromDataBase);
         editText.setAdapter(autoCompleteTextAdapter);
 
 
@@ -150,7 +150,7 @@ public class SelectArea extends AppCompatActivity implements CityUtil.SolveCityC
                 if (!TextUtils.isEmpty(editText.getText().toString())) {
                     showProgress(true);
                     cityName = editText.getText().toString();
-                    CityUtil.queryCity(cityName, mContext, SelectArea.this);
+                    CityUtil.queryCity(cityName, mContext, SelectLocationActivity.this);
                 }
             }
         });
@@ -159,7 +159,7 @@ public class SelectArea extends AppCompatActivity implements CityUtil.SolveCityC
         cityListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(SelectArea.this, WeatherActivity.class);
+                Intent intent = new Intent(SelectLocationActivity.this, WeatherActivity.class);
                 City city = searchResultCityList.get(position);
                 if (city != null) {
                     intent.putExtra("selectCity", city);
@@ -174,7 +174,7 @@ public class SelectArea extends AppCompatActivity implements CityUtil.SolveCityC
         });
     }
 
-    public static void allCityLoadFinish(List<String> loadCity) {
+    public void allCityLoadFinish(List<String> loadCity) {
 
         cityListFromDataBase.clear();
         cityListFromDataBase.addAll(loadCity);
@@ -220,7 +220,7 @@ public class SelectArea extends AppCompatActivity implements CityUtil.SolveCityC
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                Intent intent = new Intent(SelectArea.this, WeatherActivity.class);
+                Intent intent = new Intent(SelectLocationActivity.this, WeatherActivity.class);
                 startActivity(intent);
                 finish();
         }
@@ -230,7 +230,7 @@ public class SelectArea extends AppCompatActivity implements CityUtil.SolveCityC
     @Override
     public void onBackPressed() {
         if (isFromWeatherActivity) {
-            Intent intent = new Intent(SelectArea.this, WeatherActivity.class);
+            Intent intent = new Intent(SelectLocationActivity.this, WeatherActivity.class);
             startActivity(intent);
             finish();
         }

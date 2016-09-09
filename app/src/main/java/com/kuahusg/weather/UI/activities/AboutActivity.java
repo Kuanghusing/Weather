@@ -17,14 +17,14 @@ import com.kuahusg.weather.R;
  * Created by kuahusg on 16-5-19.
  */
 
-public class About extends AppCompatActivity {
+public class AboutActivity extends AppCompatActivity {
     private Toolbar toolbar;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.about_layout);
+        setContentView(R.layout.activity_about);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 

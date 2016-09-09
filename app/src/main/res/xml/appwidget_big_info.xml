@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:initialLayout="@layout/weather_appwidget_big"
+    android:initialLayout="@layout/appwidget_weather_big"
     android:minHeight="60dp"
     android:minWidth="220dp"
     android:resizeMode="vertical|horizontal"

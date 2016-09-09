@@ -50,7 +50,7 @@ public class WeatherAppWidgetWeekProvider extends AppWidgetProvider {
         }
 
         for (int appwidgetId : appWidgetIds) {
-            RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.weather_appwidget_week);
+            RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.appwidget_weather_week);
             forecast = forecastList.get(0);
             rv.setImageViewResource(R.id.weather_pic, getWeatherPicId(forecast.getText()));
             rv.setTextViewText(R.id.city_name, cityName);

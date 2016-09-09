@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +17,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.kuahusg.weather.R;
-import com.kuahusg.weather.UI.Widget.BackgroundPicture;
+import com.kuahusg.weather.UI.Widget.BackgroundPictureView;
 import com.kuahusg.weather.UI.activities.WeatherActivity;
 import com.kuahusg.weather.model.Forecast;
 import com.kuahusg.weather.model.ForecastInfo;
@@ -51,7 +50,7 @@ public class WeatherFragment extends Fragment implements View.OnClickListener, W
     private Button check;
     private String link;
     private TextView refresh_time;
-    private BackgroundPicture backgroundPicture;
+    private BackgroundPictureView backgroundPictureView;
 
 
     private RelativeLayout forecast_now_container;
@@ -61,7 +60,7 @@ public class WeatherFragment extends Fragment implements View.OnClickListener, W
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.weather_frag, container, false);
+        view = inflater.inflate(R.layout.fragment_weather_main, container, false);
         mContext = getActivity();
         initView();
 
@@ -109,7 +108,7 @@ public class WeatherFragment extends Fragment implements View.OnClickListener, W
 
             showWeatherPic(weatherText);
         } else {
-            Snackbar.make(WeatherActivity.fab, mContext.getString(R.string.error_network), Snackbar.LENGTH_LONG).show();
+//            Snackbar.make(WeatherActivity.fab, mContext.getString(R.string.error_network), Snackbar.LENGTH_LONG).show();
 
 
         }
@@ -175,10 +174,10 @@ public class WeatherFragment extends Fragment implements View.OnClickListener, W
         check.setOnClickListener(this);
         forecast_now_container = (RelativeLayout) view.findViewById(R.id.weather_now_container);
         forecast_info_container = (LinearLayout) view.findViewById(R.id.weather_info_container);
-        backgroundPicture = (BackgroundPicture) view.findViewById(R.id.today_background);
+        backgroundPictureView = (BackgroundPictureView) view.findViewById(R.id.today_background);
 
 
-        backgroundPicture.addOnBackgroundPicClickListener(new BackgroundPicture.OnBackgroundPicClickListener() {
+        backgroundPictureView.addOnBackgroundPicClickListener(new BackgroundPictureView.OnBackgroundPicClickListener() {
             @Override
             public void OnClickClickPic(ImageView pic) {
 //                int from = DateUtil.getDatePart(Calendar.DAY_OF_MONTH, 0);

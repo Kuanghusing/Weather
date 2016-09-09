@@ -1,4 +1,4 @@
-package com.kuahusg.weather.util;
+package com.kuahusg.weather;
 
 import android.app.Application;
 import android.content.Context;
@@ -6,7 +6,7 @@ import android.content.Context;
 /**
  * Created by kuahusg on 16-4-30.
  */
-public class Myapplication extends Application{
+public class App extends Application {
     private static Context context;
 
     @Override

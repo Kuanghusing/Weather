@@ -17,22 +17,22 @@
 
             <include
                 android:id="@+id/first_card"
-                layout="@layout/weather_card" />
+                layout="@layout/include_weather_card" />
 
             <include
                 android:id="@+id/second_card"
-                layout="@layout/weather_card" />
+                layout="@layout/include_weather_card" />
 
             <include
                 android:id="@+id/third_card"
-                layout="@layout/weather_card" />
+                layout="@layout/include_weather_card" />
 
             <include
                 android:id="@+id/fourth_card"
-                layout="@layout/weather_card" />
+                layout="@layout/include_weather_card" />
 
             <include
-                layout="@layout/weather_card"
+                layout="@layout/include_weather_card"
                 android:id="@+id/fifth_card" />
 
             <LinearLayout

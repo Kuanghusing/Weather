@@ -51,7 +51,7 @@ public class WeatherAppWidgetSmallProvider extends AppWidgetProvider {
 
         for (int appwidgetId :
                 appWidgetIds) {
-            RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.weather_appwidget_small);
+            RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.appwidget_weather_small);
             rv.setImageViewResource(R.id.weather_pic, getWeatherPicId(forecast_to_show.getText()));
             rv.setTextViewText(R.id.weather_info, forecast_to_show.getText());
             rv.setTextViewText(R.id.temp_now, temp_now);

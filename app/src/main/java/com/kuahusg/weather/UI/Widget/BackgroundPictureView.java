@@ -1,41 +1,36 @@
 package com.kuahusg.weather.UI.Widget;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.bumptech.glide.Glide;
 import com.kuahusg.weather.R;
 import com.kuahusg.weather.util.LogUtil;
-
-import java.util.Random;
 
 /**
  * Created by kuahusg on 16-6-29.
  * com.kuahusg.weather.UI
  */
-public class BackgroundPicture extends LinearLayout implements View.OnClickListener {
+public class BackgroundPictureView extends LinearLayout implements View.OnClickListener {
     LinearLayout container;
     Context mContext;
     ImageView imageView;
     OnBackgroundPicClickListener listener;
 
-    public BackgroundPicture(Context context) {
+    public BackgroundPictureView(Context context) {
         super(context);
         init(context);
     }
 
-    public BackgroundPicture(Context context, AttributeSet attrs, int defStyleAttr) {
+    public BackgroundPictureView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }
 
-    public BackgroundPicture(Context context, AttributeSet attrs) {
+    public BackgroundPictureView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
 
@@ -44,7 +39,7 @@ public class BackgroundPicture extends LinearLayout implements View.OnClickListe
 
     private void init(Context context) {
         mContext = context;
-        container = (LinearLayout) LayoutInflater.from(context).inflate(R.layout.background_picture, null);
+        container = (LinearLayout) LayoutInflater.from(context).inflate(R.layout.include_background_picture, null);
         imageView = (ImageView) container.findViewById(R.id.back_pic);
         addView(container);
 

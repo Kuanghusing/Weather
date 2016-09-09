@@ -17,6 +17,7 @@
             android:summary="@string/update_time_summary"
             android:title="@string/update_time" />
 
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/more">

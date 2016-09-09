@@ -64,7 +64,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
 
-                        <com.kuahusg.weather.UI.Widget.BackgroundPicture
+                        <com.kuahusg.weather.UI.Widget.BackgroundPictureView
                             android:id="@+id/today_background"
                             android:layout_width="match_parent"
                             android:layout_height="250dp" />
@@ -375,7 +375,7 @@
 
     <!--
                 <RelativeLayout
-                    android:id="@+id/weather_frag"
+                    android:id="@+id/fragment_weather_main"
                     android:layout_width="match_parent"
                     android:layout_height="500dp"
                     android:visibility="gone">

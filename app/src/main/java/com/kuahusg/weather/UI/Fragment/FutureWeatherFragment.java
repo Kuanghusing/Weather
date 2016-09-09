@@ -28,7 +28,7 @@ import java.util.Random;
  * Created by kuahusg on 16-5-26.
  */
 
-public class FutureWeatherFrag extends Fragment implements WeatherUtil.GetWeatherCallback, NestedScrollView.OnScrollChangeListener {
+public class FutureWeatherFragment extends Fragment implements WeatherUtil.GetWeatherCallback, NestedScrollView.OnScrollChangeListener {
     CardView cardView;
     private View view;
     private List<Forecast> forecastList;
@@ -48,7 +48,7 @@ public class FutureWeatherFrag extends Fragment implements WeatherUtil.GetWeathe
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
 
-        view = inflater.inflate(R.layout.future_frag, container, false);
+        view = inflater.inflate(R.layout.fragment_future, container, false);
 
 
         nestedScrollView = (NestedScrollView) view.findViewById(R.id.nestedScrollView);
@@ -120,7 +120,7 @@ public class FutureWeatherFrag extends Fragment implements WeatherUtil.GetWeathe
                     @Override
                     public void initBackgroundPic(ImageView pic) {
                         loadPicture(DateUtil.getDate("yy-MM-dd",temp_i),pic);
-//                        LogUtil.v("FutureWeatherFrag", "i:" + i);
+//                        LogUtil.v("FutureWeatherFragment", "i:" + i);
                     }
                 });*/
 
@@ -181,10 +181,11 @@ public class FutureWeatherFrag extends Fragment implements WeatherUtil.GetWeathe
     @Override
     public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
         if (oldScrollY < scrollY) {
-            WeatherActivity.fab.hide();
+//            WeatherActivity.fab.hide();
+            // TODO: 16-9-10 it should use interface
 
         } else {
-            WeatherActivity.fab.show();
+//            WeatherActivity.fab.show();
         }
     }
 }

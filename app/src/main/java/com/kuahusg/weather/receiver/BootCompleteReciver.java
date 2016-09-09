@@ -16,7 +16,7 @@ public class BootCompleteReciver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         LogUtil.v(this.toString(),"boot complete,start service");
         Intent intent1 = new Intent(context,AutoUpdateService.class);
-        context.startService(intent);
+        context.startService(intent1);
 
     }
 }

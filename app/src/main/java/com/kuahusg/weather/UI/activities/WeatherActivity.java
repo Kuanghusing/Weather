@@ -28,8 +28,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.kuahusg.weather.R;
-import com.kuahusg.weather.UI.Fragment.FutureWeatherFrag;
-import com.kuahusg.weather.UI.Fragment.SettingFrag;
+import com.kuahusg.weather.UI.Fragment.FutureWeatherFragment;
+import com.kuahusg.weather.UI.Fragment.SettingFragment;
 import com.kuahusg.weather.UI.Fragment.WeatherFragment;
 import com.kuahusg.weather.model.City;
 import com.kuahusg.weather.model.Forecast;
@@ -48,13 +48,13 @@ import java.util.List;
 public class WeatherActivity extends AppCompatActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener, ViewPager.OnPageChangeListener, WeatherUtil.UpdateWeatherCallback {
 
 
-    public static FloatingActionButton fab;
-    public static Toolbar toolbar;
-    public static Context mContext;
-    public static WeatherFragment todayFrag;
-    public static FutureWeatherFrag futureWeatherFrag;
+    public FloatingActionButton fab;
+    public Toolbar toolbar;
+    public Context mContext;
+    public WeatherFragment todayFrag;
+    public FutureWeatherFragment futureWeatherFragment;
     public static SharedPreferences preferences;
-    public static SwipeRefreshLayout refreshLayout;
+    public SwipeRefreshLayout refreshLayout;
     private static City selectCity;
     private List<Forecast> forecastList;
     private WeatherDB db;
@@ -70,7 +70,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.weather_layout);
+        setContentView(R.layout.activity_weather_main);
         db = WeatherDB.getInstance(this);
         mContext = WeatherActivity.this;
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -82,7 +82,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
 
 
         Intent intent = new Intent(mContext, AutoUpdateService.class);
-        if (preferences.getBoolean(SettingFrag.AUTO_UPDATE, false)) {
+        if (preferences.getBoolean(SettingFragment.AUTO_UPDATE, false)) {
 
             mContext.startService(intent);
         } else {
@@ -174,7 +174,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     }
 
 
-    public static void queryWeatherFromServer(final City selectCity) {
+    public void queryWeatherFromServer(final City selectCity) {
         WeatherUtil.queryWeather(selectCity.getWoeid(), mContext, (WeatherActivity) mContext);
 
     }
@@ -200,7 +200,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     public void updateWeather(List<Forecast> forecastList) {
         this.forecastList = forecastList;
         todayFrag.showWeather(forecastList);
-        futureWeatherFrag.initView(forecastList);
+        futureWeatherFragment.initView(forecastList);
         Snackbar.make(fab, getString(R.string.load_finish), Snackbar.LENGTH_LONG).show();
         resumeUI();
     }
@@ -296,7 +296,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
                             @Override
                             public void run() {
 
-                                Intent i = new Intent(mContext, About.class);
+                                Intent i = new Intent(mContext, AboutActivity.class);
                                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 mContext.startActivity(i);
                             }
@@ -320,13 +320,13 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
 
 
         todayFrag = new WeatherFragment();
-        futureWeatherFrag = new FutureWeatherFrag();
+        futureWeatherFragment = new FutureWeatherFragment();
         List<String> list = new ArrayList<>();
         List<android.support.v4.app.Fragment> fragmentList = new ArrayList<>();
         list.add(getString(R.string.today));
         list.add(getString(R.string.future));
         fragmentList.add(todayFrag);
-        fragmentList.add(futureWeatherFrag);
+        fragmentList.add(futureWeatherFragment);
 
         adapter = new PagerAdapter(getSupportFragmentManager(), fragmentList, list);
         viewPager.setAdapter(adapter);
@@ -336,7 +336,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
 
         tabLayout.setupWithViewPager(viewPager);
         todayFrag = (WeatherFragment) adapter.getItem(0);
-        futureWeatherFrag = (FutureWeatherFrag) adapter.getItem(1);
+        futureWeatherFragment = (FutureWeatherFragment) adapter.getItem(1);
     }
 
     @Override
@@ -353,7 +353,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
                 break;
             case R.id.menu_setting:
 //                Toast.makeText(this, "还没完成...", Toast.LENGTH_LONG).show();
-                Intent i = new Intent(WeatherActivity.this, Setting.class);
+                Intent i = new Intent(WeatherActivity.this, SettingActivity.class);
                 startActivity(i);
                 break;
             case R.id.change_btn:
@@ -362,7 +362,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
                         this.getString(R.string.no), this.getString(R.string.yes), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Intent intent = new Intent(WeatherActivity.this, SelectArea.class);
+                                Intent intent = new Intent(WeatherActivity.this, SelectLocationActivity.class);
                                 intent.putExtra("isFromWeatherActivity", true);
                                 startActivity(intent);
                                 finish();

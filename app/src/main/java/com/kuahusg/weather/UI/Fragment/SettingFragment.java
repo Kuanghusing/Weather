@@ -13,7 +13,7 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.kuahusg.weather.R;
-import com.kuahusg.weather.UI.activities.About;
+import com.kuahusg.weather.UI.activities.AboutActivity;
 import com.kuahusg.weather.service.AutoUpdateService;
 import com.kuahusg.weather.util.LogUtil;
 
@@ -21,7 +21,7 @@ import com.kuahusg.weather.util.LogUtil;
  * Created by kuahusg on 16-6-10.
  * com.kuahusg.weather.UI.Fragment
  */
-public class SettingFrag extends PreferenceFragment implements Preference.OnPreferenceChangeListener {
+public class SettingFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener {
     public static final String AUTO_UPDATE = "auto_update";
     public static final String UPDATE_TIME = "update_time";
     public static final String OPEN_SOURCE = "open_source";
@@ -56,7 +56,7 @@ public class SettingFrag extends PreferenceFragment implements Preference.OnPref
                 updateTimePreference.setEnabled(autoUpdatePreference.isChecked());
                 break;
             case ABOUT:
-                Intent intent = new Intent(activity, About.class);
+                Intent intent = new Intent(activity, AboutActivity.class);
                 activity.startActivity(intent);
                 break;
             case OPEN_SOURCE:
@@ -78,7 +78,7 @@ public class SettingFrag extends PreferenceFragment implements Preference.OnPref
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         Intent intent = new Intent(activity, AutoUpdateService.class);
         LogUtil.v(this.toString(), "onPreferenceChange()");
-        if (preference.getKey().equals(SettingFrag.UPDATE_TIME)) {
+        if (preference.getKey().equals(SettingFragment.UPDATE_TIME)) {
             LogUtil.v(this.toString(), "onPreferenceChange() -> UPDATE");
             if (TextUtils.isEmpty((String) newValue)) {
                 Toast.makeText(activity, activity.getString(R.string.no_value_error), Toast.LENGTH_LONG).show();
@@ -86,7 +86,7 @@ public class SettingFrag extends PreferenceFragment implements Preference.OnPref
             }
             activity.stopService(intent);
             activity.startService(intent);
-        } else if (preference.getKey().equals(SettingFrag.AUTO_UPDATE)) {
+        } else if (preference.getKey().equals(SettingFragment.AUTO_UPDATE)) {
             LogUtil.v(this.toString(), "onPreferenceChange() -> AUTO");
 
             if ((boolean) newValue) {

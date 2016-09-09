@@ -60,7 +60,7 @@ public class WeatherAppWidgetBigProvider extends AppWidgetProvider {
          */
         for (int appwidgetId :
                 appWidgetIds) {
-            RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.weather_appwidget_big);
+            RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.appwidget_weather_big);
             rv.setImageViewResource(R.id.weather_pic, getWeatherPicId(forecast_to_show.getText()));
             rv.setTextViewText(R.id.city_name, selectedCity);
             rv.setTextViewText(R.id.weather_info, forecast_to_show.getText());

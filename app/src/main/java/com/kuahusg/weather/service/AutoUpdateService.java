@@ -11,7 +11,7 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
-import com.kuahusg.weather.UI.Fragment.SettingFrag;
+import com.kuahusg.weather.UI.Fragment.SettingFragment;
 import com.kuahusg.weather.receiver.AutoUpdateReceiver;
 import com.kuahusg.weather.util.LogUtil;
 import com.kuahusg.weather.util.WeatherUtil;
@@ -49,7 +49,7 @@ public class AutoUpdateService extends Service {
         if (sharedPreferences == null) {
             sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         }
-        time = Double.valueOf(sharedPreferences.getString(SettingFrag.UPDATE_TIME, "0"));
+        time = Double.valueOf(sharedPreferences.getString(SettingFragment.UPDATE_TIME, "0"));
         if (time <= 0) {
             time = 2;
         }

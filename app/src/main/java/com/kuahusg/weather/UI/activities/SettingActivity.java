@@ -6,14 +6,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-import com.kuahusg.weather.UI.Fragment.SettingFrag;
 import com.kuahusg.weather.R;
+import com.kuahusg.weather.UI.Fragment.SettingFragment;
 
 /**
  * Created by kuahusg on 16-6-10.
  * com.kuahusg.weather.UI.activities
  */
-public class Setting extends AppCompatActivity {
+public class SettingActivity extends AppCompatActivity {
     private Toolbar toolbar;
 
     @Override
@@ -30,7 +30,7 @@ public class Setting extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        addPreferencesFromResource(R.xml.preference);
-        setContentView(R.layout.setting);
+        setContentView(R.layout.activity_setting);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -43,12 +43,12 @@ public class Setting extends AppCompatActivity {
         ViewGroup viewRoot = (ViewGroup) findViewById(android.R.id.content);
         View content = viewRoot.getChildAt(0);
 
-        LinearLayout toolbarLayout = (LinearLayout)LayoutInflater.from(this).inflate(R.layout.setting, null);
+        LinearLayout toolbarLayout = (LinearLayout)LayoutInflater.from(this).inflate(R.layout.activity_setting, null);
         viewRoot.removeAllViews();
         toolbarLayout.addView(content);
         viewRoot.addView(toolbarLayout);*/
 
-        getFragmentManager().beginTransaction().replace(R.id.setting_part, new SettingFrag()).commit();
+        getFragmentManager().beginTransaction().replace(R.id.setting_part, new SettingFragment()).commit();
 
 
     }
