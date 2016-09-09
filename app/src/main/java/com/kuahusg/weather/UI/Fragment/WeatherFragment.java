@@ -57,7 +57,6 @@ public class WeatherFragment extends Fragment implements View.OnClickListener, W
     private RelativeLayout forecast_now_container;
     private LinearLayout forecast_info_container;
     private int whichDay = 0;
-    private ForecastInfo info;
 
     @Nullable
     @Override
@@ -72,28 +71,10 @@ public class WeatherFragment extends Fragment implements View.OnClickListener, W
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        /*forecastList = getArguments().getParcelableArrayList("forecastList");
-        info = (ForecastInfo) getArguments().getSerializable("ForecastInfo");*/
-        if (info != null) {
-            link = info.getLink();
-        }
-
-
+    public void onStart() {
+        super.onStart();
         ((WeatherActivity) mContext).getWeatherFromActivity(this);
-
-        /*forecastList = WeatherUtil.loadForecastFromDatabase(selectCity.getWoeid());
-        info = WeatherUtil.loadForecastInfoFromDatabase(selectCity.getWoeid());*/
-
-        /*if (forecastList != null && forecastList.size() > 0 && info != null) {
-
-            showWeather(forecastList);
-            showForecastInfo(info);*/
-
-
     }
-
 
     @Override
     public void getWeather(List<Forecast> forecastList) {
@@ -103,6 +84,7 @@ public class WeatherFragment extends Fragment implements View.OnClickListener, W
     @Override
     public void getWeatherInfo(ForecastInfo info) {
         showForecastInfo(info);
+
 
     }
 
@@ -169,6 +151,7 @@ public class WeatherFragment extends Fragment implements View.OnClickListener, W
             temp_now.setText(info.getTemp());
             date.setText(info.getDate().substring(16, 22));
             refresh_time.setText(getString(R.string.refersh_time) + "\n" + info.getLastBuildDate().substring(17, 22));
+            link = info.getLink();
         }
 
 
@@ -219,7 +202,7 @@ public class WeatherFragment extends Fragment implements View.OnClickListener, W
         switch (v.getId()) {
             case R.id.check_source:
                 Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse(info.getLink()));
+                intent.setData(Uri.parse(link));
                 startActivity(intent);
         }
     }
