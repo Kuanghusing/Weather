@@ -13,6 +13,7 @@
     <string name="load_finish">刷新完毕</string>
     <string name="refresh_icon">刷新</string>
     <string name="publish_date_text">更新时间</string>
+    <string name="retry">重试</string>
     <string name="today">今天</string>
     <string name="future">未来几天</string>
     <string name="wind">风</string>

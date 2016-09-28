@@ -1,10 +1,7 @@
 package com.kuahusg.weather.Presenter.interfaceOfPresenter;
 
 import com.kuahusg.weather.Presenter.base.IBasePresenter;
-import com.kuahusg.weather.model.Forecast;
-import com.kuahusg.weather.model.ForecastInfo;
-
-import java.util.List;
+import com.kuahusg.weather.model.City;
 
 /**
  * Created by kuahusg on 16-9-27.
@@ -28,11 +25,9 @@ public interface IWeatherViewPresenter extends IBasePresenter {
 
     void refreshWeather();
 
-    void requireAnotherCity();
+    void refreshWeather(City city);
 
-    ForecastInfo requireInfo(String woeid);
 
-    List<Forecast> requireForecase(String woeid);
 
 
 }

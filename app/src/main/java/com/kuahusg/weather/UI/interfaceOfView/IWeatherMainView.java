@@ -3,6 +3,10 @@ package com.kuahusg.weather.UI.interfaceOfView;
 import android.content.DialogInterface;
 
 import com.kuahusg.weather.UI.base.IBaseView;
+import com.kuahusg.weather.model.Forecast;
+import com.kuahusg.weather.model.ForecastInfo;
+
+import java.util.List;
 
 /**
  * Created by kuahusg on 16-9-27.
@@ -25,4 +29,7 @@ public interface IWeatherMainView extends IBaseView {
 
     void showAlertDialog(String title, String message, String negativeString, String positiveString,
                          DialogInterface.OnClickListener listener);
+
+
+    void loadWeatherDataSourceFinish(List<Forecast> forecasts, ForecastInfo info);
 }
