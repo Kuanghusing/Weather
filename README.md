@@ -1,8 +1,8 @@
-# 晴 天气
 
-> 仅用于学习
+
+> 重构中...
 
 > ![image](https://github.com/Kuanghusing/Weather/raw/master/Screenshot.png)
 > [酷安下载](http://coolapk.com/apk/com.kuahusg.weather)
 
-> 弃坑……
+> 谁说要弃坑的……

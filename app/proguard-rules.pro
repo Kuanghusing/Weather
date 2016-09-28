@@ -15,3 +15,17 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+##class extends Application
+-keep class com.kuahusg.weather.App
+
+##class extends Activity, Receiver, Service, Content Provider, CustomerView??
+#-keep class * extends android.app.Activity
+##class entity
+#-keep class com.kuahusg.weather.model.Data.**
+-keep class com.kuahusg.weather.model.**
+
+
+
+##libraries??
+

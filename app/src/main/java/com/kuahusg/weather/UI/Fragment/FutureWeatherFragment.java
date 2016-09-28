@@ -182,7 +182,6 @@ public class FutureWeatherFragment extends Fragment implements WeatherUtil.GetWe
     public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
         if (oldScrollY < scrollY) {
 //            WeatherActivity.fab.hide();
-            // TODO: 16-9-10 it should use interface
 
         } else {
 //            WeatherActivity.fab.show();
