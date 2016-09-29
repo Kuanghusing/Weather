@@ -1,5 +1,6 @@
 package com.kuahusg.weather.data;
 
+import com.kuahusg.weather.data.callback.RequestCityCallback;
 import com.kuahusg.weather.data.callback.RequestWeatherCallback;
 import com.kuahusg.weather.model.Forecast;
 import com.kuahusg.weather.model.ForecastInfo;
@@ -15,5 +16,7 @@ public interface IDataSource {
 
 
     void saveWeather(List<Forecast> forecastList, ForecastInfo info);
+
+    void loadAllCity(RequestCityCallback cityCallback);
 
 }

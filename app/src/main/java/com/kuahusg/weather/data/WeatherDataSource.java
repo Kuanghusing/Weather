@@ -2,6 +2,7 @@ package com.kuahusg.weather.data;
 
 import com.kuahusg.weather.App;
 import com.kuahusg.weather.R;
+import com.kuahusg.weather.data.callback.RequestCityCallback;
 import com.kuahusg.weather.data.callback.RequestWeatherCallback;
 import com.kuahusg.weather.data.local.LocalForecastDataSource;
 import com.kuahusg.weather.data.remote.RemoteForecastDataSource;
@@ -59,6 +60,11 @@ public class WeatherDataSource implements IDataSource {
 
     }
 
+    @Override
+    public void loadAllCity(RequestCityCallback cityCallback) {
+
+    }
+
     public void queryWeather(final RequestWeatherCallback callback) {
         //from cache
         if (this.forecastInfo != null && this.forecasts != null && this.forecasts.size() > 0) {
@@ -80,8 +86,7 @@ public class WeatherDataSource implements IDataSource {
                 public void error(String message) {
 //                    callback.error(message);
                     //local db error then get it from remote data source
-                    remote.queryWeather(null, callback);
-                    // TODO: 16-9-28 get woeid
+                    remote.queryWeather(local.getWoeid(), callback);
                 }
             });
         }

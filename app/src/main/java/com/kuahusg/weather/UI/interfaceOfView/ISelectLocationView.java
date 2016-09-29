@@ -9,7 +9,7 @@ import java.util.List;
  * Created by kuahusg on 16-9-27.
  */
 
-public interface ISelecLocationView extends IBaseView {
+public interface ISelectLocationView extends IBaseView {
 
     @Override
     void start();
@@ -25,9 +25,9 @@ public interface ISelecLocationView extends IBaseView {
 
     void queryCityError(String message);
 
-    void finishQueryCity(List<String> list);
+    void finishQueryCity(List<City> list);
 
-    void finishLoadCityListFromDB(List<City> cityList);
+    void loadAllCityFinish(List<String> cityList);
 
 
 }

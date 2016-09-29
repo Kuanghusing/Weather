@@ -24,7 +24,7 @@ public interface ISelectLocationPresenter extends IBasePresenter {
 
     void onClickQueryButton(String cityNameToSearch);
 
-    void onClickResultCityItem(City selectedCity);
+    void onClickResultCityItem(City selectedCity, Context context);
 
 
 }

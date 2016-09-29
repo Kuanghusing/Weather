@@ -19,12 +19,13 @@ import com.kuahusg.weather.util.PreferenceUtil;
 
 import java.util.List;
 
+import static com.kuahusg.weather.util.PreferenceUtil.PREF_HAS_LOAD_ALL_CITY;
+
 /**
  * Created by kuahusg on 16-9-27.
  */
 
 public class WeatherViewPresenterImpl extends BasePresenter implements IWeatherViewPresenter {
-    public static final String PREF_HAS_LOAD_ALL_CITY = "hasLoadAllCity";
     private WeatherDataSource dataSource;
     private LoadWeatherCallback callback = new LoadWeatherCallback();
 
@@ -80,6 +81,13 @@ public class WeatherViewPresenterImpl extends BasePresenter implements IWeatherV
         dataSource.queryWeather(city.getWoeid(), callback);
     }
 
+    @Override
+    public void selectCitySuccess(City selectedCity) {
+        SharedPreferences.Editor editor = PreferenceUtil.getInstance().getSharedPreferencesEditor();
+        editor.putString(PreferenceUtil.PREF_SELECTED_CITY, selectedCity.getFullNmae())
+                .apply();
+
+    }
 
     private void shouldGotoSelectLocationActivity() {
         if (isFirstToOpen()) {

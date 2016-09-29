@@ -88,7 +88,7 @@ public class WeatherDB {
 
 
     public static void saveForecastAndInfo(List<Forecast> forecasts, ForecastInfo info) {
-        //data source: 这个出错我不背锅
+        //data source: 这锅我不背
 
         SQLiteDatabase db = InstanceHolder.INSTANCE.db;
 
@@ -162,6 +162,7 @@ public class WeatherDB {
                             cursor.getString(cursor.getColumnIndex("woeid")));
                     forecastList.add(forecast);
                 } while (cursor.moveToNext());
+
             }
 
 

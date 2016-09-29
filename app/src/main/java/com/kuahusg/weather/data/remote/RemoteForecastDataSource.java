@@ -5,6 +5,7 @@ import android.util.Log;
 import com.kuahusg.weather.App;
 import com.kuahusg.weather.R;
 import com.kuahusg.weather.data.IDataSource;
+import com.kuahusg.weather.data.callback.RequestCityCallback;
 import com.kuahusg.weather.data.callback.RequestWeatherCallback;
 import com.kuahusg.weather.model.Data.WeatherResult;
 import com.kuahusg.weather.model.Forecast;
@@ -28,6 +29,11 @@ public class RemoteForecastDataSource implements IDataSource {
     @Override
     public void saveWeather(List<Forecast> forecastList, ForecastInfo info) {
         //do nothing
+    }
+
+    @Override
+    public void loadAllCity(RequestCityCallback cityCallback) {
+
     }
 
     @Override
@@ -82,5 +88,7 @@ public class RemoteForecastDataSource implements IDataSource {
                 callback.error(App.getContext().getString(R.string.error_network));
             }
         });
+
+
     }
 }

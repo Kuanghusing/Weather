@@ -27,8 +27,8 @@ import com.kuahusg.weather.Presenter.WeatherViewPresenterImpl;
 import com.kuahusg.weather.Presenter.base.IBasePresenter;
 import com.kuahusg.weather.Presenter.interfaceOfPresenter.IWeatherViewPresenter;
 import com.kuahusg.weather.R;
-import com.kuahusg.weather.UI.Fragment.FutureWeatherFragment;
-import com.kuahusg.weather.UI.Fragment.WeatherFragment;
+import com.kuahusg.weather.UI.Fragment.rebuild.FutureWeatherFragment;
+import com.kuahusg.weather.UI.Fragment.rebuild.WeatherFragment;
 import com.kuahusg.weather.UI.base.BaseActivity;
 import com.kuahusg.weather.UI.interfaceOfView.IWeatherMainView;
 import com.kuahusg.weather.model.City;
@@ -118,18 +118,26 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
 
     @Override
     public void loadWeatherDataSourceFinish(List<Forecast> forecasts, ForecastInfo info) {
+        if (isFragmentAvaliable()) {
+            mWeatherFragment.showWeather(forecasts);
+            mWeatherFragment.showForecastInfo(info);
 
+            mFutureWeatherFragment.showForecast(forecasts);
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_SELECT_LOCATION) {
+        if (requestCode == REQUEST_SELECT_LOCATION && resultCode == RESULT_OK) {
             Bundle bundle = data.getBundleExtra(BUNDLE_CITY_WOEID_NAME);
             City city = (City) bundle.get(CITY_NAME);
 
-            if (hasPresenter())
+            if (hasPresenter()) {
                 mPresenter.refreshWeather(city);
+                mPresenter.selectCitySuccess(city);
+            }
+
         }
     }
 
@@ -215,6 +223,19 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
 
     }
 
+    private boolean isFragmentAvaliable() {
+        if (this.mPagerAdapter != null) {
+            if ((mWeatherFragment = (WeatherFragment) mPagerAdapter.getItem(0)) != null && (mFutureWeatherFragment = (FutureWeatherFragment) mPagerAdapter.getItem(1)) != null) {
+                return true;
+            } else
+                return false;
+        }
+        return false;
+    }
+
+
+
+
     private class Listener implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener, ViewPager.OnPageChangeListener, NavigationView.OnNavigationItemSelectedListener {
         @Override
         public void onRefresh() {
@@ -276,17 +297,13 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
                                 public void run() {
 
                                     Intent i = new Intent(WeatherMainActivity.this, AboutMeActivity.class);
-//                                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                     startActivity(i);
                                 }
                             }, 250);
                             break;
-
                     }
 
-
                     if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
-
                         mDrawerLayout.closeDrawers();
                     }
 

@@ -12,6 +12,8 @@ import com.kuahusg.weather.App;
 public class PreferenceUtil {
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
+    public static final String PREF_HAS_LOAD_ALL_CITY = "hasLoadAllCity";
+    public static final String PREF_SELECTED_CITY = "selectedCity";
 
     private PreferenceUtil() {
 
