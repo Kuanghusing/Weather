@@ -38,7 +38,7 @@ public class WeatherDB {
 
     }
 
-    public static void saveAllMainCity(List<String> cityList) throws Exception {
+    public static void saveAllMainCity(List<String> cityList) {
         SQLiteDatabase db = InstanceHolder.INSTANCE.db;
 
 

@@ -10,6 +10,7 @@ import com.kuahusg.weather.data.callback.RequestWeatherCallback;
 import com.kuahusg.weather.model.Data.WeatherResult;
 import com.kuahusg.weather.model.Forecast;
 import com.kuahusg.weather.model.ForecastInfo;
+import com.kuahusg.weather.util.PreferenceUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +18,8 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static com.kuahusg.weather.util.PreferenceUtil.PREF_SELECTED_CITY;
 
 /**
  * Created by kuahusg on 16-9-28.
@@ -32,12 +35,29 @@ public class RemoteForecastDataSource implements IDataSource {
     }
 
     @Override
-    public void loadAllCity(RequestCityCallback cityCallback) {
+    public void loadAllCity(final RequestCityCallback cityCallback) {
+        RetrofitManager.getWeatherService().queryAllMainCity()
+                .enqueue(new Callback<List<String>>() {
+                    @Override
+                    public void onResponse(Call<List<String>> call, Response<List<String>> response) {
+                        List<String> cityList = response.body();
+                        if (cityList != null && cityList.size() > 0) {
+                            cityCallback.success(cityList);
+                        } else
+                            cityCallback.error();
+                    }
 
+                    @Override
+                    public void onFailure(Call<List<String>> call, Throwable t) {
+                        cityCallback.error();
+                    }
+                });
     }
 
     @Override
     public void queryWeather(final String woeid, final RequestWeatherCallback callback) {
+        if (woeid == null)
+            getWoeid();
 
         Call<WeatherResult> call = RetrofitManager.getWeatherService()
                 .queryWeather(String.format(queryString, woeid), formatMethod);
@@ -78,8 +98,12 @@ public class RemoteForecastDataSource implements IDataSource {
                     onFailure(call, e);
                     // TODO: 16-9-28 ??
                 }
-                assert forecasts != null && forecastInfo != null;
-                callback.success(Arrays.asList(forecasts), forecastInfo);
+//                assert forecasts != null && forecastInfo != null;
+                if (forecasts != null && forecastInfo != null && forecasts.length > 0) {
+
+                    callback.success(Arrays.asList(forecasts), forecastInfo);
+                } else
+                    callback.error(App.getContext().getString(R.string.error_network));
             }
 
             @Override
@@ -89,6 +113,16 @@ public class RemoteForecastDataSource implements IDataSource {
             }
         });
 
+
+    }
+
+    @Override
+    public void saveAllCity(List<String> cityList) {
+        //do nothing
+    }
+
+    private String getWoeid() {
+        return PreferenceUtil.getInstance().getSharedPreferences().getString(PREF_SELECTED_CITY, null);
 
     }
 }

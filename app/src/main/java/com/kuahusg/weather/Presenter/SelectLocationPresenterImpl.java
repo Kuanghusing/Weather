@@ -8,6 +8,8 @@ import com.kuahusg.weather.UI.base.IBaseView;
 import com.kuahusg.weather.UI.interfaceOfView.ISelectLocationView;
 import com.kuahusg.weather.data.WeatherDataSource;
 import com.kuahusg.weather.data.callback.RequestCityCallback;
+import com.kuahusg.weather.data.local.LocalForecastDataSource;
+import com.kuahusg.weather.data.remote.RemoteForecastDataSource;
 import com.kuahusg.weather.model.City;
 import com.kuahusg.weather.util.CityUtil;
 import com.kuahusg.weather.util.PreferenceUtil;
@@ -26,7 +28,7 @@ public class SelectLocationPresenterImpl extends BasePresenter implements ISelec
         super(view);
 
         mView = (ISelectLocationView) view;
-        dataSource = new WeatherDataSource();
+        dataSource = new WeatherDataSource(new RemoteForecastDataSource(), new LocalForecastDataSource());
 
     }
 

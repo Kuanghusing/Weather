@@ -36,18 +36,22 @@ public class LocalForecastDataSource implements IDataSource {
 
     @Override
     public void loadAllCity(RequestCityCallback cityCallback) {
+        WeatherDB.loadAllMainCity(cityCallback);
+    }
 
+    @Override
+    public void saveAllCity(List<String> cityList) {
+        WeatherDB.saveAllMainCity(cityList);
     }
 
     public void queryWeather(RequestWeatherCallback callback) {
-
+        // TODO: 16-10-7 ??
     }
 
-    public String getWoeid() {
+    private String getWoeid() {
         return PreferenceUtil.getInstance().getSharedPreferences().getString(PREF_SELECTED_CITY, null);
 
     }
-
 
 
 }

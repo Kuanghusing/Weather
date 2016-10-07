@@ -11,6 +11,8 @@ import com.kuahusg.weather.UI.base.IBaseView;
 import com.kuahusg.weather.UI.interfaceOfView.IWeatherMainView;
 import com.kuahusg.weather.data.WeatherDataSource;
 import com.kuahusg.weather.data.callback.RequestWeatherCallback;
+import com.kuahusg.weather.data.local.LocalForecastDataSource;
+import com.kuahusg.weather.data.remote.RemoteForecastDataSource;
 import com.kuahusg.weather.model.City;
 import com.kuahusg.weather.model.Forecast;
 import com.kuahusg.weather.model.ForecastInfo;
@@ -36,7 +38,7 @@ public class WeatherViewPresenterImpl extends BasePresenter implements IWeatherV
         super(view);
         mView = (IWeatherMainView) view;
 
-        dataSource = new WeatherDataSource();
+        dataSource = new WeatherDataSource(new RemoteForecastDataSource(), new LocalForecastDataSource());
     }
 
     @Override

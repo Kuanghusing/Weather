@@ -4,8 +4,6 @@ import com.kuahusg.weather.App;
 import com.kuahusg.weather.R;
 import com.kuahusg.weather.data.callback.RequestCityCallback;
 import com.kuahusg.weather.data.callback.RequestWeatherCallback;
-import com.kuahusg.weather.data.local.LocalForecastDataSource;
-import com.kuahusg.weather.data.remote.RemoteForecastDataSource;
 import com.kuahusg.weather.model.Forecast;
 import com.kuahusg.weather.model.ForecastInfo;
 import com.kuahusg.weather.util.NetwordUtil;
@@ -18,18 +16,23 @@ import java.util.List;
  */
 
 public class WeatherDataSource implements IDataSource {
-    private RemoteForecastDataSource remote;
-    private LocalForecastDataSource local;
+    private IDataSource remote;
+    private IDataSource local;
 
     //cache
-    private List<Forecast> forecasts = new ArrayList<>();
-    private ForecastInfo forecastInfo = null;
+    private List<Forecast> forecastListCache = new ArrayList<>();
+    private ForecastInfo forecastInfoCache = null;
+    private List<String> cityListCache = new ArrayList<>();
 
 
+    public WeatherDataSource(IDataSource remoteDatasource, IDataSource localDatasource) {
+        this.remote = remoteDatasource;
+        this.local = localDatasource;
+    }
     @Override
     public void queryWeather(final String woeid, final RequestWeatherCallback callback) {
         //TODO it means require network to query ??
-        clearCache();
+        clearWeatherCache();
         if (NetwordUtil.hasNetwork(App.getContext()))
 
             remote.queryWeather(woeid, new RequestWeatherCallback() {
@@ -54,21 +57,45 @@ public class WeatherDataSource implements IDataSource {
 
     @Override
     public void saveWeather(List<Forecast> forecastList, ForecastInfo info) {
-        clearCache();
-        this.forecastInfo = info;
-        this.forecasts = forecastList;
+        clearWeatherCache();
+        this.forecastInfoCache = info;
+        this.forecastListCache = forecastList;
 
     }
 
     @Override
-    public void loadAllCity(RequestCityCallback cityCallback) {
+    public void loadAllCity(final RequestCityCallback cityCallback) {
+        if (this.cityListCache != null && this.cityListCache.size() > 0) {
+            cityCallback.success(this.cityListCache);
 
+        } else {
+            clearCityCache();
+            local.loadAllCity(new RequestCityCallback() {
+                @Override
+                public void success(List<String> cityList) {
+                    saveAllCity(cityList);
+                    local.saveAllCity(cityList);
+                    cityCallback.success(cityList);
+                }
+
+                @Override
+                public void error() {
+                    remote.loadAllCity(cityCallback);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void saveAllCity(List<String> cityList) {
+        clearCityCache();
+        this.cityListCache = cityList;
     }
 
     public void queryWeather(final RequestWeatherCallback callback) {
         //from cache
-        if (this.forecastInfo != null && this.forecasts != null && this.forecasts.size() > 0) {
-            callback.success(this.forecasts, this.forecastInfo);
+        if (this.forecastInfoCache != null && this.forecastListCache != null && this.forecastListCache.size() > 0) {
+            callback.success(this.forecastListCache, this.forecastInfoCache);
             return;
         }
 
@@ -86,7 +113,7 @@ public class WeatherDataSource implements IDataSource {
                 public void error(String message) {
 //                    callback.error(message);
                     //local db error then get it from remote data source
-                    remote.queryWeather(local.getWoeid(), callback);
+                    remote.queryWeather(null, callback);
                 }
             });
         }
@@ -94,9 +121,13 @@ public class WeatherDataSource implements IDataSource {
 
     }
 
-    private void clearCache() {
-        this.forecastInfo = null;
-        this.forecasts = null;
+    private void clearWeatherCache() {
+        this.forecastInfoCache = null;
+        this.forecastListCache = null;
+    }
+
+    private void clearCityCache() {
+        this.cityListCache = null;
     }
 
 }

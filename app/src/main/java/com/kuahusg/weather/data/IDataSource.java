@@ -19,4 +19,6 @@ public interface IDataSource {
 
     void loadAllCity(RequestCityCallback cityCallback);
 
+    void saveAllCity(List<String> cityList);
+
 }
