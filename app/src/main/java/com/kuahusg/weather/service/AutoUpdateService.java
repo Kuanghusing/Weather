@@ -12,16 +12,30 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
 import com.kuahusg.weather.UI.Fragment.SettingFragment;
+import com.kuahusg.weather.data.IDataSource;
+import com.kuahusg.weather.data.WeatherDataSource;
+import com.kuahusg.weather.data.callback.RequestWeatherCallback;
+import com.kuahusg.weather.data.local.LocalForecastDataSource;
+import com.kuahusg.weather.data.remote.RemoteForecastDataSource;
+import com.kuahusg.weather.model.Forecast;
+import com.kuahusg.weather.model.ForecastInfo;
 import com.kuahusg.weather.receiver.AutoUpdateReceiver;
 import com.kuahusg.weather.util.LogUtil;
+import com.kuahusg.weather.util.PreferenceUtil;
 import com.kuahusg.weather.util.WeatherUtil;
+
+import java.lang.ref.WeakReference;
+import java.util.List;
 
 /**
  * Created by kuahusg on 16-5-10.
  */
 public class AutoUpdateService extends Service {
     private double time = 2;
-    private SharedPreferences sharedPreferences;
+
+    //    private IDataSource dataSource = new WeatherDataSource(new RemoteForecastDataSource(), new LocalForecastDataSource());
+    private WeakReference<IDataSource> dataSourceWeakReference = new WeakReference<IDataSource>(new WeatherDataSource(new RemoteForecastDataSource(), new LocalForecastDataSource()));
+
 
     @Override
     public void onCreate() {
@@ -39,7 +53,7 @@ public class AutoUpdateService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        LogUtil.v(this.toString(), "Service onStartCommand()");
+        /*LogUtil.v(this.toString(), "Service onStartCommand()");
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -53,7 +67,25 @@ public class AutoUpdateService extends Service {
         if (time <= 0) {
             time = 2;
         }
-        LogUtil.v(this.toString(), "update time:" + time);
+        LogUtil.v(this.toString(), "update time:" + time);*/
+
+
+        time = Double.valueOf(PreferenceUtil.getInstance().getSharedPreferences().getString(SettingFragment.UPDATE_TIME, "0"));
+        if (time <= 0)
+            time = 2;
+        // TODO: 16-10-8 ??
+        dataSourceWeakReference.get().queryWeather(new RequestWeatherCallback() {
+            @Override
+            public void success(List<Forecast> forecasts, ForecastInfo forecastInfo) {
+                dataSourceWeakReference.get().saveWeather(forecasts, forecastInfo);
+            }
+
+            @Override
+            public void error(String message) {
+
+            }
+        });
+
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         long hours = (long) (time * 60 * 60 * 1000 + SystemClock.elapsedRealtime());
         Intent i = new Intent(this, AutoUpdateReceiver.class);

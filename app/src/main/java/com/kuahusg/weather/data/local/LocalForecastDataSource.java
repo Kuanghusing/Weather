@@ -2,6 +2,7 @@ package com.kuahusg.weather.data.local;
 
 import com.kuahusg.weather.data.IDataSource;
 import com.kuahusg.weather.data.callback.RequestCityCallback;
+import com.kuahusg.weather.data.callback.RequestCityResultCallback;
 import com.kuahusg.weather.data.callback.RequestWeatherCallback;
 import com.kuahusg.weather.model.Forecast;
 import com.kuahusg.weather.model.ForecastInfo;
@@ -9,7 +10,7 @@ import com.kuahusg.weather.util.PreferenceUtil;
 
 import java.util.List;
 
-import static com.kuahusg.weather.util.PreferenceUtil.PREF_SELECTED_CITY;
+import static com.kuahusg.weather.util.PreferenceUtil.PREF_WOEID;
 
 /**
  * Created by kuahusg on 16-9-28.
@@ -44,12 +45,18 @@ public class LocalForecastDataSource implements IDataSource {
         WeatherDB.saveAllMainCity(cityList);
     }
 
+    @Override
     public void queryWeather(RequestWeatherCallback callback) {
         // TODO: 16-10-7 ??
     }
 
+    @Override
+    public void queryCity(RequestCityResultCallback callback, String cityName) {
+        //I don't care
+    }
+
     private String getWoeid() {
-        return PreferenceUtil.getInstance().getSharedPreferences().getString(PREF_SELECTED_CITY, null);
+        return PreferenceUtil.getInstance().getSharedPreferences().getString(PREF_WOEID, null);
 
     }
 

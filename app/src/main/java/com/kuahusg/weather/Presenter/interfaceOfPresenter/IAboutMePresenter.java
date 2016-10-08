@@ -1,5 +1,7 @@
 package com.kuahusg.weather.Presenter.interfaceOfPresenter;
 
+import android.app.Activity;
+
 import com.kuahusg.weather.Presenter.base.IBasePresenter;
 
 /**
@@ -16,7 +18,7 @@ public interface IAboutMePresenter extends IBasePresenter {
     @Override
     void onDestroy();
 
-    void onClickFab();
+    void onClickFab(Activity activity);
 
 
 }

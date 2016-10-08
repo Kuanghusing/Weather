@@ -1,5 +1,6 @@
 package com.kuahusg.weather.Presenter.interfaceOfPresenter;
 
+import android.app.Activity;
 import android.content.Context;
 
 import com.kuahusg.weather.Presenter.base.IBasePresenter;
@@ -24,7 +25,7 @@ public interface ISelectLocationPresenter extends IBasePresenter {
 
     void onClickQueryButton(String cityNameToSearch);
 
-    void onClickResultCityItem(City selectedCity, Context context);
+    void onClickResultCityItem(City selectedCity, Activity activity);
 
 
 }

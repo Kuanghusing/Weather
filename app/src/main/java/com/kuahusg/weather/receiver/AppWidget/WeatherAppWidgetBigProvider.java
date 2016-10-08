@@ -5,34 +5,90 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.widget.RemoteViews;
 
 import com.kuahusg.weather.R;
 import com.kuahusg.weather.UI.activities.WeatherActivity;
+import com.kuahusg.weather.data.IDataSource;
+import com.kuahusg.weather.data.WeatherDataSource;
+import com.kuahusg.weather.data.callback.RequestWeatherCallback;
+import com.kuahusg.weather.data.local.LocalForecastDataSource;
+import com.kuahusg.weather.data.remote.RemoteForecastDataSource;
 import com.kuahusg.weather.model.Forecast;
 import com.kuahusg.weather.model.ForecastInfo;
 import com.kuahusg.weather.util.LogUtil;
-import com.kuahusg.weather.util.WeatherUtil;
+import com.kuahusg.weather.util.PreferenceUtil;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
+
+import static com.kuahusg.weather.util.PreferenceUtil.PREF_CITY_SIMPLE_NAME;
 
 /**
  * Created by kuahusg on 16-6-17.
  * com.kuahusg.weather.receiver
  */
 public class WeatherAppWidgetBigProvider extends AppWidgetProvider {
+    private WeakReference<IDataSource> dataSourceWeakReference = new WeakReference<IDataSource>(new WeatherDataSource(new RemoteForecastDataSource(), new LocalForecastDataSource()));
+    private Forecast forecast_to_show;
+    private String temp_now = "NaN";
+    private String date = "NaN";
+
     @Override
-    public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+    public void onEnabled(Context context) {
+        super.onEnabled(context);
+        // TODO: 16-10-8 should check auto update
+    }
+
+    @Override
+    public void onUpdate(final Context context, final AppWidgetManager appWidgetManager, final int[] appWidgetIds) {
         LogUtil.v(this.toString(), "onUpdate()");
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        dataSourceWeakReference.get().queryWeather(new RequestWeatherCallback() {
+            @Override
+            public void success(List<Forecast> forecasts, ForecastInfo forecastInfo) {
+                if (forecasts != null && forecasts.size() > 0) {
+                    forecast_to_show = forecasts.get(0);
+                } else {
+                    return;
+                }
+                if (forecastInfo != null) {
+                    temp_now = forecastInfo.getTemp();
+                    date = forecastInfo.getDate().substring(17, 25);
+                }
+                for (int appwidgetId :
+                        appWidgetIds) {
+                    RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.appwidget_weather_big);
+                    rv.setImageViewResource(R.id.weather_pic, getWeatherPicId(forecast_to_show.getText()));
+                    rv.setTextViewText(R.id.city_name, PreferenceUtil.getInstance().getSharedPreferences().getString(PREF_CITY_SIMPLE_NAME, "N"));
+                    rv.setTextViewText(R.id.weather_info, forecast_to_show.getText());
+                    rv.setTextViewText(R.id.date, date);
+                    rv.setTextViewText(R.id.temp_now, temp_now);
+                    rv.setTextViewText(R.id.temp, forecast_to_show.getLow() + "|" + forecast_to_show.getHigh());
+
+                    Intent intent = new Intent(context, WeatherActivity.class);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+                    rv.setOnClickPendingIntent(R.id.main_container, pendingIntent);
+
+                    appWidgetManager.updateAppWidget(appwidgetId, rv);
+                }
+
+            }
+
+            @Override
+            public void error(String message) {
+
+            }
+        });
+
+        //...
+        /*SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String selectedCity = sharedPreferences.getString("selectCitySimpleName", "N");
         String woeid = sharedPreferences.getString("woeid", "");
-        /*
+        *//*
          weather information
-         */
+         *//*
         List<Forecast> forecastList = WeatherUtil.loadForecastFromDatabase(woeid);
         Forecast forecast_to_show = null;
         if (forecastList != null && forecastList.size() > 0) {
@@ -46,18 +102,18 @@ public class WeatherAppWidgetBigProvider extends AppWidgetProvider {
         String date = "NaN";
 
         if (info != null) {
-/*            String[] t = tempAndDate.split("\\|");
+*//*            String[] t = tempAndDate.split("\\|");
             temp_now = t[0];
-            date = t[1].substring(17, 25);*/
+            date = t[1].substring(17, 25);*//*
             temp_now = info.getTemp();
             date = info.getDate().substring(17,25);
         }
 
 
 
-        /*
+        *//*
          update view
-         */
+         *//*
         for (int appwidgetId :
                 appWidgetIds) {
             RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.appwidget_weather_big);
@@ -73,7 +129,7 @@ public class WeatherAppWidgetBigProvider extends AppWidgetProvider {
             rv.setOnClickPendingIntent(R.id.main_container, pendingIntent);
 
             appWidgetManager.updateAppWidget(appwidgetId, rv);
-        }
+        }*/
         super.onUpdate(context, appWidgetManager, appWidgetIds);
     }
 

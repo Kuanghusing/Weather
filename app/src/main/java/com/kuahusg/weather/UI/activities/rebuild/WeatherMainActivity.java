@@ -38,6 +38,11 @@ import com.kuahusg.weather.model.ForecastInfo;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.kuahusg.weather.util.Constant.BUNDLE_KEY_CITY_NAME;
+import static com.kuahusg.weather.util.Constant.BUNDLE_NAME_CITY;
+import static com.kuahusg.weather.util.Constant.REQUEST_CODE_SELECT_LOCATION;
+
+
 /**
  * Created by kuahusg on 16-9-27.
  */
@@ -58,6 +63,7 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
 
     private IWeatherViewPresenter mPresenter;
     private Listener listener;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,17 +74,20 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
             mPresenter.init();
         }
 
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        setupViewPager();
+        if (mPagerAdapter == null) {
+            setupViewPager();
+            // TODO: 16-10-8 为什么fragment的onCreateView不会调用？
 
-
-        if (hasPresenter())
-            mPresenter.start();
+            if (hasPresenter())
+                mPresenter.start();
+        }
     }
 
     @Override
@@ -105,14 +114,12 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
 
     }
 
-    public static final int REQUEST_SELECT_LOCATION = 0;
-    public static final String BUNDLE_CITY_WOEID_NAME = "bundle_city_woeid";
-    public static final String CITY_NAME = "city_name";
+
     @Override
     public void goToSelectLocationActivity() {
         Intent intent = new Intent(this, SelectLocationActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-        startActivityForResult(intent, REQUEST_SELECT_LOCATION);
+        startActivityForResult(intent, REQUEST_CODE_SELECT_LOCATION);
 
     }
 
@@ -129,9 +136,9 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_SELECT_LOCATION && resultCode == RESULT_OK) {
-            Bundle bundle = data.getBundleExtra(BUNDLE_CITY_WOEID_NAME);
-            City city = (City) bundle.get(CITY_NAME);
+        if (requestCode == REQUEST_CODE_SELECT_LOCATION && resultCode == RESULT_OK) {
+            Bundle bundle = data.getBundleExtra(BUNDLE_NAME_CITY);
+            City city = (City) bundle.get(BUNDLE_KEY_CITY_NAME);
 
             if (hasPresenter()) {
                 mPresenter.refreshWeather(city);
@@ -207,33 +214,26 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
 
 
     private void setupViewPager() {
-        if (mPagerAdapter == null) {
-            mWeatherFragment = new WeatherFragment();
-            mFutureWeatherFragment = new FutureWeatherFragment();
-            List<String> list = new ArrayList<>();
-            List<Fragment> fragmentList = new ArrayList<>();
-            list.add(getString(R.string.today));
-            list.add(getString(R.string.future));
-            fragmentList.add(mWeatherFragment);
-            fragmentList.add(mFutureWeatherFragment);
-            mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), fragmentList, list);
-            mViewPager.setAdapter(mPagerAdapter);
-            mViewPager.addOnPageChangeListener(listener);
-        }
+        mWeatherFragment = new WeatherFragment();
+        mFutureWeatherFragment = new FutureWeatherFragment();
+        List<String> list = new ArrayList<>();
+        List<Fragment> fragmentList = new ArrayList<>();
+        list.add(getString(R.string.today));
+        list.add(getString(R.string.future));
+        fragmentList.add(mWeatherFragment);
+        fragmentList.add(mFutureWeatherFragment);
+        mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), fragmentList, list);
+        mViewPager.setAdapter(mPagerAdapter);
+        mViewPager.addOnPageChangeListener(listener);
 
     }
 
     private boolean isFragmentAvaliable() {
         if (this.mPagerAdapter != null) {
-            if ((mWeatherFragment = (WeatherFragment) mPagerAdapter.getItem(0)) != null && (mFutureWeatherFragment = (FutureWeatherFragment) mPagerAdapter.getItem(1)) != null) {
-                return true;
-            } else
-                return false;
+            return (mWeatherFragment = (WeatherFragment) mPagerAdapter.getItem(0)) != null && (mFutureWeatherFragment = (FutureWeatherFragment) mPagerAdapter.getItem(1)) != null;
         }
         return false;
     }
-
-
 
 
     private class Listener implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener, ViewPager.OnPageChangeListener, NavigationView.OnNavigationItemSelectedListener {

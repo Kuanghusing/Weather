@@ -13,7 +13,9 @@ public class PreferenceUtil {
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
     public static final String PREF_HAS_LOAD_ALL_CITY = "hasLoadAllCity";
-    public static final String PREF_SELECTED_CITY = "selectedCity";
+    public static final String PREF_SELECTED_CITY = "selectCity";
+    public static final String PREF_WOEID = "woeid";
+    public static final String PREF_CITY_SIMPLE_NAME = "selectCitySimpleName";
 
     private PreferenceUtil() {
 

@@ -9,6 +9,7 @@ import com.kuahusg.weather.Presenter.interfaceOfPresenter.IWeatherViewPresenter;
 import com.kuahusg.weather.UI.Fragment.SettingFragment;
 import com.kuahusg.weather.UI.base.IBaseView;
 import com.kuahusg.weather.UI.interfaceOfView.IWeatherMainView;
+import com.kuahusg.weather.data.IDataSource;
 import com.kuahusg.weather.data.WeatherDataSource;
 import com.kuahusg.weather.data.callback.RequestWeatherCallback;
 import com.kuahusg.weather.data.local.LocalForecastDataSource;
@@ -21,14 +22,15 @@ import com.kuahusg.weather.util.PreferenceUtil;
 
 import java.util.List;
 
+import static com.kuahusg.weather.util.PreferenceUtil.PREF_CITY_SIMPLE_NAME;
 import static com.kuahusg.weather.util.PreferenceUtil.PREF_HAS_LOAD_ALL_CITY;
+import static com.kuahusg.weather.util.PreferenceUtil.PREF_WOEID;
 
 /**
  * Created by kuahusg on 16-9-27.
  */
 
 public class WeatherViewPresenterImpl extends BasePresenter implements IWeatherViewPresenter {
-    private WeatherDataSource dataSource;
     private LoadWeatherCallback callback = new LoadWeatherCallback();
 
 
@@ -38,19 +40,25 @@ public class WeatherViewPresenterImpl extends BasePresenter implements IWeatherV
         super(view);
         mView = (IWeatherMainView) view;
 
-        dataSource = new WeatherDataSource(new RemoteForecastDataSource(), new LocalForecastDataSource());
     }
 
     @Override
     public void init() {
 
+        super.init();
         shouldGotoSelectLocationActivity();
 
     }
 
     @Override
+    protected IDataSource setDataSource() {
+        return new WeatherDataSource(new RemoteForecastDataSource(), new LocalForecastDataSource());
+    }
+
+    @Override
     public void start() {
         //get data
+        refreshWeather();
 
     }
 
@@ -75,18 +83,20 @@ public class WeatherViewPresenterImpl extends BasePresenter implements IWeatherV
     //日常甩锅
     @Override
     public void refreshWeather() {
-        dataSource.queryWeather(callback);
+        getDataSource().queryWeather(callback);
     }
 
     @Override
     public void refreshWeather(City city) {
-        dataSource.queryWeather(city.getWoeid(), callback);
+        getDataSource().queryWeather(city.getWoeid(), callback);
     }
 
     @Override
     public void selectCitySuccess(City selectedCity) {
         SharedPreferences.Editor editor = PreferenceUtil.getInstance().getSharedPreferencesEditor();
         editor.putString(PreferenceUtil.PREF_SELECTED_CITY, selectedCity.getFullNmae())
+                .putString(PREF_WOEID, selectedCity.getWoeid())
+                .putString(PREF_CITY_SIMPLE_NAME, selectedCity.getCity_name())
                 .apply();
 
     }

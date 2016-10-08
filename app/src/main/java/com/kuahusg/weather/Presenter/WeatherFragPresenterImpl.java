@@ -11,6 +11,7 @@ import com.kuahusg.weather.Presenter.interfaceOfPresenter.IWeatherMainFragPresen
 import com.kuahusg.weather.R;
 import com.kuahusg.weather.UI.base.IBaseView;
 import com.kuahusg.weather.UI.interfaceOfView.IWeatherMainView;
+import com.kuahusg.weather.data.IDataSource;
 import com.kuahusg.weather.util.DateUtil;
 
 import java.util.Random;
@@ -31,7 +32,12 @@ public class WeatherFragPresenterImpl extends BasePresenter implements IWeatherM
 
     @Override
     public void init() {
+        super.init();
+    }
 
+    @Override
+    protected IDataSource setDataSource() {
+        return null;
     }
 
     @Override

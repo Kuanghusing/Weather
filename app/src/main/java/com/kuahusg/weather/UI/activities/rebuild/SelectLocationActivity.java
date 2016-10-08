@@ -70,6 +70,14 @@ public class SelectLocationActivity extends BaseActivity implements ISelectLocat
         super.onCreate(savedInstanceState);
 
         initView();
+        mPresenter.init();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (hasPresenter())
+            mPresenter.start();
     }
 
     @Override
@@ -110,6 +118,12 @@ public class SelectLocationActivity extends BaseActivity implements ISelectLocat
     @Override
     public void error(String message) {
 
+    }
+
+    @Override
+    public void startLoadingData(boolean canCancelPgb) {
+
+        showProgress(canCancelPgb);
     }
 
     @Override
@@ -163,11 +177,11 @@ public class SelectLocationActivity extends BaseActivity implements ISelectLocat
             mPgd.setMessage("loading");
             mPgd.setCancelable(cancelable);
             // TODO: 16-9-29 ??
-            try {
+//            try {
                 mPgd.show();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
         }
     }
 

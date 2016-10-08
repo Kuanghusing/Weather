@@ -3,6 +3,7 @@ package com.kuahusg.weather.data;
 import com.kuahusg.weather.App;
 import com.kuahusg.weather.R;
 import com.kuahusg.weather.data.callback.RequestCityCallback;
+import com.kuahusg.weather.data.callback.RequestCityResultCallback;
 import com.kuahusg.weather.data.callback.RequestWeatherCallback;
 import com.kuahusg.weather.model.Forecast;
 import com.kuahusg.weather.model.ForecastInfo;
@@ -92,6 +93,7 @@ public class WeatherDataSource implements IDataSource {
         this.cityListCache = cityList;
     }
 
+    @Override
     public void queryWeather(final RequestWeatherCallback callback) {
         //from cache
         if (this.forecastInfoCache != null && this.forecastListCache != null && this.forecastListCache.size() > 0) {
@@ -119,6 +121,11 @@ public class WeatherDataSource implements IDataSource {
         }
 
 
+    }
+
+    @Override
+    public void queryCity(RequestCityResultCallback callback, String cityName) {
+        remote.queryCity(callback, cityName);
     }
 
     private void clearWeatherCache() {

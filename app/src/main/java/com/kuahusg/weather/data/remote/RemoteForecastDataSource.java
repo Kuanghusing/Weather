@@ -6,12 +6,16 @@ import com.kuahusg.weather.App;
 import com.kuahusg.weather.R;
 import com.kuahusg.weather.data.IDataSource;
 import com.kuahusg.weather.data.callback.RequestCityCallback;
+import com.kuahusg.weather.data.callback.RequestCityResultCallback;
 import com.kuahusg.weather.data.callback.RequestWeatherCallback;
+import com.kuahusg.weather.model.City;
+import com.kuahusg.weather.model.Data.CitySearchResult;
 import com.kuahusg.weather.model.Data.WeatherResult;
 import com.kuahusg.weather.model.Forecast;
 import com.kuahusg.weather.model.ForecastInfo;
 import com.kuahusg.weather.util.PreferenceUtil;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,15 +23,20 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static com.kuahusg.weather.util.PreferenceUtil.PREF_SELECTED_CITY;
+import static com.kuahusg.weather.util.PreferenceUtil.PREF_WOEID;
 
 /**
  * Created by kuahusg on 16-9-28.
  */
 
 public class RemoteForecastDataSource implements IDataSource {
-    private String queryString = "select * from weather.forecast where woeid = %s and u=\"c\"";
+    private String queryWeatherString = "select * from weather.forecast where woeid = %s and u=\"c\"";
     private String formatMethod = "json";
+    private String getAllMainCityUrl = "https://raw.githubusercontent.com/Kuanghusing/City_list/master/city-list";
+
+    private String queryCityString = "select woeid, name, country.content," +
+            "admin1.content, admin2.content, admin3.content from geo.places(1) " +
+            "where text=\"%s\" and lang = \"zh-CN\"";
 
     @Override
     public void saveWeather(List<Forecast> forecastList, ForecastInfo info) {
@@ -36,7 +45,7 @@ public class RemoteForecastDataSource implements IDataSource {
 
     @Override
     public void loadAllCity(final RequestCityCallback cityCallback) {
-        RetrofitManager.getWeatherService().queryAllMainCity()
+        RetrofitManager.getWeatherService().queryAllMainCity(getAllMainCityUrl)
                 .enqueue(new Callback<List<String>>() {
                     @Override
                     public void onResponse(Call<List<String>> call, Response<List<String>> response) {
@@ -52,6 +61,12 @@ public class RemoteForecastDataSource implements IDataSource {
                         cityCallback.error();
                     }
                 });
+
+    }
+
+    @Override
+    public void queryWeather(RequestWeatherCallback callback) {
+        queryWeather(getWoeid(), callback);
     }
 
     @Override
@@ -60,7 +75,7 @@ public class RemoteForecastDataSource implements IDataSource {
             getWoeid();
 
         Call<WeatherResult> call = RetrofitManager.getWeatherService()
-                .queryWeather(String.format(queryString, woeid), formatMethod);
+                .queryWeather(String.format(queryWeatherString, woeid), formatMethod);
 
         call.enqueue(new Callback<WeatherResult>() {
             @Override
@@ -121,8 +136,69 @@ public class RemoteForecastDataSource implements IDataSource {
         //do nothing
     }
 
+    @Override
+    public void queryCity(final RequestCityResultCallback callback, String cityName) {
+        Call<CitySearchResult> call = RetrofitManager.getWeatherService().queryCity(String.format(queryCityString, cityName), formatMethod);
+        call.enqueue(new Callback<CitySearchResult>() {
+            @Override
+            public void onResponse(Call<CitySearchResult> call, Response<CitySearchResult> response) {
+                CitySearchResult citySearchResult = response.body();
+                if (citySearchResult == null) {
+                    callback.error(App.getContext().getString(R.string.no_result));
+                    return;
+                }
+                String woeid = null;
+                String name = null;
+                String country = null;
+                String admin1 = null;
+                String admin2 = null;
+                String admin3 = null;
+                StringBuilder fullName = null;
+                City result = null;
+                try {
+                    woeid = citySearchResult.getQuery().getResults().getPlace().getWoeid();
+                    name = citySearchResult.getQuery().getResults().getPlace().getName();
+                    country = citySearchResult.getQuery().getResults().getPlace().getCountry();
+                    admin1 = citySearchResult.getQuery().getResults().getPlace().getAdmin1();
+                    admin2 = citySearchResult.getQuery().getResults().getPlace().getAdmin2();
+                    admin3 = citySearchResult.getQuery().getResults().getPlace().getAdmin3();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    callback.error(App.getContext().getString(R.string.no_result));
+
+                }
+                fullName = new StringBuilder();
+
+
+                if (country != null) {
+                    fullName.append(country);
+                }
+                if (admin1 != null) {
+                    fullName.append(admin1);
+                }
+                if (admin2 != null) {
+                    fullName.append(admin2);
+                }
+                if (admin3 != null) {
+                    fullName.append(admin3);
+                }
+                result = new City(name, woeid, fullName.toString());
+                // TODO: 16-10-8 the only one result, I know it's stupid
+                List<City> cities = new ArrayList<City>();
+                cities.add(result);
+                callback.success(cities);
+
+            }
+
+            @Override
+            public void onFailure(Call<CitySearchResult> call, Throwable t) {
+
+            }
+        });
+    }
+
     private String getWoeid() {
-        return PreferenceUtil.getInstance().getSharedPreferences().getString(PREF_SELECTED_CITY, null);
+        return PreferenceUtil.getInstance().getSharedPreferences().getString(PREF_WOEID, null);
 
     }
 }

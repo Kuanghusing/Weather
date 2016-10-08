@@ -29,5 +29,7 @@ public interface ISelectLocationView extends IBaseView {
 
     void loadAllCityFinish(List<String> cityList);
 
+    void startLoadingData(boolean canCancelPgb);
+
 
 }

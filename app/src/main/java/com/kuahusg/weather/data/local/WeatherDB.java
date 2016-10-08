@@ -29,11 +29,9 @@ public class WeatherDB {
     private static final int VERSION = 2;
     private static String DB_NAME = "myWeatherDataBase";    //stupid name
 
-    private SQLiteDatabase db;
+    private SQLiteDatabase db = new WeatherOpenHelper(App.getContext().getApplicationContext(), DB_NAME, null, VERSION).getWritableDatabase();
 
     private WeatherDB() {
-
-        db = new WeatherOpenHelper(App.getContext().getApplicationContext(), DB_NAME, null, VERSION).getWritableDatabase();
 
 
     }
