@@ -32,7 +32,6 @@ public class WeatherDataSource implements IDataSource {
     }
     @Override
     public void queryWeather(final String woeid, final RequestWeatherCallback callback) {
-        //TODO it means require network to query ??
         clearWeatherCache();
         if (NetwordUtil.hasNetwork(App.getContext()))
 
@@ -75,13 +74,24 @@ public class WeatherDataSource implements IDataSource {
                 @Override
                 public void success(List<String> cityList) {
                     saveAllCity(cityList);
-                    local.saveAllCity(cityList);
+//                    local.saveAllCity(cityList);
                     cityCallback.success(cityList);
                 }
 
                 @Override
                 public void error() {
-                    remote.loadAllCity(cityCallback);
+                    remote.loadAllCity(new RequestCityCallback() {
+                        @Override
+                        public void success(List<String> cityList) {
+                            cityCallback.success(cityList);
+                            local.saveAllCity(cityList);
+                        }
+
+                        @Override
+                        public void error() {
+                            cityCallback.error();
+                        }
+                    });
                 }
             });
         }

@@ -2,6 +2,9 @@ package com.kuahusg.weather.Presenter.base;
 
 import com.kuahusg.weather.UI.base.IBaseView;
 import com.kuahusg.weather.data.IDataSource;
+import com.kuahusg.weather.data.WeatherDataSource;
+import com.kuahusg.weather.data.local.LocalForecastDataSource;
+import com.kuahusg.weather.data.remote.RemoteForecastDataSource;
 
 import java.lang.ref.WeakReference;
 
@@ -31,10 +34,10 @@ public abstract class BasePresenter implements IBasePresenter {
     protected abstract IDataSource setDataSource();
 
     public IDataSource getDataSource() {
-        if (dataSourceWeakReference.get() != null) {
+        if (dataSourceWeakReference.get() == null) {
+            getDatasource();
+        }
             return dataSourceWeakReference.get();
-        } else
-            throw new NullPointerException("datasource not set!");
     }
 
     @Override
@@ -45,6 +48,14 @@ public abstract class BasePresenter implements IBasePresenter {
     @Override
     public void onDestroy() {
         mView = null;
+        if (dataSourceWeakReference != null) {
+            dataSourceWeakReference.clear();
+            dataSourceWeakReference = null;
+        }
+    }
+
+    private void getDatasource() {
+        this.dataSourceWeakReference = new WeakReference<IDataSource>(new WeatherDataSource(new RemoteForecastDataSource(), new LocalForecastDataSource()));
     }
 
 

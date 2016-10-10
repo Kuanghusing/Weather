@@ -2,8 +2,9 @@ package com.kuahusg.weather.UI.Fragment.rebuild;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.NestedScrollView;
-import android.support.v7.widget.CardView;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import com.kuahusg.weather.model.Forecast;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by kuahusg on 16-9-29.
@@ -29,26 +31,14 @@ import java.util.List;
 
 public class FutureWeatherFragment extends BaseFragment implements IFutureWeatherFragView {
 
-    private CardView cardView;
-    private CardView cardView2;
-    private CardView cardView3;
-    private CardView cardView4;
-    private CardView cardView5;
 
     private View view;
-    private List<Forecast> forecastList;
-    private ImageView pic;
-    private TextView info;
-    private TextView temp;
-    private TextView date;
-    private ImageView background_img;
-    private ImageView imageView;
-    private int index = 1;
-    private NestedScrollView nestedScrollView;
+    private RecyclerView mRvForecastList;
+
+    private RvAdapter mRvAdapter;
 
     private IFutureWeatherFragPresenter mPresenter;
 
-    private static final int count = 5;
 
     @Override
     protected int setLayoutId() {
@@ -85,12 +75,9 @@ public class FutureWeatherFragment extends BaseFragment implements IFutureWeathe
     @Override
     public void showForecast(List<Forecast> forecastList) {
 
-        initCard(cardView, forecastList.get(0));
-        initCard(cardView2, forecastList.get(1));
-        initCard(cardView3, forecastList.get(2));
-        initCard(cardView4, forecastList.get(3));
-        initCard(cardView5, forecastList.get(4));
-        // TODO: 16-9-29 ...
+        if (mRvAdapter != null) {
+            mRvAdapter.setData(forecastList);
+        }
 
     }
 
@@ -104,92 +91,39 @@ public class FutureWeatherFragment extends BaseFragment implements IFutureWeathe
         return view;
     }
 
+    @Override
+    public void scrollToTop() {
+        if (mRvForecastList != null) {
+            mRvForecastList.smoothScrollToPosition(0);
+
+        }
+    }
+
     private void initView() {
 
-        nestedScrollView = (NestedScrollView) view.findViewById(R.id.nestedScrollView);
-
-        cardView = (CardView) view.findViewById(R.id.first_card);
-        initView(cardView);
-
-        cardView2 = (CardView) view.findViewById(R.id.second_card);
-        initView(cardView2);
-
-        cardView3 = (CardView) view.findViewById(R.id.third_card);
-        initView(cardView3);
-
-        cardView4 = (CardView) view.findViewById(R.id.fourth_card);
-        initView(cardView4);
-
-        cardView5 = (CardView) view.findViewById(R.id.fifth_card);
-        initView(cardView5);
-    }
-
-    private void initView(CardView cardView) {
-        pic = (ImageView) cardView.findViewById(R.id.weaher_pic);
-        info = (TextView) cardView.findViewById(R.id.weather_info);
-        temp = (TextView) cardView.findViewById(R.id.weather_temp);
-        date = (TextView) cardView.findViewById(R.id.weather_date);
-        background_img = (ImageView) cardView.findViewById(R.id.card_background);
-        cardView.setTag(new ViewHolder(pic, info, date, temp, background_img, index++));
+        mRvAdapter = new RvAdapter(null);
+        mRvForecastList = (RecyclerView) view.findViewById(R.id.rv_forecast_info_list);
+        mRvForecastList.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRvForecastList.setItemAnimator(new DefaultItemAnimator());
+        mRvForecastList.setAdapter(mRvAdapter);
 
     }
 
-    private void initCard(CardView cardView, Forecast forecast) {
-        ViewHolder v = (ViewHolder) cardView.getTag();
-        ImageView img = v.getPic();
 
-        TextView info = v.getInfo();
-        TextView temp = v.getTemp();
-        TextView date = v.getDate();
-        ImageView background = v.getBackground_img();
-        Date today = new Date();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yy-MM-dd");
-        String date_string = simpleDateFormat.format(new Date(today.getTime() - (index - 1) * 24 * 60 * 60 * 1000));
-
-        temp.setText(forecast.getLow() + "~" + forecast.getHigh());
-        info.setText(forecast.getText());
-        date.setText(forecast.getDate().substring(0, 6));
-        initImg(img, info.getText().toString());
-        Glide.with(getActivity()).load("http://s.tu.ihuan.me/bgc/" + date_string + ".png").placeholder(R.drawable.back).into(background);
-    }
-
-    private void initImg(ImageView img, String info) {
-        if (info.contains("Thunderstorms")) {
-            img.setImageResource(R.drawable.thunderstorm);
-
-
-        } else if (info.contains("Cloudy")) {
-            img.setImageResource(R.drawable.cloud_sun);
-        } else if (info.contains("Sunny")) {
-            img.setImageResource(R.drawable.sunny);
-
-        } else if (info.contains("Showers") || info.contains("Rain")) {
-            img.setImageResource(R.drawable.rain3);
-        } else if (info.contains("Breezy")) {
-            img.setImageResource(R.drawable.wind);
-        } else if (info.contains("snow")) {
-            img.setImageResource(R.drawable.snow2);
-        } else {
-            img.setImageResource(R.drawable.sun);
-        }
-
-    }
-
-    private class ViewHolder {
+    private class ViewHolder extends RecyclerView.ViewHolder {
         ImageView pic;
         TextView info;
         TextView date;
         TextView temp;
         ImageView background_img;
-        int index;
 
-        public ViewHolder(ImageView pic, TextView info, TextView date, TextView temp, ImageView background_img, int index) {
+        public ViewHolder(View itemView, ImageView pic, TextView info, TextView date, TextView temp, ImageView background_img) {
+            super(itemView);
             this.pic = pic;
             this.info = info;
             this.date = date;
             this.temp = temp;
             this.background_img = background_img;
-            this.index = index;
         }
 
         public TextView getTemp() {
@@ -212,8 +146,85 @@ public class FutureWeatherFragment extends BaseFragment implements IFutureWeathe
             return background_img;
         }
 
-        public int getIndex() {
-            return index;
+    }
+
+    private class RvAdapter extends RecyclerView.Adapter<ViewHolder> {
+        private List<Forecast> forecastList;
+
+        private ImageView pic;
+        private TextView info;
+        private TextView temp;
+        private TextView date;
+        private ImageView background_img;
+
+        public RvAdapter(List<Forecast> forecastList) {
+            this.forecastList = forecastList;
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View cardView = LayoutInflater.from(getContext()).inflate(R.layout.include_weather_card, parent, false);
+            pic = (ImageView) cardView.findViewById(R.id.weaher_pic);
+            info = (TextView) cardView.findViewById(R.id.weather_info);
+            temp = (TextView) cardView.findViewById(R.id.weather_temp);
+            date = (TextView) cardView.findViewById(R.id.weather_date);
+            background_img = (ImageView) cardView.findViewById(R.id.card_background);
+            return new ViewHolder(cardView, pic, info, date, temp, background_img);
+
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            Forecast forecast = this.forecastList.get(position);
+            Date today = new Date();
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yy-MM-dd", Locale.SIMPLIFIED_CHINESE);
+            String date_string = simpleDateFormat.format(new Date(today.getTime()
+                    - (position - 1) * 24 * 60 * 60 * 1000));
+
+            pic = holder.getPic();
+            info = holder.getInfo();
+            temp = holder.getTemp();
+            date = holder.getDate();
+            background_img = holder.getBackground_img();
+
+            temp.setText(forecast.getLow() + "~" + forecast.getHigh());
+            info.setText(forecast.getText());
+            date.setText(forecast.getDate().substring(0, 6));
+            initImg(pic, info.getText().toString());
+            Glide.with(getActivity()).load("http://s.tu.ihuan.me/bgc/" + date_string + ".png")
+                    .placeholder(R.drawable.back).into(background_img);
+        }
+
+        @Override
+        public int getItemCount() {
+            return forecastList == null ? 0 : forecastList.size();
+        }
+
+        public void setData(List<Forecast> forecastList) {
+            this.forecastList = forecastList;
+            notifyDataSetChanged();
+        }
+
+        private void initImg(ImageView img, String info) {
+            if (info.contains("Thunderstorms")) {
+                img.setImageResource(R.drawable.thunderstorm);
+
+
+            } else if (info.contains("Cloudy")) {
+                img.setImageResource(R.drawable.cloud_sun);
+            } else if (info.contains("Sunny")) {
+                img.setImageResource(R.drawable.sunny);
+
+            } else if (info.contains("Showers") || info.contains("Rain")) {
+                img.setImageResource(R.drawable.rain3);
+            } else if (info.contains("Breezy")) {
+                img.setImageResource(R.drawable.wind);
+            } else if (info.contains("snow")) {
+                img.setImageResource(R.drawable.snow2);
+            } else {
+                img.setImageResource(R.drawable.sun);
+            }
+
         }
     }
 }

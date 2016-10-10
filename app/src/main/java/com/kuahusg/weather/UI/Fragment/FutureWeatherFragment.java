@@ -51,7 +51,7 @@ public class FutureWeatherFragment extends Fragment implements WeatherUtil.GetWe
         view = inflater.inflate(R.layout.fragment_future, container, false);
 
 
-        nestedScrollView = (NestedScrollView) view.findViewById(R.id.nestedScrollView);
+//        nestedScrollView = (NestedScrollView) view.findViewById(R.id.nestedScrollView);
         nestedScrollView.setOnScrollChangeListener(this);
         ((WeatherActivity) getActivity()).getWeatherFromActivity(this);
 
@@ -63,7 +63,7 @@ public class FutureWeatherFragment extends Fragment implements WeatherUtil.GetWe
             this.forecastList = forecastList;
         }
         i = 1;
-        cardView = (CardView) view.findViewById(R.id.first_card);
+        /*cardView = (CardView) view.findViewById(R.id.first_card);
         initView(cardView);
 
         cardView = (CardView) view.findViewById(R.id.second_card);
@@ -76,7 +76,7 @@ public class FutureWeatherFragment extends Fragment implements WeatherUtil.GetWe
         initView(cardView);
 
         cardView = (CardView) view.findViewById(R.id.fifth_card);
-        initView(cardView);
+        initView(cardView);*/
 
     }
 

@@ -29,6 +29,8 @@ public interface IWeatherViewPresenter extends IBasePresenter {
 
     void selectCitySuccess(City selectedCity);
 
+    void goToSelectLocationActivity();
+
 
 
 

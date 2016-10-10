@@ -2,6 +2,7 @@ package com.kuahusg.weather.UI.Fragment.rebuild;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.NestedScrollView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,7 @@ import java.util.List;
 public class WeatherFragment extends BaseFragment implements IWeatherFragView, View.OnClickListener {
     private IWeatherMainFragPresenter mPresenter;
 
+    private NestedScrollView nestedScrollView;
     private View view;
     private TextView date;
     private TextView temp_now;
@@ -113,6 +115,16 @@ public class WeatherFragment extends BaseFragment implements IWeatherFragView, V
         }
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -135,6 +147,7 @@ public class WeatherFragment extends BaseFragment implements IWeatherFragView, V
 
     private void initView() {
 
+        nestedScrollView = (NestedScrollView) view.findViewById(R.id.nscrollView);
         date = (TextView) view.findViewById(R.id.public_data);
         temp_now = (TextView) view.findViewById(R.id.temp_now);
         temp1 = (TextView) view.findViewById(R.id.temp1);
@@ -203,6 +216,14 @@ public class WeatherFragment extends BaseFragment implements IWeatherFragView, V
             return "西南 " + (num - 180);
         } else {
             return "东南 " + (360 - num);
+        }
+    }
+
+    @Override
+    public void scrollToTop() {
+        if (nestedScrollView != null) {
+//            nestedScrollView.scrollTo(0, 0);
+            nestedScrollView.smoothScrollTo(0, 0);
         }
     }
 

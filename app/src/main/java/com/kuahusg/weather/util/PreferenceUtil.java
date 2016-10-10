@@ -27,7 +27,6 @@ public class PreferenceUtil {
 
 
     public SharedPreferences getSharedPreferences() {
-        // TODO: 16-9-27 context from application work??
         if (sharedPreferences == null)
             sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getContext());
         return sharedPreferences;
@@ -39,6 +38,14 @@ public class PreferenceUtil {
         }
 
         return editor;
+    }
+
+    public static String getWoeid() {
+        return InstanceHolder.INSTANCE.getSharedPreferences().getString(PREF_WOEID, null);
+    }
+
+    public static String getCitySimpleName() {
+        return InstanceHolder.INSTANCE.getSharedPreferences().getString(PREF_CITY_SIMPLE_NAME, null);
     }
 
 

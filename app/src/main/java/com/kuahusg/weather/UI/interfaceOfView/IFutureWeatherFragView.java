@@ -23,4 +23,6 @@ public interface IFutureWeatherFragView extends IBaseView {
     void init();
 
     void showForecast(List<Forecast> forecastList);
+
+    void scrollToTop();
 }

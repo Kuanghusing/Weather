@@ -10,7 +10,7 @@ import com.kuahusg.weather.Presenter.base.BasePresenter;
 import com.kuahusg.weather.Presenter.interfaceOfPresenter.IWeatherMainFragPresenter;
 import com.kuahusg.weather.R;
 import com.kuahusg.weather.UI.base.IBaseView;
-import com.kuahusg.weather.UI.interfaceOfView.IWeatherMainView;
+import com.kuahusg.weather.UI.interfaceOfView.IWeatherFragView;
 import com.kuahusg.weather.data.IDataSource;
 import com.kuahusg.weather.util.DateUtil;
 
@@ -21,11 +21,11 @@ import java.util.Random;
  */
 
 public class WeatherFragPresenterImpl extends BasePresenter implements IWeatherMainFragPresenter {
-    private IWeatherMainView mView;
+    private IWeatherFragView mView;
 
     public WeatherFragPresenterImpl(IBaseView view) {
         super(view);
-        mView = (IWeatherMainView) view;
+        mView = (IWeatherFragView) view;
 
 
     }

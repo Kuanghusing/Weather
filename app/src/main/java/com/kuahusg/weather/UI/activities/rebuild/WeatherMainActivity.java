@@ -20,6 +20,8 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -29,6 +31,7 @@ import com.kuahusg.weather.Presenter.interfaceOfPresenter.IWeatherViewPresenter;
 import com.kuahusg.weather.R;
 import com.kuahusg.weather.UI.Fragment.rebuild.FutureWeatherFragment;
 import com.kuahusg.weather.UI.Fragment.rebuild.WeatherFragment;
+import com.kuahusg.weather.UI.activities.SettingActivity;
 import com.kuahusg.weather.UI.base.BaseActivity;
 import com.kuahusg.weather.UI.interfaceOfView.IWeatherMainView;
 import com.kuahusg.weather.model.City;
@@ -64,6 +67,8 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
     private IWeatherViewPresenter mPresenter;
     private Listener listener;
 
+    private boolean first = true;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,13 +83,20 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        if (mPagerAdapter == null) {
+            setupViewPager();
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
 
-        if (mPagerAdapter == null) {
-            setupViewPager();
-            // TODO: 16-10-8 为什么fragment的onCreateView不会调用？
-
+        if (first) {
+            first = false;
+            mSwipeRefreshLayout.setRefreshing(true);
             if (hasPresenter())
                 mPresenter.start();
         }
@@ -118,14 +130,16 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
     @Override
     public void goToSelectLocationActivity() {
         Intent intent = new Intent(this, SelectLocationActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         startActivityForResult(intent, REQUEST_CODE_SELECT_LOCATION);
+
 
     }
 
     @Override
     public void loadWeatherDataSourceFinish(List<Forecast> forecasts, ForecastInfo info) {
         if (isFragmentAvaliable()) {
+            mSwipeRefreshLayout.setRefreshing(false);
             mWeatherFragment.showWeather(forecasts);
             mWeatherFragment.showForecastInfo(info);
 
@@ -150,7 +164,8 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
 
     @Override
     public void loadWeatherError(String message) {
-        Snackbar snackbar = Snackbar.make(fab, message, Snackbar.LENGTH_SHORT);
+        mSwipeRefreshLayout.setRefreshing(false);
+        Snackbar snackbar = Snackbar.make(fab, message, Snackbar.LENGTH_LONG);
         snackbar.setAction(getString(R.string.retry), new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -158,6 +173,11 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
                     mPresenter.refreshWeather();
             }
         }).show();
+    }
+
+    @Override
+    public void setToolbarSubTitle(String title) {
+        mToolbar.setSubtitle(title);
     }
 
     @Override
@@ -182,6 +202,47 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                break;
+            case R.id.menu_setting:
+//                Toast.makeText(this, "还没完成...", Toast.LENGTH_LONG).show();
+                Intent i = new Intent(WeatherMainActivity.this, SettingActivity.class);
+                startActivity(i);
+                break;
+            case R.id.change_btn:
+
+                showAlertDialog(this.getString(R.string.sure), this.getString(R.string.switch_city),
+                        this.getString(R.string.no), this.getString(R.string.yes), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (hasPresenter())
+                                    mPresenter.goToSelectLocationActivity();
+                            }
+                        });
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.closeDrawers();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
     private void initView() {
         listener = new Listener();
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -191,7 +252,6 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.main_container);
         mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
@@ -224,15 +284,13 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
         fragmentList.add(mFutureWeatherFragment);
         mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), fragmentList, list);
         mViewPager.setAdapter(mPagerAdapter);
+        mTabLayout.setupWithViewPager(mViewPager);
         mViewPager.addOnPageChangeListener(listener);
 
     }
 
     private boolean isFragmentAvaliable() {
-        if (this.mPagerAdapter != null) {
-            return (mWeatherFragment = (WeatherFragment) mPagerAdapter.getItem(0)) != null && (mFutureWeatherFragment = (FutureWeatherFragment) mPagerAdapter.getItem(1)) != null;
-        }
-        return false;
+        return this.mPagerAdapter != null && (mWeatherFragment = (WeatherFragment) mPagerAdapter.getItem(0)) != null && (mFutureWeatherFragment = (FutureWeatherFragment) mPagerAdapter.getItem(1)) != null;
     }
 
 
@@ -245,6 +303,7 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
         @Override
         public void onClick(View view) {
             if (view.getId() == R.id.fab) {
+                mSwipeRefreshLayout.setRefreshing(true);
                 mPresenter.onClickFab();
             }
         }
@@ -267,8 +326,16 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
         public void onPageScrollStateChanged(int state) {
             if (state == ViewPager.SCROLL_STATE_IDLE) {
                 mSwipeRefreshLayout.setEnabled(true);
+                Log.d(this.getClass().getSimpleName(), "item:" + mViewPager.getCurrentItem());
+                if (mViewPager.getCurrentItem() == 0) {
+                    mWeatherFragment.scrollToTop();
+                } else if (mViewPager.getCurrentItem() == 1) {
+                    mFutureWeatherFragment.scrollToTop();
+                }
+
             } else {
-                mSwipeRefreshLayout.setEnabled(false);
+                if (!mSwipeRefreshLayout.isRefreshing())
+                    mSwipeRefreshLayout.setEnabled(false);
             }
         }
 
@@ -280,7 +347,7 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
                 @Override
-                public boolean onNavigationItemSelected(MenuItem item) {
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     item.setChecked(true);
                     switch (item.getItemId()) {
 

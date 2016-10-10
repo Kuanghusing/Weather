@@ -14,7 +14,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
 
-        <activity android:name=".UI.activities.rebuild.WeatherMainActivity">
+        <activity
+            android:name=".UI.activities.rebuild.WeatherMainActivity"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -29,7 +31,7 @@
         </activity>
 
         <!--old-->
-        <activity android:name=".UI.activities.SelectLocationActivity">
+        <!--<activity android:name=".UI.activities.SelectLocationActivity">
 
         </activity>
         <activity android:name=".UI.activities.WeatherActivity">
@@ -37,7 +39,7 @@
         </activity>
         <activity android:name=".UI.activities.AboutActivity">
 
-        </activity>
+        </activity>-->
         <activity android:name=".UI.activities.SettingActivity">
 
 

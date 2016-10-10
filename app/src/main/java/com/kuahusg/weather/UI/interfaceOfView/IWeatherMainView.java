@@ -32,4 +32,6 @@ public interface IWeatherMainView extends IBaseView {
 
 
     void loadWeatherDataSourceFinish(List<Forecast> forecasts, ForecastInfo info);
+
+    void setToolbarSubTitle(String title);
 }

@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.kuahusg.weather.App;
 import com.kuahusg.weather.data.callback.RequestCityCallback;
@@ -109,6 +110,9 @@ public class WeatherDB {
                 }
                 db.setTransactionSuccessful();
             } catch (SQLException e) {
+//                db.endTransaction();
+                Log.e("WeatherDB", e.getMessage());
+            } finally {
                 db.endTransaction();
             }
         }

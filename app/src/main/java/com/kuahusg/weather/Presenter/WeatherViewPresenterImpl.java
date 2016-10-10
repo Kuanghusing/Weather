@@ -47,6 +47,8 @@ public class WeatherViewPresenterImpl extends BasePresenter implements IWeatherV
 
         super.init();
         shouldGotoSelectLocationActivity();
+        setToolbarSubTitle();
+
 
     }
 
@@ -80,10 +82,16 @@ public class WeatherViewPresenterImpl extends BasePresenter implements IWeatherV
         refreshWeather();
     }
 
+    @Override
+    public void goToSelectLocationActivity() {
+        if (hasView())
+            mView.goToSelectLocationActivity();
+    }
+
     //日常甩锅
     @Override
     public void refreshWeather() {
-        getDataSource().queryWeather(callback);
+        getDataSource().queryWeather(null, callback);
     }
 
     @Override
@@ -98,7 +106,19 @@ public class WeatherViewPresenterImpl extends BasePresenter implements IWeatherV
                 .putString(PREF_WOEID, selectedCity.getWoeid())
                 .putString(PREF_CITY_SIMPLE_NAME, selectedCity.getCity_name())
                 .apply();
+        setToolbarSubTitle();
+    }
 
+    private void setToolbarSubTitle() {
+        String simpleName;
+        if (hasView()) {
+            simpleName = PreferenceUtil.getCitySimpleName();
+            if (simpleName != null) {
+                mView.setToolbarSubTitle(simpleName);
+            }
+
+
+        }
     }
 
     private void shouldGotoSelectLocationActivity() {

@@ -1,7 +1,6 @@
 package com.kuahusg.weather.Presenter;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -16,14 +15,12 @@ import com.kuahusg.weather.data.callback.RequestCityResultCallback;
 import com.kuahusg.weather.data.local.LocalForecastDataSource;
 import com.kuahusg.weather.data.remote.RemoteForecastDataSource;
 import com.kuahusg.weather.model.City;
-import com.kuahusg.weather.util.CityUtil;
 import com.kuahusg.weather.util.PreferenceUtil;
 
 import java.util.List;
 
 import static com.kuahusg.weather.util.Constant.BUNDLE_KEY_CITY_NAME;
 import static com.kuahusg.weather.util.Constant.BUNDLE_NAME_CITY;
-import static com.kuahusg.weather.util.Constant.REQUEST_CODE_SELECT_LOCATION;
 
 /**
  * Created by kuahusg on 16-9-27.
@@ -52,29 +49,26 @@ public class SelectLocationPresenterImpl extends BasePresenter implements ISelec
 
     @Override
     public void start() {
-        if (shouldGetAllCity()) {
+        if (shouldGetAllCityFromServer()) {
             if (hasView())
                 mView.startLoadingData(false);
-            getDataSource().loadAllCity(new RequestCityCallback() {
-                @Override
-                public void success(List<String> cityList) {
-                    if (hasView())
-                        mView.loadAllCityFinish(cityList);
-
-                }
-
-                @Override
-                public void error() {
-
-                }
-            });
         }
+        getDataSource().loadAllCity(new RequestCityCallback() {
+            @Override
+            public void success(List<String> cityList) {
+                if (hasView())
+                    mView.loadAllCityFinish(cityList);
+
+            }
+
+            @Override
+            public void error() {
+
+            }
+        });
+
     }
 
-    @Override
-    public void loadAllCitiesFromRemoteServer(CityUtil.SolveCityCallback callback, Context context) {
-        // TODO: 16-10-8 ??
-    }
 
     @Override
     public void onClickQueryButton(String cityNameToSearch) {
@@ -90,7 +84,7 @@ public class SelectLocationPresenterImpl extends BasePresenter implements ISelec
         bundle.putSerializable(BUNDLE_KEY_CITY_NAME, selectedCity);
         data.putExtra(BUNDLE_NAME_CITY, bundle);
 
-        activity.setResult(REQUEST_CODE_SELECT_LOCATION, data);
+        activity.setResult(Activity.RESULT_OK, data);
         activity.finish();
     }
 
@@ -107,7 +101,7 @@ public class SelectLocationPresenterImpl extends BasePresenter implements ISelec
             mView.queryCityError(message);
     }
 
-    private boolean shouldGetAllCity() {
+    private boolean shouldGetAllCityFromServer() {
         return !PreferenceUtil.getInstance().getSharedPreferences().getBoolean(PreferenceUtil.PREF_HAS_LOAD_ALL_CITY, false);
     }
 }

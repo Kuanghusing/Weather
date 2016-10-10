@@ -23,8 +23,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static com.kuahusg.weather.util.PreferenceUtil.PREF_WOEID;
-
 /**
  * Created by kuahusg on 16-9-28.
  */
@@ -66,20 +64,28 @@ public class RemoteForecastDataSource implements IDataSource {
 
     @Override
     public void queryWeather(RequestWeatherCallback callback) {
-        queryWeather(getWoeid(), callback);
+        queryWeather(PreferenceUtil.getWoeid(), callback);
     }
 
     @Override
-    public void queryWeather(final String woeid, final RequestWeatherCallback callback) {
+    public void queryWeather(String woeid, final RequestWeatherCallback callback) {
+        final String woeid_copy;
         if (woeid == null)
-            getWoeid();
+            woeid_copy = PreferenceUtil.getWoeid();
+        else
+            woeid_copy = woeid;
 
         Call<WeatherResult> call = RetrofitManager.getWeatherService()
-                .queryWeather(String.format(queryWeatherString, woeid), formatMethod);
+                .queryWeather(String.format(queryWeatherString, woeid_copy), formatMethod);
 
         call.enqueue(new Callback<WeatherResult>() {
             @Override
             public void onResponse(Call<WeatherResult> call, Response<WeatherResult> response) {
+                Log.d(this.getClass().getSimpleName(), response.raw().toString());
+                if (response.code() != 200) {
+                    callback.error(App.getContext().getString(R.string.error_network) + ":" + response.message());
+                    return;
+                }
                 WeatherResult weatherResult = response.body();
                 Forecast[] forecasts = null;
                 ForecastInfo forecastInfo = null;
@@ -105,7 +111,7 @@ public class RemoteForecastDataSource implements IDataSource {
                             .getSunset();
 
                     forecastInfo = new ForecastInfo(link, lastBuildDate, wind_direction, wind_speed, date,
-                            temp, text, woeid, sunrise, sunset);
+                            temp, text, woeid_copy, sunrise, sunset);
 
 
                 } catch (Exception e) {
@@ -153,8 +159,8 @@ public class RemoteForecastDataSource implements IDataSource {
                 String admin1 = null;
                 String admin2 = null;
                 String admin3 = null;
-                StringBuilder fullName = null;
-                City result = null;
+                StringBuilder fullName;
+                City result;
                 try {
                     woeid = citySearchResult.getQuery().getResults().getPlace().getWoeid();
                     name = citySearchResult.getQuery().getResults().getPlace().getName();
@@ -184,7 +190,7 @@ public class RemoteForecastDataSource implements IDataSource {
                 }
                 result = new City(name, woeid, fullName.toString());
                 // TODO: 16-10-8 the only one result, I know it's stupid
-                List<City> cities = new ArrayList<City>();
+                List<City> cities = new ArrayList<>();
                 cities.add(result);
                 callback.success(cities);
 
@@ -197,8 +203,5 @@ public class RemoteForecastDataSource implements IDataSource {
         });
     }
 
-    private String getWoeid() {
-        return PreferenceUtil.getInstance().getSharedPreferences().getString(PREF_WOEID, null);
 
-    }
 }

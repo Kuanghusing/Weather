@@ -16,4 +16,6 @@ public interface IWeatherFragView extends IBaseView {
 
     void showForecastInfo(ForecastInfo info);
 
+    void scrollToTop();
+
 }

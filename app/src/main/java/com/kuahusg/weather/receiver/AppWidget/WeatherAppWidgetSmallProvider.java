@@ -2,18 +2,17 @@ package com.kuahusg.weather.receiver.AppWidget;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
-import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.widget.RemoteViews;
 
 import com.kuahusg.weather.R;
-import com.kuahusg.weather.UI.activities.WeatherActivity;
+import com.kuahusg.weather.UI.activities.rebuild.WeatherMainActivity;
+import com.kuahusg.weather.data.callback.RequestWeatherCallback;
 import com.kuahusg.weather.model.Forecast;
 import com.kuahusg.weather.model.ForecastInfo;
-import com.kuahusg.weather.util.WeatherUtil;
+import com.kuahusg.weather.util.PreferenceUtil;
 
 import java.util.List;
 
@@ -21,46 +20,42 @@ import java.util.List;
  * Created by kuahusg on 16-6-18.
  * com.kuahusg.weather.receiver
  */
-public class WeatherAppWidgetSmallProvider extends AppWidgetProvider {
+public class WeatherAppWidgetSmallProvider extends BaseAppWidget {
     @Override
-    public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+    public void onUpdate(final Context context, final AppWidgetManager appWidgetManager, final int[] appWidgetIds) {
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String woeid = sharedPreferences.getString("woeid", "");
+        SharedPreferences sharedPreferences = PreferenceUtil.getInstance().getSharedPreferences();
+        String woeid = sharedPreferences.getString("woeid", null);
 
-        String tempAndDate;
-        ForecastInfo info = WeatherUtil.loadForecastInfoFromDatabase(woeid);
-        String temp_now = "NaN";
-        if (info != null) {
-            /*String[] t = tempAndDate.split("\\|");
-            temp_now = t[0];*/
-            temp_now = info.getTemp();
-        }
-        List<Forecast> forecastList = WeatherUtil.loadForecastFromDatabase(woeid);
-        Forecast forecast_to_show = null;
-        if (forecastList != null && forecastList.size() > 0) {
-            forecast_to_show = forecastList.get(0);
-        } else {
-            return;
-        }
+        getDatasource().queryWeather(woeid, new RequestWeatherCallback() {
+            @Override
+            public void success(List<Forecast> forecasts, ForecastInfo forecastInfo) {
+                String temp_now = "NaN";
+                if (forecastInfo == null || forecasts == null)
+                    return;
+                temp_now = forecastInfo.getTemp();
+                Forecast forecast_to_show = null;
 
+                for (int appwidgetId :
+                        appWidgetIds) {
+                    RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.appwidget_weather_small);
+                    rv.setImageViewResource(R.id.weather_pic, getWeatherPicId(forecast_to_show.getText()));
+                    rv.setTextViewText(R.id.weather_info, forecast_to_show.getText());
+                    rv.setTextViewText(R.id.temp_now, temp_now);
 
-        /*
-        update view
-         */
+                    Intent intent = new Intent(context, WeatherMainActivity.class);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+                    rv.setOnClickPendingIntent(R.id.main_container, pendingIntent);
+                    appWidgetManager.updateAppWidget(appwidgetId, rv);
+                }
+            }
 
-        for (int appwidgetId :
-                appWidgetIds) {
-            RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.appwidget_weather_small);
-            rv.setImageViewResource(R.id.weather_pic, getWeatherPicId(forecast_to_show.getText()));
-            rv.setTextViewText(R.id.weather_info, forecast_to_show.getText());
-            rv.setTextViewText(R.id.temp_now, temp_now);
+            @Override
+            public void error(String message) {
 
-            Intent intent = new Intent(context, WeatherActivity.class);
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-            rv.setOnClickPendingIntent(R.id.main_container, pendingIntent);
-            appWidgetManager.updateAppWidget(appwidgetId, rv);
-        }
+            }
+        });
+
         super.onUpdate(context, appWidgetManager, appWidgetIds);
     }
 

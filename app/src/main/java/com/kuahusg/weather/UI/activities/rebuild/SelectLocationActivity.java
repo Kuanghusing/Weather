@@ -70,7 +70,8 @@ public class SelectLocationActivity extends BaseActivity implements ISelectLocat
         super.onCreate(savedInstanceState);
 
         initView();
-        mPresenter.init();
+        if (hasPresenter())
+            mPresenter.init();
     }
 
     @Override
@@ -178,7 +179,7 @@ public class SelectLocationActivity extends BaseActivity implements ISelectLocat
             mPgd.setCancelable(cancelable);
             // TODO: 16-9-29 ??
 //            try {
-                mPgd.show();
+            mPgd.show();
 //            } catch (Exception e) {
 //                e.printStackTrace();
 //            }
@@ -186,7 +187,7 @@ public class SelectLocationActivity extends BaseActivity implements ISelectLocat
     }
 
     private void dismissProgress() {
-        if (mPgd.isShowing())
+        if (mPgd != null && mPgd.isShowing())
             mPgd.dismiss();
     }
 }
