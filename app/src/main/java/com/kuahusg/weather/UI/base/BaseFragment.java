@@ -7,7 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.kuahusg.weather.App;
 import com.kuahusg.weather.Presenter.base.IBasePresenter;
+import com.squareup.leakcanary.RefWatcher;
 
 /**
  * Created by kuahusg on 16-9-29.
@@ -48,6 +50,9 @@ public abstract class BaseFragment extends Fragment implements IBaseView {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        RefWatcher watcher = App.getWatcher(getActivity());
+        watcher.watch(this);
+
         if (hasPresenter())
             mPresenter.onDestroy();
     }

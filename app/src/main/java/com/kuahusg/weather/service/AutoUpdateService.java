@@ -5,10 +5,8 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.os.SystemClock;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
 import com.kuahusg.weather.UI.Fragment.SettingFragment;
@@ -22,7 +20,6 @@ import com.kuahusg.weather.model.ForecastInfo;
 import com.kuahusg.weather.receiver.AutoUpdateReceiver;
 import com.kuahusg.weather.util.LogUtil;
 import com.kuahusg.weather.util.PreferenceUtil;
-import com.kuahusg.weather.util.WeatherUtil;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -53,31 +50,14 @@ public class AutoUpdateService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        /*LogUtil.v(this.toString(), "Service onStartCommand()");
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                updateWeather();
-            }
-        }).start();
-        if (sharedPreferences == null) {
-            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        }
-        time = Double.valueOf(sharedPreferences.getString(SettingFragment.UPDATE_TIME, "0"));
-        if (time <= 0) {
-            time = 2;
-        }
-        LogUtil.v(this.toString(), "update time:" + time);*/
-
 
         time = Double.valueOf(PreferenceUtil.getInstance().getSharedPreferences().getString(SettingFragment.UPDATE_TIME, "0"));
         if (time <= 0)
             time = 2;
         // TODO: 16-10-8 ??
-        dataSourceWeakReference.get().queryWeather(new RequestWeatherCallback() {
+        dataSourceWeakReference.get().queryWeather(null, new RequestWeatherCallback() {
             @Override
             public void success(List<Forecast> forecasts, ForecastInfo forecastInfo) {
-                dataSourceWeakReference.get().saveWeather(forecasts, forecastInfo);
             }
 
             @Override
@@ -98,12 +78,6 @@ public class AutoUpdateService extends Service {
     public void onDestroy() {
         super.onDestroy();
         LogUtil.v(this.toString(), "Service onDestroy()");
-    }
-
-    private void updateWeather() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String woeid = sharedPreferences.getString("woeid", "");
-        WeatherUtil.queryWeather(woeid, AutoUpdateService.this, null);
     }
 
 

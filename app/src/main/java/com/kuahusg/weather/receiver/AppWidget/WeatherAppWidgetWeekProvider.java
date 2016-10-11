@@ -4,7 +4,6 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.widget.RemoteViews;
 
 import com.kuahusg.weather.R;
@@ -24,11 +23,9 @@ public class WeatherAppWidgetWeekProvider extends BaseAppWidget {
     @Override
     public void onUpdate(final Context context, final AppWidgetManager appWidgetManager, final int[] appWidgetIds) {
 
-        SharedPreferences sharedPreferences = PreferenceUtil.getInstance().getSharedPreferences();
-        final String cityName = sharedPreferences.getString("selectCitySimpleName", "N");
-        String woeid = sharedPreferences.getString("woeid", "");
+        final String cityName = PreferenceUtil.getCitySimpleName();
 
-        getDatasource().queryWeather(woeid, new RequestWeatherCallback() {
+        getDatasource().queryWeather(null, new RequestWeatherCallback() {
             @Override
             public void success(List<Forecast> forecasts, ForecastInfo forecastInfo) {
                 String temp_now = "N";

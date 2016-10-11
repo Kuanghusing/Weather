@@ -13,7 +13,7 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.kuahusg.weather.R;
-import com.kuahusg.weather.UI.activities.AboutActivity;
+import com.kuahusg.weather.UI.activities.rebuild.AboutMeActivity;
 import com.kuahusg.weather.service.AutoUpdateService;
 import com.kuahusg.weather.util.LogUtil;
 
@@ -56,7 +56,7 @@ public class SettingFragment extends PreferenceFragment implements Preference.On
                 updateTimePreference.setEnabled(autoUpdatePreference.isChecked());
                 break;
             case ABOUT:
-                Intent intent = new Intent(activity, AboutActivity.class);
+                Intent intent = new Intent(activity, AboutMeActivity.class);
                 activity.startActivity(intent);
                 break;
             case OPEN_SOURCE:

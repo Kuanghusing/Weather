@@ -16,6 +16,7 @@ public class PreferenceUtil {
     public static final String PREF_SELECTED_CITY = "selectCity";
     public static final String PREF_WOEID = "woeid";
     public static final String PREF_CITY_SIMPLE_NAME = "selectCitySimpleName";
+    public static final String PREF_AUTO_UPDATE = "auto_update";
 
     private PreferenceUtil() {
 
@@ -46,6 +47,10 @@ public class PreferenceUtil {
 
     public static String getCitySimpleName() {
         return InstanceHolder.INSTANCE.getSharedPreferences().getString(PREF_CITY_SIMPLE_NAME, null);
+    }
+
+    public static boolean getCanAutoUpdate() {
+        return InstanceHolder.INSTANCE.getSharedPreferences().getBoolean(PREF_AUTO_UPDATE, false);
     }
 
 

@@ -3,8 +3,11 @@ package com.kuahusg.weather.UI.base;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
+import com.kuahusg.weather.App;
 import com.kuahusg.weather.Presenter.base.IBasePresenter;
+import com.squareup.leakcanary.RefWatcher;
 
 /**
  * Created by kuahusg on 16-9-27.
@@ -46,7 +49,11 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseVie
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mPresenter.onDestroy();
+        Log.d(this.getClass().getSimpleName(), "Activity onDestroy");
+        RefWatcher watcher = App.getWatcher(this);
+        watcher.watch(this);
+        if (hasPresenter())
+            mPresenter.onDestroy();
 
     }
 }

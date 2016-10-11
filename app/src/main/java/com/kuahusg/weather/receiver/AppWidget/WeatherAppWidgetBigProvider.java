@@ -4,6 +4,7 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.kuahusg.weather.R;
@@ -30,6 +31,7 @@ public class WeatherAppWidgetBigProvider extends BaseAppWidget {
     @Override
     public void onEnabled(Context context) {
         super.onEnabled(context);
+        Log.d(this.getClass().getSimpleName(), "onEnabled");
         // TODO: 16-10-8 should check auto update
     }
 
@@ -38,7 +40,7 @@ public class WeatherAppWidgetBigProvider extends BaseAppWidget {
         LogUtil.v(this.toString(), "onUpdate()");
 
 
-        getDatasource().queryWeather(new RequestWeatherCallback() {
+        getDatasource().queryWeather(null, new RequestWeatherCallback() {
             @Override
             public void success(List<Forecast> forecasts, ForecastInfo forecastInfo) {
                 if (forecasts != null && forecasts.size() > 0) {

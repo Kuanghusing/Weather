@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.kuahusg.weather.service.AutoUpdateService;
-import com.kuahusg.weather.util.LogUtil;
+import com.kuahusg.weather.util.PreferenceUtil;
 
 /**
  * Created by kuahusg on 16-6-21.
@@ -14,9 +14,11 @@ import com.kuahusg.weather.util.LogUtil;
 public class BootCompleteReciver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        LogUtil.v(this.toString(),"boot complete,start service");
-        Intent intent1 = new Intent(context,AutoUpdateService.class);
-        context.startService(intent1);
+//        LogUtil.v(this.toString(), "boot complete,start service");
+        if (PreferenceUtil.getCanAutoUpdate()) {
+            Intent intent1 = new Intent(context, AutoUpdateService.class);
+            context.startService(intent1);
+        }
 
     }
 }

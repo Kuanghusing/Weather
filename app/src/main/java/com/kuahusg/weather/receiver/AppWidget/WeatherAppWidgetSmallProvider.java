@@ -4,7 +4,6 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.widget.RemoteViews;
 
 import com.kuahusg.weather.R;
@@ -12,7 +11,6 @@ import com.kuahusg.weather.UI.activities.rebuild.WeatherMainActivity;
 import com.kuahusg.weather.data.callback.RequestWeatherCallback;
 import com.kuahusg.weather.model.Forecast;
 import com.kuahusg.weather.model.ForecastInfo;
-import com.kuahusg.weather.util.PreferenceUtil;
 
 import java.util.List;
 
@@ -24,10 +22,8 @@ public class WeatherAppWidgetSmallProvider extends BaseAppWidget {
     @Override
     public void onUpdate(final Context context, final AppWidgetManager appWidgetManager, final int[] appWidgetIds) {
 
-        SharedPreferences sharedPreferences = PreferenceUtil.getInstance().getSharedPreferences();
-        String woeid = sharedPreferences.getString("woeid", null);
 
-        getDatasource().queryWeather(woeid, new RequestWeatherCallback() {
+        getDatasource().queryWeather(null, new RequestWeatherCallback() {
             @Override
             public void success(List<Forecast> forecasts, ForecastInfo forecastInfo) {
                 String temp_now = "NaN";
@@ -35,6 +31,7 @@ public class WeatherAppWidgetSmallProvider extends BaseAppWidget {
                     return;
                 temp_now = forecastInfo.getTemp();
                 Forecast forecast_to_show = null;
+                forecast_to_show = forecasts.get(0);
 
                 for (int appwidgetId :
                         appWidgetIds) {
