@@ -1,7 +1,7 @@
 package com.kuahusg.weather.UI.interfaceOfView;
 
 import com.kuahusg.weather.UI.base.IBaseView;
-import com.kuahusg.weather.model.Forecast;
+import com.kuahusg.weather.model.bean.Forecast;
 
 import java.util.List;
 

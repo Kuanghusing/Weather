@@ -14,7 +14,7 @@ import com.kuahusg.weather.data.callback.RequestCityCallback;
 import com.kuahusg.weather.data.callback.RequestCityResultCallback;
 import com.kuahusg.weather.data.local.LocalForecastDataSource;
 import com.kuahusg.weather.data.remote.RemoteForecastDataSource;
-import com.kuahusg.weather.model.City;
+import com.kuahusg.weather.model.bean.City;
 import com.kuahusg.weather.util.PreferenceUtil;
 
 import java.util.List;

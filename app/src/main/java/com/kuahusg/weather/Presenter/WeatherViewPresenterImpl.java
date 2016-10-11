@@ -14,9 +14,9 @@ import com.kuahusg.weather.data.WeatherDataSource;
 import com.kuahusg.weather.data.callback.RequestWeatherCallback;
 import com.kuahusg.weather.data.local.LocalForecastDataSource;
 import com.kuahusg.weather.data.remote.RemoteForecastDataSource;
-import com.kuahusg.weather.model.City;
-import com.kuahusg.weather.model.Forecast;
-import com.kuahusg.weather.model.ForecastInfo;
+import com.kuahusg.weather.model.bean.City;
+import com.kuahusg.weather.model.bean.Forecast;
+import com.kuahusg.weather.model.bean.ForecastInfo;
 import com.kuahusg.weather.service.AutoUpdateService;
 import com.kuahusg.weather.util.PreferenceUtil;
 

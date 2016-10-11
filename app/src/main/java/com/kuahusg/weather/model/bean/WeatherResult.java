@@ -1,6 +1,4 @@
-package com.kuahusg.weather.model.Data;
-
-import com.kuahusg.weather.model.Forecast;
+package com.kuahusg.weather.model.bean;
 
 /**
  * Created by kuahusg on 16-6-28.

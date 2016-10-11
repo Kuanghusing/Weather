@@ -1,4 +1,4 @@
-package com.kuahusg.weather.UI.activities.rebuild;
+package com.kuahusg.weather.UI.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -29,14 +29,13 @@ import com.kuahusg.weather.Presenter.WeatherViewPresenterImpl;
 import com.kuahusg.weather.Presenter.base.IBasePresenter;
 import com.kuahusg.weather.Presenter.interfaceOfPresenter.IWeatherViewPresenter;
 import com.kuahusg.weather.R;
-import com.kuahusg.weather.UI.Fragment.rebuild.FutureWeatherFragment;
-import com.kuahusg.weather.UI.Fragment.rebuild.WeatherFragment;
-import com.kuahusg.weather.UI.activities.SettingActivity;
+import com.kuahusg.weather.UI.Fragment.FutureWeatherFragment;
+import com.kuahusg.weather.UI.Fragment.WeatherFragment;
 import com.kuahusg.weather.UI.base.BaseActivity;
 import com.kuahusg.weather.UI.interfaceOfView.IWeatherMainView;
-import com.kuahusg.weather.model.City;
-import com.kuahusg.weather.model.Forecast;
-import com.kuahusg.weather.model.ForecastInfo;
+import com.kuahusg.weather.model.bean.City;
+import com.kuahusg.weather.model.bean.Forecast;
+import com.kuahusg.weather.model.bean.ForecastInfo;
 
 import java.util.ArrayList;
 import java.util.List;

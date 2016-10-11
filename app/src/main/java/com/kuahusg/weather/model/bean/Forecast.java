@@ -1,4 +1,4 @@
-package com.kuahusg.weather.model;
+package com.kuahusg.weather.model.bean;
 
 import android.os.Parcel;
 import android.os.Parcelable;

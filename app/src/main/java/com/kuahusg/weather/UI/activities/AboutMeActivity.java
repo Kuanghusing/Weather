@@ -1,4 +1,4 @@
-package com.kuahusg.weather.UI.activities.rebuild;
+package com.kuahusg.weather.UI.activities;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

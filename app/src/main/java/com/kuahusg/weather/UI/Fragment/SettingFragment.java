@@ -13,7 +13,7 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.kuahusg.weather.R;
-import com.kuahusg.weather.UI.activities.rebuild.AboutMeActivity;
+import com.kuahusg.weather.UI.activities.AboutMeActivity;
 import com.kuahusg.weather.service.AutoUpdateService;
 import com.kuahusg.weather.util.LogUtil;
 

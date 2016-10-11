@@ -1,11 +1,8 @@
 package com.kuahusg.weather.UI.Fragment;
 
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.support.v4.widget.NestedScrollView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,25 +12,27 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.kuahusg.weather.Presenter.WeatherFragPresenterImpl;
+import com.kuahusg.weather.Presenter.base.IBasePresenter;
+import com.kuahusg.weather.Presenter.interfaceOfPresenter.IWeatherMainFragPresenter;
 import com.kuahusg.weather.R;
 import com.kuahusg.weather.UI.Widget.BackgroundPictureView;
-import com.kuahusg.weather.model.Forecast;
-import com.kuahusg.weather.model.ForecastInfo;
-import com.kuahusg.weather.util.DateUtil;
-import com.kuahusg.weather.util.LogUtil;
+import com.kuahusg.weather.UI.base.BaseFragment;
+import com.kuahusg.weather.UI.interfaceOfView.IWeatherFragView;
+import com.kuahusg.weather.model.bean.Forecast;
+import com.kuahusg.weather.model.bean.ForecastInfo;
 
 import java.util.List;
-import java.util.Random;
 
 /**
- * Created by kuahusg on 16-5-25.
+ * Created by kuahusg on 16-9-29.
  */
 
-public class WeatherFragment extends Fragment implements View.OnClickListener {
+public class WeatherFragment extends BaseFragment implements IWeatherFragView, View.OnClickListener {
+    private IWeatherMainFragPresenter mPresenter;
+
+    private NestedScrollView nestedScrollView;
     private View view;
-    private List<Forecast> forecastList;
-    private Context mContext;
     private TextView date;
     private TextView temp_now;
     private TextView temp1;
@@ -50,74 +49,146 @@ public class WeatherFragment extends Fragment implements View.OnClickListener {
     private TextView refresh_time;
     private BackgroundPictureView backgroundPictureView;
 
-
     private RelativeLayout forecast_now_container;
     private LinearLayout forecast_info_container;
-    private int whichDay = 0;
 
-    @Nullable
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_weather_main, container, false);
-        mContext = getActivity();
-        initView();
+    protected int setLayoutId() {
+        return R.layout.fragment_weather_main;
+    }
 
-        return view;
-
+    @Override
+    public void init() {
 
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-//        ((WeatherActivity) mContext).getWeatherFromActivity(this);
+    public void start() {
+
     }
 
-//    @Override
-//    public void getWeather(List<Forecast> forecastList) {
-//        showWeather(forecastList);
-//    }
-//
-//    @Override
-//    public void getWeatherInfo(ForecastInfo info) {
-//        showForecastInfo(info);
-//
-//
-//    }
+    @Override
+    public void error(String message) {
 
-    public void showWeather(List<Forecast> list) {
-        if (list != null) {
-            forecastList = list;
-        }
-        if (!forecastList.isEmpty()) {
-            Forecast forecastToday = forecastList.get(whichDay);
+    }
+
+    @Override
+    public void finish() {
+
+    }
+
+    @Override
+    protected IBasePresenter setPresenter() {
+        this.mPresenter = new WeatherFragPresenterImpl(this);
+        return mPresenter;
+    }
+
+    @Override
+    public void showWeather(List<Forecast> forecastList) {
+        if (forecastList != null && !forecastList.isEmpty()) {
+            Forecast forecastToday = forecastList.get(0);
             String weatherText = forecastToday.getText();
             temp1.setText(forecastToday.getLow());
             temp2.setText(forecastToday.getHigh());
             weather_text.setText(weatherText);
             cal_date.setText(forecastToday.getDate().substring(0, 6));
 
-//            WeatherActivity.toolbar.setSubtitle(selectCity.getCity_name());
-
-
             forecast_info_container.setVisibility(View.VISIBLE);
             forecast_now_container.setVisibility(View.VISIBLE);
 
-
             showWeatherPic(weatherText);
-        } else {
-//            Snackbar.make(WeatherActivity.fab, mContext.getString(R.string.error_network), Snackbar.LENGTH_LONG).show();
-
-
         }
+    }
+
+    @Override
+    public void showForecastInfo(ForecastInfo info) {
+        if (info != null) {
+            sunrise.setText(info.getSunrise());
+            sunset.setText(info.getSunset());
+            wind_direction.setText(getWindDirection(Integer.valueOf(info.getWindDirection())));
+            wind_speed.setText(info.getWindSpeed() + " km/h");
+            temp_now.setText(info.getTemp());
+            date.setText(info.getDate().substring(16, 22));
+            refresh_time.setText(getString(R.string.refersh_time) + "\n" + info.getLastBuildDate().substring(17, 22));
+            link = info.getLink();
+        }
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        this.view = super.onCreateView(inflater, container, savedInstanceState);
+
+
+        initView();
+        return this.view;
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.check_source:
+                if (hasPresenter())
+                    mPresenter.checkForecastSource(this.link, getContext());
+                break;
+        }
+    }
+
+    private void initView() {
+
+        nestedScrollView = (NestedScrollView) view.findViewById(R.id.nscrollView);
+        date = (TextView) view.findViewById(R.id.public_data);
+        temp_now = (TextView) view.findViewById(R.id.temp_now);
+        temp1 = (TextView) view.findViewById(R.id.temp1);
+        temp2 = (TextView) view.findViewById(R.id.temp2);
+        weather_text = (TextView) view.findViewById(R.id.weather_text);
+        cal_date = (TextView) view.findViewById(R.id.date_textview);
+        weatherPic = (ImageView) view.findViewById(R.id.weather_pic);
+        wind_speed = (TextView) view.findViewById(R.id.wind_speed);
+        wind_direction = (TextView) view.findViewById(R.id.wind_direction);
+        sunrise = (TextView) view.findViewById(R.id.sunrise);
+        sunset = (TextView) view.findViewById(R.id.sunset);
+        refresh_time = (TextView) view.findViewById(R.id.refresh_time);
+        check = (Button) view.findViewById(R.id.check_source);
+        check.setOnClickListener(this);
+        forecast_now_container = (RelativeLayout) view.findViewById(R.id.weather_now_container);
+        forecast_info_container = (LinearLayout) view.findViewById(R.id.weather_info_container);
+        backgroundPictureView = (BackgroundPictureView) view.findViewById(R.id.today_background);
+
+
+        backgroundPictureView.addOnBackgroundPicClickListener(new BackgroundPictureView.OnBackgroundPicClickListener() {
+            @Override
+            public void OnClickClickPic(ImageView pic) {
+                if (hasPresenter())
+                    mPresenter.onClickBackgroundPic(pic);
+            }
+
+            @Override
+            public void initBackgroundPic(ImageView pic) {
+                if (hasPresenter())
+                    mPresenter.initBackgroundPic(pic);
+
+            }
+        });
+
+        forecast_now_container.setVisibility(View.INVISIBLE);
+        forecast_info_container.setVisibility(View.INVISIBLE);
 
     }
 
 
     private void showWeatherPic(String info) {
-        /*Glide.with(mContext).load("http://s.tu.ihuan.me/bgc/" + DateUtil.getDate("yy-MM-dd") + ".png")
-                .placeholder(R.drawable.back).into(today_background);*/
-
         if (info.contains("Thunderstorms")) {
             weatherPic.setImageResource(R.drawable.thunderstorm);
         } else if (info.contains("Cloudy")) {
@@ -133,77 +204,7 @@ public class WeatherFragment extends Fragment implements View.OnClickListener {
         } else {
             weatherPic.setImageResource(R.drawable.sun);
         }
-
-
     }
-
-    public void showForecastInfo(ForecastInfo info) {
-
-
-        if (info != null) {
-            sunrise.setText(info.getSunrise());
-            sunset.setText(info.getSunset());
-            wind_direction.setText(getWindDirection(Integer.valueOf(info.getWindDirection())));
-            wind_speed.setText(info.getWindSpeed() + " km/h");
-            temp_now.setText(info.getTemp());
-            date.setText(info.getDate().substring(16, 22));
-            refresh_time.setText(getString(R.string.refersh_time) + "\n" + info.getLastBuildDate().substring(17, 22));
-            link = info.getLink();
-        }
-
-
-    }
-
-    private void initView() {
-        date = (TextView) view.findViewById(R.id.public_data);
-        temp_now = (TextView) view.findViewById(R.id.temp_now);
-        temp1 = (TextView) view.findViewById(R.id.temp1);
-        temp2 = (TextView) view.findViewById(R.id.temp2);
-        weather_text = (TextView) view.findViewById(R.id.weather_text);
-        cal_date = (TextView) view.findViewById(R.id.date_textview);
-        weatherPic = (ImageView) view.findViewById(R.id.weather_pic);
-        wind_speed = (TextView) view.findViewById(R.id.wind_speed);
-        wind_direction = (TextView) view.findViewById(R.id.wind_direction);
-        sunrise = (TextView) view.findViewById(R.id.sunrise);
-        sunset = (TextView) view.findViewById(R.id.sunset);
-//        today_background = (ImageView) view.findViewById(R.id.today_background);
-        refresh_time = (TextView) view.findViewById(R.id.refresh_time);
-        check = (Button) view.findViewById(R.id.check_source);
-        check.setOnClickListener(this);
-        forecast_now_container = (RelativeLayout) view.findViewById(R.id.weather_now_container);
-        forecast_info_container = (LinearLayout) view.findViewById(R.id.weather_info_container);
-        backgroundPictureView = (BackgroundPictureView) view.findViewById(R.id.today_background);
-
-
-        backgroundPictureView.addOnBackgroundPicClickListener(new BackgroundPictureView.OnBackgroundPicClickListener() {
-            @Override
-            public void OnClickClickPic(ImageView pic) {
-//                int from = DateUtil.getDatePart(Calendar.DAY_OF_MONTH, 0);
-                int i = getRandomNum(7, 17);
-                loadPicture(DateUtil.getDate("yy-MM-dd", i), pic);
-            }
-
-            @Override
-            public void initBackgroundPic(ImageView pic) {
-                LogUtil.v(this.toString(), "initBackgroundPic()");
-                loadPicture(DateUtil.getDate("yy-MM-dd"), pic);
-            }
-        });
-
-        forecast_now_container.setVisibility(View.INVISIBLE);
-        forecast_info_container.setVisibility(View.INVISIBLE);
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.check_source:
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse(link));
-                startActivity(intent);
-        }
-    }
-
 
     private String getWindDirection(int num) {
         if (num > 0 && num < 90) {
@@ -218,19 +219,13 @@ public class WeatherFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-
-    private int getRandomNum(int from, int to) {
-        Random random = new Random();
-        return (random.nextInt(to - from) + from);
+    @Override
+    public void scrollToTop() {
+        if (nestedScrollView != null) {
+//            nestedScrollView.scrollTo(0, 0);
+            nestedScrollView.smoothScrollTo(0, 0);
+        }
     }
 
-    private void loadPicture(String s, ImageView imageView) {
-        Glide.with(mContext).load("http://s.tu.ihuan.me/bgc/" + s + ".png")
-                .placeholder(R.drawable.back)
-                .into(imageView);
-    }
 
 }
-
-
-

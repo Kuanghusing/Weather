@@ -1,7 +1,7 @@
 package com.kuahusg.weather.Presenter.interfaceOfPresenter;
 
 import com.kuahusg.weather.Presenter.base.IBasePresenter;
-import com.kuahusg.weather.model.City;
+import com.kuahusg.weather.model.bean.City;
 
 /**
  * Created by kuahusg on 16-9-27.

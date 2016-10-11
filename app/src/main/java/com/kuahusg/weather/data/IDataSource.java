@@ -3,8 +3,8 @@ package com.kuahusg.weather.data;
 import com.kuahusg.weather.data.callback.RequestCityCallback;
 import com.kuahusg.weather.data.callback.RequestCityResultCallback;
 import com.kuahusg.weather.data.callback.RequestWeatherCallback;
-import com.kuahusg.weather.model.Forecast;
-import com.kuahusg.weather.model.ForecastInfo;
+import com.kuahusg.weather.model.bean.Forecast;
+import com.kuahusg.weather.model.bean.ForecastInfo;
 
 import java.util.List;
 

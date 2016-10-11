@@ -9,9 +9,9 @@ import android.util.Log;
 import com.kuahusg.weather.App;
 import com.kuahusg.weather.data.callback.RequestCityCallback;
 import com.kuahusg.weather.data.callback.RequestWeatherCallback;
-import com.kuahusg.weather.model.City;
-import com.kuahusg.weather.model.Forecast;
-import com.kuahusg.weather.model.ForecastInfo;
+import com.kuahusg.weather.model.bean.City;
+import com.kuahusg.weather.model.bean.Forecast;
+import com.kuahusg.weather.model.bean.ForecastInfo;
 import com.kuahusg.weather.util.LogUtil;
 import com.kuahusg.weather.util.NetwordUtil;
 

@@ -1,7 +1,7 @@
 package com.kuahusg.weather.data.remote;
 
-import com.kuahusg.weather.model.Data.CitySearchResult;
-import com.kuahusg.weather.model.Data.WeatherResult;
+import com.kuahusg.weather.model.bean.CitySearchResult;
+import com.kuahusg.weather.model.bean.WeatherResult;
 
 import java.util.List;
 

@@ -1,240 +1,193 @@
 package com.kuahusg.weather.UI.activities;
 
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
+import com.kuahusg.weather.Presenter.SelectLocationPresenterImpl;
+import com.kuahusg.weather.Presenter.base.IBasePresenter;
+import com.kuahusg.weather.Presenter.interfaceOfPresenter.ISelectLocationPresenter;
 import com.kuahusg.weather.R;
-import com.kuahusg.weather.model.City;
-import com.kuahusg.weather.model.db.WeatherDB;
-import com.kuahusg.weather.util.CityUtil;
+import com.kuahusg.weather.UI.base.BaseActivity;
+import com.kuahusg.weather.UI.interfaceOfView.ISelectLocationView;
+import com.kuahusg.weather.model.bean.City;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by kuahusg on 16-4-30.
+ * Created by kuahusg on 16-9-27.
  */
-public class SelectLocationActivity extends AppCompatActivity implements CityUtil.SolveCityCallback, CityUtil.QueryCityCallback {
-    private AutoCompleteTextView editText;
-    private ArrayAdapter<String> autoCompleteTextAdapter;
-    private ListView cityListView;
-    private List<String> cityNameList;
+
+public class SelectLocationActivity extends BaseActivity implements ISelectLocationView, View.OnClickListener, ListView.OnItemClickListener {
+    private ISelectLocationPresenter mPresenter;
+
+    private AutoCompleteTextView mAutoCpTv;
+    private ArrayAdapter<String> mAutoCpTvAdapter;
+    private ListView mLvCitySearchResult;
+    private ArrayAdapter<String> mCitySearchResultAdapter;
+    private ProgressDialog mPgd;
+    private Button mBtnSearch;
+    private Toolbar mToolbar;
+
+    private List<String> searchResultNameOfCitys;
     private List<City> searchResultCityList;
-    private ArrayAdapter<String> adapter;
-    private static ProgressDialog progressDialog;
-    private static List<String> cityListFromDataBase = new ArrayList<>();
-    private Context mContext;
+    private List<String> cityListFromDataBase;
 
-    private Button queryButton;
-    private Toolbar toolbar;
-    private boolean isFromWeatherActivity;
-    private WeatherDB db;
-    private String selectCity;
-    private boolean hasLoadAllCity;
 
+    @Override
+    protected IBasePresenter setPresenter() {
+        this.mPresenter = new SelectLocationPresenterImpl(this);
+        return mPresenter;
+    }
+
+    @Override
+    protected int setLayoutId() {
+        return R.layout.activity_select_location;
+    }
+
+    @Override
+    public void init() {
+
+    }
+
+    @Override
+    public void start() {
+
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        initView();
+        if (hasPresenter())
+            mPresenter.init();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (hasPresenter())
+            mPresenter.start();
+    }
 
     @Override
     public void queryCityError(String message) {
+        Snackbar.make(mBtnSearch, message, Snackbar.LENGTH_SHORT)
+                .setAction(getString(R.string.retry), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (hasPresenter())
+                            mPresenter.onClickQueryButton(mAutoCpTv.getText().toString());
 
-        Toast.makeText(SelectLocationActivity.this, message, Toast.LENGTH_SHORT).show();
-        dismissProgress();
+                    }
+                })
+                .show();
     }
 
     @Override
-    public void solveCity(List<String> list) {
-
+    public void finishQueryCity(List<City> list) {
         dismissProgress();
-        allCityLoadFinish(list);
-
-        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(SelectLocationActivity.this).edit();
-        editor.putBoolean("hasLoadAllCity", true);
-        editor.apply();
-    }
-
-    @Override
-    public void solveCityError(String message) {
-
-        Snackbar.make(cityListView, message, Snackbar.LENGTH_LONG).show();
-        dismissProgress();
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_select_location);
-
-        isFromWeatherActivity = getIntent().getBooleanExtra("isFromWeatherActivity", false);
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        selectCity = sharedPreferences.getString("selectCity", "");
-        hasLoadAllCity = sharedPreferences.getBoolean("hasLoadAllCity", false);
-
-
-        if (!isFromWeatherActivity && !TextUtils.isEmpty(selectCity)) {
-            Intent intent = new Intent(SelectLocationActivity.this, WeatherActivity.class);
-            startActivity(intent);
-            finish();
-            return;
+        this.searchResultCityList = list;
+        searchResultNameOfCitys.clear();
+        for (City city :
+                list) {
+            searchResultNameOfCitys.add(city.getFullNmae());
         }
-
-        initView();
+        mCitySearchResultAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void loadAllCityFinish(List<String> cityList) {
+        dismissProgress();
+        cityListFromDataBase.clear();
+        cityListFromDataBase.addAll(cityList);
+        mAutoCpTvAdapter.notifyDataSetChanged();
+
+    }
+
+    @Override
+    public void error(String message) {
+
+    }
+
+    @Override
+    public void startLoadingData(boolean canCancelPgb) {
+
+        showProgress(canCancelPgb);
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.query_button) {
+            showProgress(true);
+            if (hasPresenter())
+                mPresenter.onClickQueryButton(mAutoCpTv.getText().toString());
+
+        }
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        if (hasPresenter())
+            mPresenter.onClickResultCityItem(searchResultCityList.get(i), SelectLocationActivity.this);
+
+    }
 
     private void initView() {
-        db = WeatherDB.getInstance(this);
-        mContext = getApplicationContext();
+        cityListFromDataBase = new ArrayList<>();
+        searchResultNameOfCitys = new ArrayList<>();
+        searchResultCityList = new ArrayList<>();
 
-
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
         ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
+        actionBar.setDisplayHomeAsUpEnabled(false);
+        actionBar.setIcon(R.mipmap.ic_launcher);
 
-        queryButton = (Button) findViewById(R.id.query_button);
-        editText = (AutoCompleteTextView) findViewById(R.id.city_editText);
-        cityListView = (ListView) findViewById(R.id.city_list);
+        mBtnSearch = (Button) findViewById(R.id.query_button);
+        mBtnSearch.setOnClickListener(this);
+        mAutoCpTv = (AutoCompleteTextView) findViewById(R.id.city_editText);
+        mLvCitySearchResult = (ListView) findViewById(R.id.city_list);
+        mLvCitySearchResult.setOnItemClickListener(this);
 
-        if (!isFromWeatherActivity && actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(false);
-            actionBar.setIcon(R.mipmap.ic_launcher);
-        }
+        mCitySearchResultAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, searchResultNameOfCitys);
+        mLvCitySearchResult.setAdapter(mCitySearchResultAdapter);
 
-
-        cityNameList = new ArrayList<>();
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, cityNameList);
-        if (cityListView != null) {
-            cityListView.setAdapter(adapter);
-        }
-
-
-        autoCompleteTextAdapter = new ArrayAdapter<>(SelectLocationActivity.this, android.R.layout.simple_list_item_1, cityListFromDataBase);
-        editText.setAdapter(autoCompleteTextAdapter);
-
-
-        /**
-         * load the all the cities list from server
-         */
-
-
-        List<String> loadCity = WeatherDB.loadCity();
-
-        if (!hasLoadAllCity || loadCity.size() <= 0) {
-            showProgress(false);
-            CityUtil.handleCityList(this, this);
-        } else {
-            allCityLoadFinish(loadCity);
-
-        }
-
-
-        queryButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String cityName;
-                if (!TextUtils.isEmpty(editText.getText().toString())) {
-                    showProgress(true);
-                    cityName = editText.getText().toString();
-                    CityUtil.queryCity(cityName, mContext, SelectLocationActivity.this);
-                }
-            }
-        });
-
-
-        cityListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(SelectLocationActivity.this, WeatherActivity.class);
-                City city = searchResultCityList.get(position);
-                if (city != null) {
-                    intent.putExtra("selectCity", city);
-                    if (isFromWeatherActivity)
-                        intent.putExtra("anotherCity", true);
-                    startActivity(intent);
-                    finish();
-
-                }
-
-            }
-        });
-    }
-
-    public void allCityLoadFinish(List<String> loadCity) {
-
-        cityListFromDataBase.clear();
-        cityListFromDataBase.addAll(loadCity);
-        autoCompleteTextAdapter.notifyDataSetChanged();
+        mAutoCpTvAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, cityListFromDataBase);
+        mAutoCpTv.setAdapter(mAutoCpTvAdapter);
     }
 
 
-    @Override
-    public void queryCityFinish(List<City> cityList) {
-        dismissProgress();
-        this.cityNameList.clear();
-        this.searchResultCityList = cityList;
-        for (City city :
-                cityList) {
-            this.cityNameList.add(city.getFullNmae());
-        }
-        if (this.cityNameList.size() > 0) {
-            adapter.notifyDataSetChanged();
-            cityListView.setSelection(0);
-        }
-    }
+    private void showProgress(boolean cancelable) {
 
-
-    public static void dismissProgress() {
-        if (progressDialog.isShowing())
-            progressDialog.dismiss();
-    }
-    public void showProgress(boolean cancelable) {
         if (!this.isFinishing()) {
-            if (progressDialog == null)
-                progressDialog = new ProgressDialog(this);
-            progressDialog.setMessage("loading");
-            progressDialog.setCancelable(cancelable);
-            try {
-                progressDialog.show();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            if (mPgd == null)
+                mPgd = new ProgressDialog(this);
+            mPgd.setMessage("loading");
+            mPgd.setCancelable(cancelable);
+            // TODO: 16-9-29 ??
+//            try {
+            mPgd.show();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                Intent intent = new Intent(SelectLocationActivity.this, WeatherActivity.class);
-                startActivity(intent);
-                finish();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (isFromWeatherActivity) {
-            Intent intent = new Intent(SelectLocationActivity.this, WeatherActivity.class);
-            startActivity(intent);
-            finish();
-        }
-        super.onBackPressed();
-
+    private void dismissProgress() {
+        if (mPgd != null && mPgd.isShowing())
+            mPgd.dismiss();
     }
 }

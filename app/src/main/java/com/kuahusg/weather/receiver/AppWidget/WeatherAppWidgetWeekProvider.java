@@ -7,10 +7,10 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 
 import com.kuahusg.weather.R;
-import com.kuahusg.weather.UI.activities.rebuild.WeatherMainActivity;
+import com.kuahusg.weather.UI.activities.WeatherMainActivity;
 import com.kuahusg.weather.data.callback.RequestWeatherCallback;
-import com.kuahusg.weather.model.Forecast;
-import com.kuahusg.weather.model.ForecastInfo;
+import com.kuahusg.weather.model.bean.Forecast;
+import com.kuahusg.weather.model.bean.ForecastInfo;
 import com.kuahusg.weather.util.PreferenceUtil;
 
 import java.util.List;

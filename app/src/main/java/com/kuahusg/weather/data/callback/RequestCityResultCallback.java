@@ -1,6 +1,6 @@
 package com.kuahusg.weather.data.callback;
 
-import com.kuahusg.weather.model.City;
+import com.kuahusg.weather.model.bean.City;
 
 import java.util.List;
 

@@ -8,11 +8,11 @@ import com.kuahusg.weather.data.IDataSource;
 import com.kuahusg.weather.data.callback.RequestCityCallback;
 import com.kuahusg.weather.data.callback.RequestCityResultCallback;
 import com.kuahusg.weather.data.callback.RequestWeatherCallback;
-import com.kuahusg.weather.model.City;
-import com.kuahusg.weather.model.Data.CitySearchResult;
-import com.kuahusg.weather.model.Data.WeatherResult;
-import com.kuahusg.weather.model.Forecast;
-import com.kuahusg.weather.model.ForecastInfo;
+import com.kuahusg.weather.model.bean.City;
+import com.kuahusg.weather.model.bean.CitySearchResult;
+import com.kuahusg.weather.model.bean.Forecast;
+import com.kuahusg.weather.model.bean.ForecastInfo;
+import com.kuahusg.weather.model.bean.WeatherResult;
 import com.kuahusg.weather.util.PreferenceUtil;
 
 import java.util.ArrayList;
