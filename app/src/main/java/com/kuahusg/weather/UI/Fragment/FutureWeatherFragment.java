@@ -5,10 +5,14 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -34,6 +38,8 @@ public class FutureWeatherFragment extends BaseFragment implements IFutureWeathe
 
     private View view;
     private RecyclerView mRvForecastList;
+    private LinearLayout mLayoutMessage;
+    private TextView mTvMessage;
 
     private RvAdapter mRvAdapter;
 
@@ -54,7 +60,7 @@ public class FutureWeatherFragment extends BaseFragment implements IFutureWeathe
 
     @Override
     public void init() {
-
+        showMessage(true, getString(R.string.loading));
     }
 
     @Override
@@ -64,7 +70,8 @@ public class FutureWeatherFragment extends BaseFragment implements IFutureWeathe
 
     @Override
     public void error(String message) {
-
+        if (mRvAdapter != null && !mRvAdapter.hasData())
+            showMessage(true, message);
     }
 
     @Override
@@ -74,6 +81,7 @@ public class FutureWeatherFragment extends BaseFragment implements IFutureWeathe
 
     @Override
     public void showForecast(List<Forecast> forecastList) {
+        showMessage(false, null);
 
         if (mRvAdapter != null) {
             mRvAdapter.setData(forecastList);
@@ -87,7 +95,8 @@ public class FutureWeatherFragment extends BaseFragment implements IFutureWeathe
         view = super.onCreateView(inflater, container, savedInstanceState);
 
         initView();
-
+        if (hasPresenter())
+            mPresenter.init();
         return view;
     }
 
@@ -101,14 +110,26 @@ public class FutureWeatherFragment extends BaseFragment implements IFutureWeathe
 
     private void initView() {
 
+        mTvMessage = (TextView) view.findViewById(R.id.tv_message);
+        mLayoutMessage = (LinearLayout) view.findViewById(R.id.layout_message);
+
         mRvAdapter = new RvAdapter(null);
         mRvForecastList = (RecyclerView) view.findViewById(R.id.rv_forecast_info_list);
         mRvForecastList.setLayoutManager(new LinearLayoutManager(getContext()));
         mRvForecastList.setItemAnimator(new DefaultItemAnimator());
+        mRvForecastList.setHasFixedSize(true);
         mRvForecastList.setAdapter(mRvAdapter);
 
     }
 
+    private void showMessage(boolean show, String message) {
+        if (!show && mLayoutMessage.getVisibility() == View.VISIBLE) {
+            mLayoutMessage.setVisibility(View.GONE);
+        } else {
+            mLayoutMessage.setVisibility(View.VISIBLE);
+            mTvMessage.setText(message);
+        }
+    }
 
     private class ViewHolder extends RecyclerView.ViewHolder {
         ImageView pic;
@@ -157,6 +178,7 @@ public class FutureWeatherFragment extends BaseFragment implements IFutureWeathe
         private TextView date;
         private ImageView background_img;
 
+
         public RvAdapter(List<Forecast> forecastList) {
             this.forecastList = forecastList;
         }
@@ -193,6 +215,9 @@ public class FutureWeatherFragment extends BaseFragment implements IFutureWeathe
             initImg(pic, info.getText().toString());
             Glide.with(getActivity()).load("http://s.tu.ihuan.me/bgc/" + date_string + ".png")
                     .placeholder(R.drawable.back).into(background_img);
+            Log.d(this.getClass().getSimpleName(), "currentPosition:" + holder.getAdapterPosition() + "oldPosition:" + holder.getOldPosition());
+//            if (holder.getAdapterPosition() > holder.getOldPosition())
+            showAnim(holder.itemView, R.anim.anmi_forecast_list);
         }
 
         @Override
@@ -203,6 +228,10 @@ public class FutureWeatherFragment extends BaseFragment implements IFutureWeathe
         public void setData(List<Forecast> forecastList) {
             this.forecastList = forecastList;
             notifyDataSetChanged();
+        }
+
+        public boolean hasData() {
+            return !(forecastList == null || forecastList.isEmpty());
         }
 
         private void initImg(ImageView img, String info) {
@@ -225,6 +254,11 @@ public class FutureWeatherFragment extends BaseFragment implements IFutureWeathe
                 img.setImageResource(R.drawable.sun);
             }
 
+        }
+
+        private void showAnim(View view, int animId) {
+            Animation animation = AnimationUtils.loadAnimation(getContext(), animId);
+            view.startAnimation(animation);
         }
     }
 }

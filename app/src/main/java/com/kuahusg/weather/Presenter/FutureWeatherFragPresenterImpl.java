@@ -21,6 +21,8 @@ public class FutureWeatherFragPresenterImpl extends BasePresenter implements IFu
     @Override
     public void init() {
         super.init();
+        if (hasView())
+            mView.init();
 
     }
 

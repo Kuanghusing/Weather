@@ -51,6 +51,7 @@ public class WeatherFragment extends BaseFragment implements IWeatherFragView, V
 
     private RelativeLayout forecast_now_container;
     private LinearLayout forecast_info_container;
+    private LinearLayout mLayoutWeatherInfo;
 
 
     @Override
@@ -94,8 +95,9 @@ public class WeatherFragment extends BaseFragment implements IWeatherFragView, V
             weather_text.setText(weatherText);
             cal_date.setText(forecastToday.getDate().substring(0, 6));
 
-            forecast_info_container.setVisibility(View.VISIBLE);
-            forecast_now_container.setVisibility(View.VISIBLE);
+/*            forecast_info_container.setVisibility(View.VISIBLE);
+            forecast_now_container.setVisibility(View.VISIBLE);*/
+            mLayoutWeatherInfo.setVisibility(View.VISIBLE);
 
             showWeatherPic(weatherText);
         }
@@ -162,8 +164,9 @@ public class WeatherFragment extends BaseFragment implements IWeatherFragView, V
         refresh_time = (TextView) view.findViewById(R.id.refresh_time);
         check = (Button) view.findViewById(R.id.check_source);
         check.setOnClickListener(this);
-        forecast_now_container = (RelativeLayout) view.findViewById(R.id.weather_now_container);
-        forecast_info_container = (LinearLayout) view.findViewById(R.id.weather_info_container);
+/*        forecast_now_container = (RelativeLayout) view.findViewById(R.id.weather_now_container);
+        forecast_info_container = (LinearLayout) view.findViewById(R.id.weather_info_container);*/
+        mLayoutWeatherInfo = (LinearLayout) view.findViewById(R.id.layout_weather_info);
         backgroundPictureView = (BackgroundPictureView) view.findViewById(R.id.today_background);
 
 
@@ -182,8 +185,9 @@ public class WeatherFragment extends BaseFragment implements IWeatherFragView, V
             }
         });
 
-        forecast_now_container.setVisibility(View.INVISIBLE);
-        forecast_info_container.setVisibility(View.INVISIBLE);
+/*        forecast_now_container.setVisibility(View.INVISIBLE);
+        forecast_info_container.setVisibility(View.INVISIBLE);*/
+        mLayoutWeatherInfo.setVisibility(View.GONE);
 
     }
 

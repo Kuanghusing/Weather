@@ -164,6 +164,7 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
     @Override
     public void loadWeatherError(String message) {
         mSwipeRefreshLayout.setRefreshing(false);
+        mFutureWeatherFragment.error(message);
         Snackbar snackbar = Snackbar.make(fab, message, Snackbar.LENGTH_LONG);
         snackbar.setAction(getString(R.string.retry), new View.OnClickListener() {
             @Override
