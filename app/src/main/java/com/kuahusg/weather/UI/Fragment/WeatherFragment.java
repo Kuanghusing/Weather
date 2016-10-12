@@ -6,6 +6,8 @@ import android.support.v4.widget.NestedScrollView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -15,8 +17,10 @@ import android.widget.TextView;
 import com.kuahusg.weather.Presenter.WeatherFragPresenterImpl;
 import com.kuahusg.weather.Presenter.base.IBasePresenter;
 import com.kuahusg.weather.Presenter.interfaceOfPresenter.IWeatherMainFragPresenter;
+import com.kuahusg.weather.Presenter.interfaceOfPresenter.IWeatherViewPresenter;
 import com.kuahusg.weather.R;
 import com.kuahusg.weather.UI.Widget.BackgroundPictureView;
+import com.kuahusg.weather.UI.base.BaseActivity;
 import com.kuahusg.weather.UI.base.BaseFragment;
 import com.kuahusg.weather.UI.interfaceOfView.IWeatherFragView;
 import com.kuahusg.weather.model.bean.Forecast;
@@ -31,7 +35,6 @@ import java.util.List;
 public class WeatherFragment extends BaseFragment implements IWeatherFragView, View.OnClickListener {
     private IWeatherMainFragPresenter mPresenter;
 
-    private NestedScrollView nestedScrollView;
     private View view;
     private TextView date;
     private TextView temp_now;
@@ -47,11 +50,15 @@ public class WeatherFragment extends BaseFragment implements IWeatherFragView, V
     private Button check;
     private String link;
     private TextView refresh_time;
+    private TextView mTvMessage;
     private BackgroundPictureView backgroundPictureView;
 
     private RelativeLayout forecast_now_container;
     private LinearLayout forecast_info_container;
     private LinearLayout mLayoutWeatherInfo;
+    private LinearLayout mLayoutMessage;
+    private NestedScrollView nestedScrollView;
+    private boolean messageShowed = false;
 
 
     @Override
@@ -61,7 +68,7 @@ public class WeatherFragment extends BaseFragment implements IWeatherFragView, V
 
     @Override
     public void init() {
-
+        showMessage(true, getString(R.string.loading));
     }
 
     @Override
@@ -71,6 +78,7 @@ public class WeatherFragment extends BaseFragment implements IWeatherFragView, V
 
     @Override
     public void error(String message) {
+        showMessage(true, message);
 
     }
 
@@ -97,9 +105,17 @@ public class WeatherFragment extends BaseFragment implements IWeatherFragView, V
 
 /*            forecast_info_container.setVisibility(View.VISIBLE);
             forecast_now_container.setVisibility(View.VISIBLE);*/
-            mLayoutWeatherInfo.setVisibility(View.VISIBLE);
+//            mLayoutWeatherInfo.setVisibility(View.VISIBLE);
 
             showWeatherPic(weatherText);
+
+            nestedScrollView.setVisibility(View.VISIBLE);
+            showMessage(false, null);
+            messageShowed = true;
+            Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.anim_weather_main);
+            nestedScrollView.startAnimation(animation);
+
+
         }
     }
 
@@ -114,6 +130,10 @@ public class WeatherFragment extends BaseFragment implements IWeatherFragView, V
             date.setText(info.getDate().substring(16, 22));
             refresh_time.setText(getString(R.string.refersh_time) + "\n" + info.getLastBuildDate().substring(17, 22));
             link = info.getLink();
+
+            nestedScrollView.setVisibility(View.VISIBLE);
+            showMessage(false, null);
+            messageShowed = true;
         }
     }
 
@@ -134,6 +154,10 @@ public class WeatherFragment extends BaseFragment implements IWeatherFragView, V
 
 
         initView();
+
+        if (hasPresenter())
+            mPresenter.init();
+
         return this.view;
     }
 
@@ -143,6 +167,12 @@ public class WeatherFragment extends BaseFragment implements IWeatherFragView, V
             case R.id.check_source:
                 if (hasPresenter())
                     mPresenter.checkForecastSource(this.link, getContext());
+                break;
+            case R.id.layout_message:
+                BaseActivity view1 = (BaseActivity) getActivity();
+                IWeatherViewPresenter presenter = null;
+                presenter = (IWeatherViewPresenter) view1.getPresenter();
+                presenter.refreshWeather();
                 break;
         }
     }
@@ -162,11 +192,14 @@ public class WeatherFragment extends BaseFragment implements IWeatherFragView, V
         sunrise = (TextView) view.findViewById(R.id.sunrise);
         sunset = (TextView) view.findViewById(R.id.sunset);
         refresh_time = (TextView) view.findViewById(R.id.refresh_time);
+        mTvMessage = (TextView) view.findViewById(R.id.tv_message);
+        mTvMessage.setText(getString(R.string.loading));
         check = (Button) view.findViewById(R.id.check_source);
         check.setOnClickListener(this);
 /*        forecast_now_container = (RelativeLayout) view.findViewById(R.id.weather_now_container);
         forecast_info_container = (LinearLayout) view.findViewById(R.id.weather_info_container);*/
         mLayoutWeatherInfo = (LinearLayout) view.findViewById(R.id.layout_weather_info);
+        mLayoutMessage = (LinearLayout) view.findViewById(R.id.layout_message);
         backgroundPictureView = (BackgroundPictureView) view.findViewById(R.id.today_background);
 
 
@@ -187,10 +220,26 @@ public class WeatherFragment extends BaseFragment implements IWeatherFragView, V
 
 /*        forecast_now_container.setVisibility(View.INVISIBLE);
         forecast_info_container.setVisibility(View.INVISIBLE);*/
-        mLayoutWeatherInfo.setVisibility(View.GONE);
+//        mLayoutWeatherInfo.setVisibility(View.GONE);
+        mLayoutMessage.setVisibility(View.VISIBLE);
+        nestedScrollView.setVisibility(View.INVISIBLE);
+
+        mLayoutMessage.setOnClickListener(this);
 
     }
 
+    private void showMessage(boolean show, String message) {
+        if (messageShowed)
+            return;
+        if (!this.isResumed())
+            return;
+        if (!show && mLayoutMessage.getVisibility() == View.VISIBLE) {
+            mLayoutMessage.setVisibility(View.GONE);
+        } else {
+            mLayoutMessage.setVisibility(View.VISIBLE);
+            mTvMessage.setText(message);
+        }
+    }
 
     private void showWeatherPic(String info) {
         if (info.contains("Thunderstorms")) {

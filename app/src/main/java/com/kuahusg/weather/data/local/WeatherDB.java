@@ -9,11 +9,10 @@ import android.util.Log;
 import com.kuahusg.weather.App;
 import com.kuahusg.weather.data.callback.RequestCityCallback;
 import com.kuahusg.weather.data.callback.RequestWeatherCallback;
-import com.kuahusg.weather.model.bean.City;
 import com.kuahusg.weather.model.bean.Forecast;
 import com.kuahusg.weather.model.bean.ForecastInfo;
 import com.kuahusg.weather.util.LogUtil;
-import com.kuahusg.weather.util.NetwordUtil;
+import com.kuahusg.weather.util.NetworkUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +27,7 @@ import static com.kuahusg.weather.data.local.WeatherOpenHelper.INFO_DB_NAME;
 
 public class WeatherDB {
     private static final int VERSION = 2;
-    private static String DB_NAME = "myWeatherDataBase";    //stupid name
+    private static String DB_NAME = "myWeatherDataBase";    //stupid name   ...
 
     private SQLiteDatabase db = new WeatherOpenHelper(App.getContext().getApplicationContext(), DB_NAME, null, VERSION).getWritableDatabase();
 
@@ -66,8 +65,7 @@ public class WeatherDB {
 
         try {
 
-            City city;
-            Cursor cursor = db.query("City", null, null, null, null, null, null);
+            Cursor cursor = db.query("city", null, null, null, null, null, null);
             if (cursor.moveToFirst()) {
                 while (cursor.moveToNext()) {
                     String city_name = cursor.getString(cursor.getColumnIndex("city_name"));
@@ -78,10 +76,14 @@ public class WeatherDB {
             cursor.close();
             LogUtil.v("WeatherDB", "loadCity finish!" + cityList.size());
         } catch (Exception e) {
+            e.printStackTrace();
             callback.error();
         }
 
-        callback.success(cityList);
+        if (cityList.size() > 0)
+            callback.success(cityList);
+        else
+            callback.error();
 
     }
 
@@ -89,12 +91,12 @@ public class WeatherDB {
     public static void saveForecastAndInfo(List<Forecast> forecasts, ForecastInfo info) {
         //data source: 这锅我不背
 
+        deleteTable("Forecast");
+        deleteTable("info");
         SQLiteDatabase db = InstanceHolder.INSTANCE.db;
 
 
-//        deleteTable("Forecast");
 
-        boolean flag = false;
         if (forecasts != null) {
             db.beginTransaction();
             try {
@@ -110,7 +112,6 @@ public class WeatherDB {
                 }
                 db.setTransactionSuccessful();
             } catch (SQLException e) {
-//                db.endTransaction();
                 Log.e("WeatherDB", e.getMessage());
             } finally {
                 db.endTransaction();
@@ -211,7 +212,7 @@ public class WeatherDB {
 
     }
 
-    public static boolean deleteTable(String table) {
+    private static boolean deleteTable(String table) {
         SQLiteDatabase db = InstanceHolder.INSTANCE.db;
 
         try {
@@ -221,7 +222,7 @@ public class WeatherDB {
             e.printStackTrace();
 
         } finally {
-            if (NetwordUtil.hasNetwork(App.getContext())) {
+            if (NetworkUtil.hasNetwork(App.getContext())) {
                 db.setTransactionSuccessful();
                 db.endTransaction();
             } else {

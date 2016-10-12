@@ -33,6 +33,8 @@ public class WeatherFragPresenterImpl extends BasePresenter implements IWeatherM
     @Override
     public void init() {
         super.init();
+        if (hasView())
+            mView.init();
     }
 
     @Override
@@ -71,6 +73,7 @@ public class WeatherFragPresenterImpl extends BasePresenter implements IWeatherM
     private void loadPicture(String s, ImageView imageView) {
         Glide.with(imageView.getContext()).load("http://s.tu.ihuan.me/bgc/" + s + ".png")
                 .placeholder(R.drawable.back)
+                .fitCenter()
                 .into(imageView);
     }
 

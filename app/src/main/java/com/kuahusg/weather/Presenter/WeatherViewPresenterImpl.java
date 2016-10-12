@@ -47,7 +47,6 @@ public class WeatherViewPresenterImpl extends BasePresenter implements IWeatherV
 
         super.init();
         shouldGotoSelectLocationActivity();
-        setToolbarSubTitle();
 
 
     }
@@ -59,6 +58,7 @@ public class WeatherViewPresenterImpl extends BasePresenter implements IWeatherV
 
     @Override
     public void start() {
+        setToolbarSubTitle();
         //get data
         refreshWeather();
 

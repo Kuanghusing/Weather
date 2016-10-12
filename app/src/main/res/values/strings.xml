@@ -2,7 +2,7 @@
     <string name="app_name">晴·天气</string>
     <string name="search_hint">输入城市名称</string>
     <string name="query_bottom">查询</string>
-    <string name="loading">加载中</string>
+    <string name="loading">加载中 请销等……</string>
     <string name="no_result">好像没有结果……</string>
     <string name="switch_city">切换城市</string>
     <string name="yes">是</string>
@@ -31,11 +31,11 @@
     <string name="more">More</string>
     <string name="no_network">网络出错了……</string>
     <string name="error_network">载入失败</string>
-    <string name="about_text">晴·天气是我的第一个作品，仅实现简单的天气显示功能，用于学习网络协议，多线程编程，和Material Design，虽然还是一个初成品的样子…… 创作过程虽然艰辛，但我从中学到了很多知识，感谢大谷歌!</string>
+    <string name="about_text">\n晴·天气是一个简单的天气App，纯个人项目，只用于学习用途，本App用到的雅虎天气接口和各个开源库都在合理范围内，你可以随时从Github上查看源代码，谢谢你的支持\n</string>
     <string name="open_source">Github</string>
     <string name="open_source_text">https://github.com/Kuanghusing/Weather</string>
     <string name="somthing">感谢以下开源项目</string>
-    <string name="somthing_text">· Google Support Library\n· Glide - github.com/bumptech/glide \n· Gson - github.com/google/gson</string>
+    <string name="somthing_text">· Google Support Library\n\n· Glide - github.com/bumptech/glide \n\n· Gson - github.com/google/gson \n\n· Retrofit2 - square.github.io/retrofit</string>
 
 
 

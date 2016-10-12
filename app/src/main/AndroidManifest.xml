@@ -23,7 +23,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".UI.activities.SelectLocationActivity">
+        <activity
+            android:name=".UI.activities.SelectLocationActivity"
+            android:windowSoftInputMode="adjustPan">
 
         </activity>
         <activity android:name=".UI.activities.AboutMeActivity">

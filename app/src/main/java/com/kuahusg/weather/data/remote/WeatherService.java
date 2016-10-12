@@ -1,5 +1,6 @@
 package com.kuahusg.weather.data.remote;
 
+import com.kuahusg.weather.model.bean.AllCityResult;
 import com.kuahusg.weather.model.bean.CitySearchResult;
 import com.kuahusg.weather.model.bean.WeatherResult;
 
@@ -19,7 +20,7 @@ public interface WeatherService {
     Call<WeatherResult> queryWeather(@Query("q") String queryString, @Query("format") String format);
 
     @GET()
-    Call<List<String>> queryAllMainCity(@Url String url);
+    Call<List<AllCityResult>> queryAllMainCity(@Url String url);
 
     @GET("/v1/public/yql")
     Call<CitySearchResult> queryCity(@Query("q") String queryString, @Query("format") String format);

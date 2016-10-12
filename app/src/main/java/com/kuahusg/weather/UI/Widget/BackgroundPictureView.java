@@ -15,6 +15,7 @@ import com.kuahusg.weather.util.LogUtil;
  * com.kuahusg.weather.UI
  */
 public class BackgroundPictureView extends LinearLayout implements View.OnClickListener {
+    // TODO: 16-10-12 这个View应该添加更多其他控件,并设计成可复用
     LinearLayout container;
     Context mContext;
     ImageView imageView;
@@ -40,6 +41,7 @@ public class BackgroundPictureView extends LinearLayout implements View.OnClickL
     private void init(Context context) {
         mContext = context;
         container = (LinearLayout) LayoutInflater.from(context).inflate(R.layout.include_background_picture, null);
+        // TODO: 16-10-12 null?
         imageView = (ImageView) container.findViewById(R.id.back_pic);
         addView(container);
 

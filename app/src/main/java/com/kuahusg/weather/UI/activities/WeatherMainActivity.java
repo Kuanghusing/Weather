@@ -20,7 +20,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -73,10 +72,10 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
         super.onCreate(savedInstanceState);
 
 
-        initView();
         if (hasPresenter()) {
             mPresenter.init();
         }
+        initView();
 
 
     }
@@ -154,6 +153,7 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
             City city = (City) bundle.get(BUNDLE_KEY_CITY_NAME);
 
             if (hasPresenter()) {
+                mSwipeRefreshLayout.setRefreshing(true);
                 mPresenter.refreshWeather(city);
                 mPresenter.selectCitySuccess(city);
             }
@@ -165,6 +165,8 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
     public void loadWeatherError(String message) {
         mSwipeRefreshLayout.setRefreshing(false);
         mFutureWeatherFragment.error(message);
+        mWeatherFragment.error(message);
+
         Snackbar snackbar = Snackbar.make(fab, message, Snackbar.LENGTH_LONG);
         snackbar.setAction(getString(R.string.retry), new View.OnClickListener() {
             @Override
@@ -221,14 +223,16 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
                 break;
             case R.id.change_btn:
 
-                showAlertDialog(this.getString(R.string.sure), this.getString(R.string.switch_city),
+/*                showAlertDialog(this.getString(R.string.sure), this.getString(R.string.switch_city),
                         this.getString(R.string.no), this.getString(R.string.yes), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 if (hasPresenter())
                                     mPresenter.goToSelectLocationActivity();
                             }
-                        });
+                        });*/
+                if (hasPresenter())
+                    mPresenter.goToSelectLocationActivity();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -251,6 +255,7 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
         }
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mToolbar.setOnClickListener(listener);
         setSupportActionBar(mToolbar);
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.main_container);
@@ -302,9 +307,17 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
 
         @Override
         public void onClick(View view) {
-            if (view.getId() == R.id.fab) {
-                mSwipeRefreshLayout.setRefreshing(true);
-                mPresenter.onClickFab();
+            switch (view.getId()) {
+                case R.id.fab:
+                    mSwipeRefreshLayout.setRefreshing(true);
+                    mPresenter.onClickFab();
+                    break;
+                case R.id.toolbar:
+                    if (mViewPager.getCurrentItem() == 0)
+                        mWeatherFragment.scrollToTop();
+                    else
+                        mFutureWeatherFragment.scrollToTop();
+                    break;
             }
         }
 
@@ -326,11 +339,11 @@ public class WeatherMainActivity extends BaseActivity implements IWeatherMainVie
         public void onPageScrollStateChanged(int state) {
             if (state == ViewPager.SCROLL_STATE_IDLE) {
                 mSwipeRefreshLayout.setEnabled(true);
-                Log.d(this.getClass().getSimpleName(), "item:" + mViewPager.getCurrentItem());
                 if (mViewPager.getCurrentItem() == 0) {
-                    mWeatherFragment.scrollToTop();
+//                    mWeatherFragment.scrollToTop();
+
                 } else if (mViewPager.getCurrentItem() == 1) {
-                    mFutureWeatherFragment.scrollToTop();
+//                    mFutureWeatherFragment.scrollToTop();
                 }
 
             } else {

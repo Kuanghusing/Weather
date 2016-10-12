@@ -1,5 +1,7 @@
 package com.kuahusg.weather.data;
 
+import android.util.Log;
+
 import com.kuahusg.weather.App;
 import com.kuahusg.weather.R;
 import com.kuahusg.weather.data.callback.RequestCityCallback;
@@ -7,7 +9,8 @@ import com.kuahusg.weather.data.callback.RequestCityResultCallback;
 import com.kuahusg.weather.data.callback.RequestWeatherCallback;
 import com.kuahusg.weather.model.bean.Forecast;
 import com.kuahusg.weather.model.bean.ForecastInfo;
-import com.kuahusg.weather.util.NetwordUtil;
+import com.kuahusg.weather.util.NetworkUtil;
+import com.kuahusg.weather.util.PreferenceUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +35,12 @@ public class WeatherDataSource implements IDataSource {
     }
     @Override
     public void queryWeather(final String woeid, final RequestWeatherCallback callback) {
+        Log.d(this.getClass().getSimpleName(), "woeid:" + PreferenceUtil.getWoeid());
+        if (PreferenceUtil.getWoeid() == null) {
+            return;
+        }
         clearWeatherCache();
-        if (NetwordUtil.hasNetwork(App.getContext()))
+        if (NetworkUtil.hasNetwork(App.getContext()))
 
             remote.queryWeather(woeid, new RequestWeatherCallback() {
                 @Override
@@ -73,7 +80,7 @@ public class WeatherDataSource implements IDataSource {
             local.loadAllCity(new RequestCityCallback() {
                 @Override
                 public void success(List<String> cityList) {
-                    saveAllCity(cityList);
+                    WeatherDataSource.this.saveAllCity(cityList);
 //                    local.saveAllCity(cityList);
                     cityCallback.success(cityList);
                 }

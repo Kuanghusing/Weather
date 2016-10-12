@@ -8,6 +8,7 @@ import com.kuahusg.weather.data.IDataSource;
 import com.kuahusg.weather.data.callback.RequestCityCallback;
 import com.kuahusg.weather.data.callback.RequestCityResultCallback;
 import com.kuahusg.weather.data.callback.RequestWeatherCallback;
+import com.kuahusg.weather.model.bean.AllCityResult;
 import com.kuahusg.weather.model.bean.City;
 import com.kuahusg.weather.model.bean.CitySearchResult;
 import com.kuahusg.weather.model.bean.Forecast;
@@ -44,18 +45,24 @@ public class RemoteForecastDataSource implements IDataSource {
     @Override
     public void loadAllCity(final RequestCityCallback cityCallback) {
         RetrofitManager.getWeatherService().queryAllMainCity(getAllMainCityUrl)
-                .enqueue(new Callback<List<String>>() {
+                .enqueue(new Callback<List<AllCityResult>>() {
                     @Override
-                    public void onResponse(Call<List<String>> call, Response<List<String>> response) {
-                        List<String> cityList = response.body();
-                        if (cityList != null && cityList.size() > 0) {
+                    public void onResponse(Call<List<AllCityResult>> call, Response<List<AllCityResult>> response) {
+                        List<AllCityResult> cityResults = response.body();
+                        List<String> cityList = new ArrayList<>();
+                        for (AllCityResult cityResult : cityResults) {
+                            cityList.add(formatCityName(cityResult.getName(), cityResult.getParent1(), cityResult.getParent2(), cityResult.getParent3()));
+
+                        }
+
+                        if (cityList.size() > 0) {
                             cityCallback.success(cityList);
                         } else
                             cityCallback.error();
                     }
 
                     @Override
-                    public void onFailure(Call<List<String>> call, Throwable t) {
+                    public void onFailure(Call<List<AllCityResult>> call, Throwable t) {
                         cityCallback.error();
                     }
                 });
@@ -171,6 +178,7 @@ public class RemoteForecastDataSource implements IDataSource {
                 } catch (Exception e) {
                     e.printStackTrace();
                     callback.error(App.getContext().getString(R.string.no_result));
+                    return;
 
                 }
                 fullName = new StringBuilder();
@@ -198,9 +206,15 @@ public class RemoteForecastDataSource implements IDataSource {
 
             @Override
             public void onFailure(Call<CitySearchResult> call, Throwable t) {
-
+                callback.error(App.getContext().getString(R.string.error_network));
             }
         });
+    }
+
+    private String formatCityName(String name, String parent1, String parent2, String parent3) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(parent2.equals("直辖市") || parent2.equals("特别行政区") ? "" : parent2).append(parent1.equals(name) ? name : parent1 + name);
+        return stringBuilder.toString();
     }
 
 

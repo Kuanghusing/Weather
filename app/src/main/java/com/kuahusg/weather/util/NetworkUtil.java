@@ -7,7 +7,7 @@ import android.net.NetworkInfo;
 /**
  * Created by kuahusg on 16-7-3.
  */
-public class NetwordUtil {
+public class NetworkUtil {
     public static boolean hasNetwork(Context mContext) {
 
         if (mContext == null)
@@ -16,9 +16,6 @@ public class NetwordUtil {
         ConnectivityManager connectivityManager = (ConnectivityManager) mContext
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = connectivityManager.getActiveNetworkInfo();
-        if (info != null) {
-            return info.getState() == NetworkInfo.State.CONNECTED;
-        } else
-            return false;
+        return info != null && info.getState() == NetworkInfo.State.CONNECTED;
     }
 }

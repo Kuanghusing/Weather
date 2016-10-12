@@ -51,13 +51,14 @@ public class SelectLocationPresenterImpl extends BasePresenter implements ISelec
     public void start() {
         if (shouldGetAllCityFromServer()) {
             if (hasView())
-                mView.startLoadingData(false);
+                mView.startLoadingData(true);
         }
         getDataSource().loadAllCity(new RequestCityCallback() {
             @Override
             public void success(List<String> cityList) {
                 if (hasView())
                     mView.loadAllCityFinish(cityList);
+                PreferenceUtil.getInstance().getSharedPreferencesEditor().putBoolean(PreferenceUtil.PREF_HAS_LOAD_ALL_CITY, true).commit();
 
             }
 
@@ -72,8 +73,8 @@ public class SelectLocationPresenterImpl extends BasePresenter implements ISelec
 
     @Override
     public void onClickQueryButton(String cityNameToSearch) {
-        if (hasView())
-            mView.startLoadingData(true);
+//        if (hasView())
+//            mView.startLoadingData(true);
         getDataSource().queryCity(this, cityNameToSearch);
     }
 

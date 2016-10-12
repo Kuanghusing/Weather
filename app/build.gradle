@@ -8,8 +8,11 @@ android {
         applicationId "com.kuahusg.weather"
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 16
-        versionName "2.1.1"
+        versionCode 17
+        versionName "2.2"
+    }
+    lintOptions {
+        abortOnError false
     }
     buildTypes {
         release {
@@ -27,7 +30,7 @@ android {
 
 def supportPackageVersion = '24.2.1';
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+//    compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile "com.android.support:appcompat-v7:$supportPackageVersion"
     compile "com.android.support:design:$supportPackageVersion"
@@ -35,7 +38,8 @@ dependencies {
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.squareup.retrofit2:retrofit:2.0.2'
     compile 'com.squareup.retrofit2:converter-gson:2.0.2'
-
-    compile files('libs/gson-2.5.jar')
-    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
+    //    compile files('libs/gson-2.5.jar')
+    //    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
+    //    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
+//    compile 'com.google.code.gson:gson:2.4'
 }
