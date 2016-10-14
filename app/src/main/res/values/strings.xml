@@ -5,14 +5,7 @@
     <string name="loading">加载中 请销等……</string>
     <string name="no_result">好像没有结果……</string>
     <string name="switch_city">切换城市</string>
-    <string name="yes">是</string>
-    <string name="no">表</string>
-    <string name="sure">确定？</string>
-    <string name="refresh">刷新天气信息？</string>
     <string name="setting">设置</string>
-    <string name="load_finish">刷新完毕</string>
-    <string name="refresh_icon">刷新</string>
-    <string name="publish_date_text">更新时间</string>
     <string name="retry">重试</string>
     <string name="today">今天</string>
     <string name="future">未来几天</string>
@@ -20,13 +13,10 @@
     <string name="wind_speed">风速</string>
     <string name="wind_direction">风向</string>
     <string name="sunrise_and_sunset">日出日落</string>
-    <string name="sunrise">日出</string>
-    <string name="sunset">日落</string>
     <string name="check_source">来源：Yahoo Weather</string>
     <string name="today_weather">今天天气</string>
     <string name="refersh_time">刷新时间</string>
 
-    <string name="tomorrow">明天</string>
     <string name="about">关于</string>
     <string name="more">More</string>
     <string name="no_network">网络出错了……</string>
@@ -38,13 +28,11 @@
     <string name="somthing_text">· Google Support Library\n\n· Glide - github.com/bumptech/glide \n\n· Gson - github.com/google/gson \n\n· Retrofit2 - square.github.io/retrofit</string>
 
 
-
-    <string name="C">℃</string>
-
     <string name="auto_update">自动更新天气</string>
     <string name="auto_update_summary">后台自动更新</string>
     <string name="update_time">更新间隔</string>
     <string name="update_time_summary">设置更新的频率（小时）</string>
     <string name="update_app">检查更新</string>
     <string name="no_value_error">不能为空哦……</string>
+    <string name="crash_message">Oops，发生了「不可描述」的错误，请联系作者foreverhgx@gmail.com，即将crash,日记已保存在:</string>
 </resources>
