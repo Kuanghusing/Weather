@@ -95,6 +95,8 @@ public class WeatherFragment extends BaseFragment implements IWeatherFragView, V
 
     @Override
     public void showWeather(List<Forecast> forecastList) {
+        if (!this.isAdded())
+            return;
         if (forecastList != null && !forecastList.isEmpty()) {
             Forecast forecastToday = forecastList.get(0);
             String weatherText = forecastToday.getText();
@@ -121,6 +123,8 @@ public class WeatherFragment extends BaseFragment implements IWeatherFragView, V
 
     @Override
     public void showForecastInfo(ForecastInfo info) {
+        if (!this.isAdded())
+            return;
         if (info != null) {
             sunrise.setText(info.getSunrise());
             sunset.setText(info.getSunset());
@@ -231,7 +235,7 @@ public class WeatherFragment extends BaseFragment implements IWeatherFragView, V
     private void showMessage(boolean show, String message) {
         if (messageShowed)
             return;
-        if (!this.isResumed())
+        if (mLayoutMessage == null || isDetached())
             return;
         if (!show && mLayoutMessage.getVisibility() == View.VISIBLE) {
             mLayoutMessage.setVisibility(View.GONE);

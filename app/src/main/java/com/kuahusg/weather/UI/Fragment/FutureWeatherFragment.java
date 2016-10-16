@@ -77,6 +77,8 @@ public class FutureWeatherFragment extends BaseFragment implements IFutureWeathe
 
     @Override
     public void showForecast(List<Forecast> forecastList) {
+        if (!this.isAdded())
+            return;
         showMessage(false, null);
         messageShowed = true;
         if (mRvAdapter != null) {
@@ -123,7 +125,7 @@ public class FutureWeatherFragment extends BaseFragment implements IFutureWeathe
     private void showMessage(boolean show, String message) {
         if (messageShowed)
             return;
-        if (!this.isResumed())
+        if (mLayoutMessage == null || isDetached())
             return;
         if (!show && mLayoutMessage.getVisibility() == View.VISIBLE) {
             mLayoutMessage.setVisibility(View.GONE);
