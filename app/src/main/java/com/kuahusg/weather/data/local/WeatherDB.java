@@ -40,6 +40,7 @@ public class WeatherDB {
         SQLiteDatabase db = InstanceHolder.INSTANCE.db;
 
 
+        deleteTable("city");
         if (cityList.size() > 0) {
             db.beginTransaction();
             ContentValues contentValues = new ContentValues();

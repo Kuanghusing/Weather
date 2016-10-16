@@ -36,7 +36,7 @@ public class WeatherDataSource implements IDataSource {
     @Override
     public void queryWeather(final String woeid, final RequestWeatherCallback callback) {
         Log.d(this.getClass().getSimpleName(), "woeid:" + PreferenceUtil.getWoeid());
-        if (PreferenceUtil.getWoeid() == null) {
+        if (PreferenceUtil.getWoeid() == null && woeid == null) {
             return;
         }
         clearWeatherCache();

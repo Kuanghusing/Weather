@@ -1,6 +1,7 @@
 package com.kuahusg.weather.data.remote;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import com.kuahusg.weather.App;
 import com.kuahusg.weather.R;
@@ -213,7 +214,7 @@ public class RemoteForecastDataSource implements IDataSource {
 
     private String formatCityName(String name, String parent1, String parent2, String parent3) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(parent2.equals("直辖市") || parent2.equals("特别行政区") ? "" : parent2).append(parent1.equals(name) ? name : parent1 + name);
+        stringBuilder.append("直辖市".equals(parent2) || "特别行政区".equals(parent2) ? "" : parent2 + " ").append(name != null ? (name.equals(parent1) ? name + " " : parent1 + " " + name) : "");
         return stringBuilder.toString();
     }
 
