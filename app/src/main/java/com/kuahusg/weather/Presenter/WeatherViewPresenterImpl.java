@@ -133,9 +133,10 @@ public class WeatherViewPresenterImpl extends BasePresenter implements IWeatherV
 
     private boolean isFirstToOpen() {
         SharedPreferences sharedPreferences = PreferenceUtil.getInstance().getSharedPreferences();
-        boolean hasLoadAllCity = sharedPreferences.getBoolean(PREF_HAS_LOAD_ALL_CITY, false);
+//        boolean hasLoadAllCity = sharedPreferences.getBoolean(PREF_HAS_LOAD_ALL_CITY, false);
+        String woeid = PreferenceUtil.getWoeid();
+        return woeid == null;
 
-        return !hasLoadAllCity;
     }
 
     private class LoadWeatherCallback implements RequestWeatherCallback {
