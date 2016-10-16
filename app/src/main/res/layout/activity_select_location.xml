@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/layout_main">
+    android:layout_height="match_parent">
 
     <ImageView
         android:layout_width="match_parent"
@@ -25,25 +25,12 @@
             android:layout_height="match_parent"
             android:background="@color/white">
 
-            <!--<android.support.design.widget.AppBarLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content">-->
-
-            <!--<android.support.v7.widget.Toolbar-->
-            <!--android:id="@+id/toolbar"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="?attr/actionBarSize"-->
-            <!--app:theme="@style/ThemeOverlay.AppCompat.Dark" />-->
-
-            <!--</android.support.design.widget.AppBarLayout>-->
-
-
             <RelativeLayout
                 android:id="@+id/relativeLayout"
                 android:layout_width="match_parent"
                 android:layout_height="220dp"
-                android:layout_marginTop="30dp"
-                android:layout_gravity="top">
+                android:layout_gravity="top"
+                android:layout_marginTop="30dp">
 
                 <LinearLayout
                     android:id="@+id/first"
@@ -61,12 +48,14 @@
                         android:layout_height="wrap_content">
 
 
-                        <android.support.v7.widget.AppCompatAutoCompleteTextView
+                        <AutoCompleteTextView
                             android:id="@+id/city_editText"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:completionThreshold="1"
-                            android:dropDownHeight="50dp"
+                            android:dropDownHeight="250dp"
+                            android:dropDownSelector="@drawable/github_icon"
+                            android:imeOptions="actionSearch"
                             android:hint="@string/search_hint"
                             android:maxLines="1"
                             android:paddingLeft="20dp"

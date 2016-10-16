@@ -1,22 +1,29 @@
 package com.kuahusg.weather.UI.activities;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.kuahusg.weather.Presenter.SelectLocationPresenterImpl;
 import com.kuahusg.weather.Presenter.base.IBasePresenter;
@@ -37,7 +44,7 @@ import java.util.List;
 public class SelectLocationActivity extends BaseActivity implements ISelectLocationView, View.OnClickListener, ListView.OnItemClickListener {
     private ISelectLocationPresenter mPresenter;
 
-    private AppCompatAutoCompleteTextView mAutoCpTv;
+    private AutoCompleteTextView mAutoCpTv;
     private FrameLayout mLayoutMain;
     private ArrayAdapter<String> mAutoCpTvAdapter;
     private ListView mLvCitySearchResult;
@@ -60,6 +67,7 @@ public class SelectLocationActivity extends BaseActivity implements ISelectLocat
 
     @Override
     protected int setLayoutId() {
+        // TODO: 16-10-13  
         return R.layout.activity_select_location;
     }
 
@@ -125,11 +133,11 @@ public class SelectLocationActivity extends BaseActivity implements ISelectLocat
     @Override
     public void loadAllCityFinish(List<String> cityList) {
         LogUtil.d(this.getClass().getSimpleName(), "cityList count:" + cityList.size());
-        dismissProgress();
+        if (dismissProgress())
+            startAnimation(mCardViewMain, R.anim.anim_weather_main);
         cityListFromDataBase.clear();
         cityListFromDataBase.addAll(cityList);
         mAutoCpTvAdapter.notifyDataSetChanged();
-        // TODO: 16-10-12 为什么突然不行了...
 
     }
 
@@ -167,16 +175,10 @@ public class SelectLocationActivity extends BaseActivity implements ISelectLocat
         searchResultNameOfCitys = new ArrayList<>();
         searchResultCityList = new ArrayList<>();
 
-/*        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
-        ActionBar actionBar = getSupportActionBar();
-        assert actionBar != null;
-        actionBar.setDisplayHomeAsUpEnabled(false);
-        actionBar.setIcon(R.mipmap.ic_launcher);*/
 
         mBtnSearch = (Button) findViewById(R.id.query_button);
         mBtnSearch.setOnClickListener(this);
-        mAutoCpTv = (AppCompatAutoCompleteTextView) findViewById(R.id.city_editText);
+        mAutoCpTv = (AutoCompleteTextView) findViewById(R.id.city_editText);
         mLvCitySearchResult = (ListView) findViewById(R.id.city_list);
         mLvCitySearchResult.setOnItemClickListener(this);
         mLayoutMain = (FrameLayout) findViewById(R.id.layout_main);
@@ -186,8 +188,20 @@ public class SelectLocationActivity extends BaseActivity implements ISelectLocat
         mLvCitySearchResult.setAdapter(mCitySearchResultAdapter);
 //        mLvCitySearchResult.setBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
 
-        mAutoCpTvAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, cityListFromDataBase);
+        mAutoCpTvAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, cityListFromDataBase);
         mAutoCpTv.setAdapter(mAutoCpTvAdapter);
+        mAutoCpTv.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                showProgress(true);
+                InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(mAutoCpTv.getWindowToken(), 0);
+//                mAutoCpTv.clearFocus();
+                if (hasPresenter())
+                    mPresenter.onClickQueryButton(mAutoCpTv.getText().toString());
+                return true;
+            }
+        });
     }
 
 
@@ -207,9 +221,12 @@ public class SelectLocationActivity extends BaseActivity implements ISelectLocat
         }
     }
 
-    private void dismissProgress() {
-        if (mPgd != null && mPgd.isShowing())
+    private boolean dismissProgress() {
+        if (mPgd != null && mPgd.isShowing()) {
             mPgd.dismiss();
+            return true;
+        } else
+            return false;
     }
 
     private void startAnimation(View view, int animId) {

@@ -51,7 +51,7 @@ public class SelectLocationPresenterImpl extends BasePresenter implements ISelec
     public void start() {
         if (shouldGetAllCityFromServer()) {
             if (hasView())
-                mView.startLoadingData(true);
+                mView.startLoadingData(false);
         }
         getDataSource().loadAllCity(new RequestCityCallback() {
             @Override
