@@ -21,9 +21,9 @@
     <string name="more">More</string>
     <string name="no_network">网络出错了……</string>
     <string name="error_network">载入失败</string>
-    <string name="about_text">\n晴·天气是一个简单的天气App，纯个人项目，只用于学习用途，本App用到的雅虎天气接口和各个开源库都在合理范围内，你可以随时从Github上查看源代码，谢谢你的支持\n</string>
+    <string name="about_text">晴·天气是一个简单的天气App，纯个人项目，只用于学习用途，本App用到的雅虎天气接口和各个开源库都在合理范围内，你可以随时从Github上查看源代码，谢谢你的支持\n</string>
     <string name="open_source">Github</string>
-    <string name="open_source_text">https://github.com/Kuanghusing/Weather</string>
+    <string name="open_source_text">https://github.com/Kuanghusing/Weather\n</string>
     <string name="somthing">感谢以下开源项目</string>
     <string name="somthing_text">· Google Support Library\n\n· Glide - github.com/bumptech/glide \n\n· Gson - github.com/google/gson \n\n· Retrofit2 - square.github.io/retrofit</string>
 
@@ -34,5 +34,6 @@
     <string name="update_time_summary">设置更新的频率（小时）</string>
     <string name="update_app">检查更新</string>
     <string name="no_value_error">不能为空哦……</string>
-    <string name="crash_message">Oops，发生了「不可描述」的错误，请联系作者foreverhgx@gmail.com，即将crash,日记已保存在:</string>
+    <string name="crash_message">Oops，发生了「不可描述」的错误，错误日志已保存，请联系作者</string>
+    <string name="solve_crash_message">点击发送错误日志给作者</string>
 </resources>
